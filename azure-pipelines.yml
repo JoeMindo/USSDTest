@@ -23,3 +23,6 @@ steps:
     npm install
     # npm start
   displayName: 'npm install'
+- script: |
+    npm run test
+  displayName: 'npm test'
