@@ -7,9 +7,10 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("*", (req, res) => {
+app.get("/ussd", (req, res) => {
   res.send("Welcome to Mamlaka Farm");
 });
-app.listen(port, () => {
-  console.log(`Server running on port ${port}, or not `);
+const server = app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
+module.exports = server
