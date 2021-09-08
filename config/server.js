@@ -11,5 +11,5 @@ app.get("*", (req, res) => {
   res.send("Welcome to Mamlaka Farm");
 });
 app.listen(port, () => {
-  console.log(`Server running on port ${port}, awesome `);
+  console.log(`Server running on port ${port}, awesome huh `);
 });
