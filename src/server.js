@@ -8,9 +8,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/ussd", (req, res) => {
-  res.send("Welcome to Mamlaka Farm");
+  let { sessionId, serviceCode, phoneNumber, text } = req.body;
+  res.send(`Welcome to Mamlaka Farm`);
 });
 const server = app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${port}, `);
 });
 module.exports = server
