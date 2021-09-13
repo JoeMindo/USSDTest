@@ -1,13 +1,11 @@
-import dotenv from "dotenv";
+
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
-import axios from "axios";
-import { use } from "chai";
 import { registerUser, clearData } from "./core/usermanagement";
 const port = process.env.PORT || 3030;
 
-let app = express();
+const app = express();
 let message = "";
 let userDetails = {
   name: "",
@@ -21,7 +19,7 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/ussd", (req, res) => {
+app.post("*", (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
   let textValue = text.split("*").length;
 
