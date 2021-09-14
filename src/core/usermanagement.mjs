@@ -9,6 +9,7 @@ let clearData = (userDetails) => {
   return userDetails;
 };
 let registerUser = (user) => {
+  console.log(user)
   axios.post('https://53b9-197-211-5-78.ngrok.io/register', user)
   .then((response) => {
    console.log(response.data);
