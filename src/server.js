@@ -19,12 +19,12 @@ app.post("/ussd", (req, res) => {
     password: "",
     role: "",
   };
-  let textValue;
+  
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
-
+  let textValue = text.split("*").length;
   if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Proceed`;
-    textValue = text.split("*").length;
+    
     res.send(message);
   } else if (textValue === 1) {
     message = `CON
