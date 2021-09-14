@@ -34,15 +34,15 @@ app.post("/ussd", (req, res) => {
     message = `CON Enter your name`
     userDetails.name = text.split("*")[1];
     res.send(message);
-  } else if (textValue === 3) {
+  } else if (textValue === 2) {
     message = `CON What is your ID number`;
     userDetails.Id = text.split("*")[2];
     res.send(message);
-  } else if (textValue === 4) {
+  } else if (textValue === 3) {
     message = `CON Which phone number would you like us to reach you at?`;
     userDetails.phone = text.split("*")[3];
     res.send(message);
-  } else if (textValue === 5) {
+  } else if (textValue === 4) {
     message = `CON Enter your password`;
     userDetails.password = text.split("*")[4];
   } else if (textValue === 6) {
