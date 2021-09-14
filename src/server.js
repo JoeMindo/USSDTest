@@ -22,7 +22,7 @@ app.post("/ussd", (req, res) => {
   let textValue;
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
 
-  if (text === "1") {
+  if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Proceed`;
     textValue = text.split("*").length;
     res.send(message);
