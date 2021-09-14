@@ -45,7 +45,12 @@ app.post("/ussd", (req, res) => {
     res.send(message);
   } else if (textValue === 4) {
     message = `CON Enter your password`;
-    userDetails.password = text.split("*")[4];
+    const salt = await bcrypt.genSalt(3);
+    let userpass = text.split("*")[4];
+    let hashedPass = await bcrypt.hash(userpass, salt);
+    hashedPass.then((hash) => {
+      userDetails.password = hash
+    })
     res.send(message)
   } else if (textValue === 5) {
     message = `CON Who are you?
