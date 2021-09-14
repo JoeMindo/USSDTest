@@ -11,7 +11,10 @@ let clearData = (userDetails) => {
 let registerUser = (user) => {
   try {
     let response = axios.post("http://localhost:3030/user", user);
-    return response.data;
+    response.then((text) => {
+      return text
+
+    });
   } catch (error) {
     return error;
   }
