@@ -1,8 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
-import cookieParser from "cookie-parser";
-import { registerUser,csrfMiddleware } from "./core/usermanagement.mjs";
+import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
 const app = express();
@@ -10,11 +9,6 @@ const app = express();
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
-app.use(cookieParser());
-app.use(csrfMiddleware);
 
 app.post("/ussd", (req, res) => {
   let message = "";
@@ -64,6 +58,7 @@ app.post("/ussd", (req, res) => {
     1. Yes
     `;
     registerUser(userDetails);
+    clearData(userDetails);
     res.send(message);
    
   } else {

@@ -1,11 +1,4 @@
 import axios from "axios";
-import bodyParser from 'body-parser';
-import csurf from 'csurf';
-import cookieParser from 'cookie-parser';
-
-const csrfMiddleware = csurf({
-	cookie: true
-});
 let clearData = (details) => {
   details.name = "";
   details.Id = "";
@@ -16,9 +9,7 @@ let clearData = (details) => {
   return details;
 };
 let registerUser = (user) => {
-  axios.post('https://53b9-197-211-5-78.ngrok.io/register', user
-    
-  )
+  axios.post('https://53b9-197-211-5-78.ngrok.io/register', user)
   .then((response) => {
   return response.data;
   })
@@ -26,4 +17,4 @@ let registerUser = (user) => {
     console.log(error);
   });
 };
-export { clearData, registerUser, csrfMiddleware };
+export { clearData, registerUser };
