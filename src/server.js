@@ -19,7 +19,7 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/", (req, res) => {
+app.post("/ussd", (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
   let textValue = text.split("*").length;
 
