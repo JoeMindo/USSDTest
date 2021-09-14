@@ -15,7 +15,7 @@ app.post("/ussd", (req, res) => {
   let userDetails = {
     name: "",
     Id: "",
-    phone,
+    phone:"",
     password: "",
     role: "",
   };
@@ -45,6 +45,7 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 4) {
     message = `CON Enter your password`;
     userDetails.password = text.split("*")[4];
+    res.send(message)
   } else if (textValue === 5) {
     message = `CON Who are you?
     1. Farmer
