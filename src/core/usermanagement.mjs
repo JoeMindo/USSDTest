@@ -1,18 +1,21 @@
 import axios from "axios";
-let clearData = (userDetails) => {
-  userDetails.name = "";
-  userDetails.Id = "";
-  userDetails.phone = "";
-  userDetails.password = "";
-  userDetails.role = "";
+let clearData = (details) => {
+  details.name = "";
+  details.Id = "";
+  details.phone = "";
+  details.password = "";
+  details.role = "";
 
-  return userDetails;
+  return details;
 };
 let registerUser = (user) => {
-  console.log(user)
-  axios.post('https://53b9-197-211-5-78.ngrok.io/register', user)
+  axios.post('https://53b9-197-211-5-78.ngrok.io/register', user, {
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  })
   .then((response) => {
-   console.log(response.data);
+  return response.data;
   })
   .catch((error) => {
     console.log(error);
