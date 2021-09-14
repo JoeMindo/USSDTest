@@ -58,7 +58,6 @@ app.post("/ussd", (req, res) => {
     1. Yes
     `;
     registerUser(userDetails);
-    clearData(userDetails);
     res.send(message);
    
   } else {
