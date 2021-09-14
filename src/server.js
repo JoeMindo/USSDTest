@@ -56,14 +56,11 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 6) {
     message = `CON Complete registration
     1. Yes
-    2. No`;
+    `;
+    registerUser(userDetails);
+    clearData(userDetails);
     res.send(message);
-    if (text.split("*")[6] === "Yes") {
-      registerUser(userDetails);
-      clearData(userDetails);
-      message = `END Thank you for registering`;
-      res.send(message);
-    }
+   
   } else {
     message = `END Thank you!`;
     res.send(message);
