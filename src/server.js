@@ -45,14 +45,14 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 4) {
     message = `CON Enter your password`;
     userDetails.password = text.split("*")[4];
-  } else if (textValue === 6) {
+  } else if (textValue === 5) {
     message = `CON Who are you?
     1. Farmer
     2. Buyer
     `;
     userDetails.role = text.split("*")[5];
     res.send(message);
-  } else if (textValue === 7) {
+  } else if (textValue === 6  ) {
     message = `CON Complete registration
     1. Yes
     2. No`;
