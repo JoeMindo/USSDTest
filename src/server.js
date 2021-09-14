@@ -15,7 +15,7 @@ app.post("/ussd", (req, res) => {
   let userDetails = {
     name: "",
     Id: "",
-    phone: "",
+    phone,
     password: "",
     role: "",
   };
