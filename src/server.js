@@ -63,15 +63,9 @@ app.post("/ussd", (req, res) => {
       clearData(userDetails);
       message = `END Thank you for registering`;
       res.send(message);
-    } else {
-      
-        message = `END Thank you for trying out Mamlaka Foods`;
-        clearData(userDetails);
-        res.send(message);
-      
     }
   } else {
-    message = `END You can resume later`;
+    message = `END Thank you!`;
     res.send(message);
   }
 });
