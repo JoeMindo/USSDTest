@@ -57,13 +57,13 @@ app.post("/ussd", (req, res) => {
     res.send(message);
     if (text.split("*")[6] === "Yes") {
       registerUser(userDetails, sessionId, phoneNumber);
-      clearData();
+      clearData(userDetails);
       message = `END Thank you for registering`;
       res.send(message);
     }
   } else {
     message = `END Thank you for trying out Mamlaka Foods`;
-    clearData();
+    clearData(userDetails);
     res.send(message);
   }
 });
