@@ -9,14 +9,12 @@ let clearData = (userDetails) => {
   return userDetails;
 };
 let registerUser = (user) => {
-  try {
-    let response = axios.post("http://localhost:3030/user", user);
-    response.then((text) => {
-      console.log(text.data)
-
-    });
-  } catch (error) {
-    return error;
-  }
+  axios.post('https://53b9-197-211-5-78.ngrok.io/register', user)
+  .then((response) => {
+    return response.data;
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 };
 export { clearData, registerUser };
