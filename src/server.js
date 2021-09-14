@@ -14,19 +14,22 @@ let userDetails = {
   password: "",
   role: "",
 };
-
+let textValue;
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/ussd", (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
-  let textValue = text.split("*").length;
+  
 
-  if (textValue === 1) {
+  if (text === "1") {
     message = `CON Welcome to Mamlaka Foods\n 1. Proceed`;
+    textValue = text.split("*").length
     res.send(message)
-  } else if (textValue === 2) {
+  }
+  
+  else if (textValue === 1) {
     message = `CON
     Enter your name
     `;
