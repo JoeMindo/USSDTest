@@ -23,39 +23,39 @@ app.post("*", (req, res) => {
   let { sessionId, serviceCode, phoneNumber, text } = req.body;
   let textValue = text.split("*").length;
 
-  if (text == "") {
+  if (textValue === 1) {
     message = `CON Welcome to Mamlaka Foods\n 1. Proceed`;
     res.send(message)
-  } else if (textValue === 1) {
+  } else if (textValue === 2) {
     message = `CON
     Enter your name
     `;
-    userDetails.name = text;
-    res.send(message)
-  } else if (textValue === 2) {
-    message = `CON What is your ID number`;
-    userDetails.Id = text.split("*")[1];
+    userDetails.name = text.split("*")[1];
     res.send(message)
   } else if (textValue === 3) {
-    message = `CON Which phone number would you like us to reach you at?`;
-    userDetails.phone = text.split("*")[2];
+    message = `CON What is your ID number`;
+    userDetails.Id = text.split("*")[2];
     res.send(message)
   } else if (textValue === 4) {
-    message = `CON Enter your password`;
-    userDetails.password = text.split("*")[3];
+    message = `CON Which phone number would you like us to reach you at?`;
+    userDetails.phone = text.split("*")[3];
+    res.send(message)
   } else if (textValue === 5) {
+    message = `CON Enter your password`;
+    userDetails.password = text.split("*")[4];
+  } else if (textValue === 6) {
     message = `CON Who are you?
     1. Farmer
     2. Buyer
     `;
-    userDetails.role = text.split("*")[4];
+    userDetails.role = text.split("*")[5];
     res.send(message)
-  } else if (textValue === 6) {
+  } else if (textValue === 7) {
     message = `CON Complete registration
     1. Yes
     2. No`;
     res.send(message)
-    if (text.split("*")[5] === "Yes") {
+    if (text.split("*")[6] === "Yes") {
       registerUser(userDetails, sessionId, phoneNumber);
       clearData();
       message = `END Thank you for registering`;
