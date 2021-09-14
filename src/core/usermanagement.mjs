@@ -10,7 +10,7 @@ let clearData = (userDetails) => {
 };
 let registerUser = (user) => {
   try {
-    let response = axios.post("https:/morning-woodland-97546/user", user);
+    let response = axios.post("https:/morning-woodland-97546/ussd", user);
     return response.data;
   } catch (error) {
     return error;

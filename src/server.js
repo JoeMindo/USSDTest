@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
 import logger from "morgan";
 import { registerUser, clearData } from "./core/usermanagement.mjs";
@@ -44,7 +45,9 @@ app.post("/ussd", (req, res) => {
     res.send(message);
   } else if (textValue === 4) {
     message = `CON Enter your password`;
-    userDetails.password = text.split("*")[4];
+    let userpass = text.split("*")[4];
+    const salt = await bcrypt.genSalt(10)
+    userDetails.password = await bcrypt.hash(userpass,salt) ;
     res.send(message)
   } else if (textValue === 5) {
     message = `CON Who are you?
