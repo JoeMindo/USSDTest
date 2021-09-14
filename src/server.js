@@ -15,7 +15,7 @@ app.post("/ussd", (req, res) => {
   let userDetails = {
     name: "",
     Id: "",
-    phone,
+    phone: "",
     password: "",
     role: "",
   };
@@ -52,7 +52,7 @@ app.post("/ussd", (req, res) => {
     `;
     userDetails.role = text.split("*")[5];
     res.send(message);
-  } else if (textValue === 6  ) {
+  } else if (textValue === 6) {
     message = `CON Complete registration
     1. Yes
     2. No`;
