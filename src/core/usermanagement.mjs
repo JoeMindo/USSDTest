@@ -12,7 +12,7 @@ let registerUser = (user) => {
   try {
     let response = axios.post("http://localhost:3030/user", user);
     response.then((text) => {
-      return text
+      console.log(text.data)
 
     });
   } catch (error) {

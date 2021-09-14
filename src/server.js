@@ -59,7 +59,7 @@ app.post("/ussd", (req, res) => {
     2. No`;
     res.send(message);
     if (text.split("*")[6] === "Yes") {
-      console.log(registerUser(userDetails));
+      registerUser(userDetails);
       clearData(userDetails);
       message = `END Thank you for registering`;
       res.send(message);
