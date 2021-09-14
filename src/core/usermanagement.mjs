@@ -1,4 +1,5 @@
 import axios from "axios";
+let csrfCookie = Cookies.get('XSRF-TOKEN');
 let clearData = (details) => {
   details.name = "";
   details.Id = "";
@@ -11,7 +12,7 @@ let clearData = (details) => {
 let registerUser = (user) => {
   axios.post('https://53b9-197-211-5-78.ngrok.io/register', user, {
     headers: {
-      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      'x-xsrf-token': csrfCookie,
     }
   })
   .then((response) => {
