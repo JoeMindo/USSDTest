@@ -55,7 +55,7 @@ app.post("/ussd", (req, res) => {
     res.send(message);
    
   } else if (textValue === 2) {
-    message = `CON Enter your last name ${responses}`;
+    message = `CON Enter your last name ${JSON.stringify(responses)}`;
     responses.push(text.split("*")[2]);
     res.send(message);
     
