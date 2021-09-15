@@ -27,8 +27,8 @@ app.post("/ussd", (req, res) => {
     password_confirmation: "",
   };
   let userLogin = {
-    phone_no,
-    password,
+    phone_no:"",
+    password:"",
   };
 
   let sessionId = req.body.sessionId;
