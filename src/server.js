@@ -53,7 +53,7 @@ app.post("/ussd", (req, res) => {
     res.send(message);
     userDetailsRegister["first_name"] = text.split("*")[1];
   } else if (textValue === 2) {
-    message = `CON Enter your last name ${userDetailsRegister["first_name"]}`;
+    message = `CON Enter your last name ${JSON.stringify(userDetailsRegister['first_name'])}`;
     res.send(message);
     userDetailsRegister.last_name = text.split("*")[2];
   } else if (textValue === 3) {
