@@ -12,7 +12,7 @@ const app = express();
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-let userDetailsRegister = {
+var userDetailsRegister = {
   first_name: "",
   last_name: "",
   id_no: "",
