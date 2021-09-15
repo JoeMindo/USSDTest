@@ -55,8 +55,8 @@ app.post("/ussd", (req, res) => {
     userDetailsRegister['first_name'] = text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name ${ JSON.stringify(userDetailsRegister.first_name)}`;
-    res.send(message);
     userDetailsRegister.last_name = text.split("*")[2];
+    res.send(message);
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
     userDetailsRegister.id_no = text.split("*")[3];
