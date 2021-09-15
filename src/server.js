@@ -90,7 +90,6 @@ app.post("/ussd", (req, res) => {
     1. Yes
     `;
     registerUser(userDetailsRegister);
-    clearData(userDetailsRegister);
     res.send(message);
   } else {
     message = `END Thank you! ${JSON.stringify(userDetailsRegister)}`;
