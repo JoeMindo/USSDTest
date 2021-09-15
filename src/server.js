@@ -51,7 +51,7 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    responses.push(text.split("*")) ;
+    console.log(text.split("*")[1]);
     res.send(message);
    
   } else if (textValue === 2) {
