@@ -17,6 +17,7 @@ let registerUser = (user) => {
   axios
     .post("https://a326-197-211-5-78.ngrok.io/api/register", user)
     .then((response) => {
+      console.log(response.data)
       return response.data;
     })
     .catch((error) => {
