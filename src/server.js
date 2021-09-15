@@ -11,7 +11,7 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/ussd", (req, res) => {
+app.post("/ussd", async (req, res) => {
   var userDetailsRegister = {
     first_name: "",
     last_name: "",
@@ -47,7 +47,7 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    userDetailsRegister.first_name = text.split("*")[1];
+    userDetailsRegister.first_name = await text.split("*")[1];
     console.log("This is first name", text.split("*")[1]);
     console.log("This is text variable", text);
     console.log("This is req.body.text variable", req.body.text);
