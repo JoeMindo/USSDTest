@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
-import { userDetailsRegister } from "./core/userdetails.mjs";
+
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
@@ -12,11 +12,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/ussd", (req, res) => {
+  var userDetailsRegister = {
+    first_name: "",
+    last_name: "",
+    id_no: "",
+    phone_no: "",
+    gender: "",
+    email: "",
+    password: "",
+    location: "",
+    password_confirmation: "",
+  };
   let message = "";
 
   let userLogin = {
-    phone_no:"",
-    password:"",
+    phone_no: "",
+    password: "",
   };
 
   let sessionId = req.body.sessionId;
@@ -40,11 +51,11 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
     res.send(message);
-    userDetailsRegister['first_name'] = text.split("*")[1];
+    userDetailsRegister["first_name"] = text.split("*")[1];
   } else if (textValue === 2) {
-    message = `CON Enter your last name ${ userDetailsRegister['first_name']}`;
-    userDetailsRegister.last_name = text.split("*")[2];
+    message = `CON Enter your last name ${userDetailsRegister["first_name"]}`;
     res.send(message);
+    userDetailsRegister.last_name = text.split("*")[2];
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
     userDetailsRegister.id_no = text.split("*")[3];
@@ -65,14 +76,14 @@ app.post("/ussd", (req, res) => {
     message = `CON Confirm your password`;
     userDetailsRegister.password_confirmation = text.split("*")[7];
     res.send(message);
-  // } else if (textValue === 8) {
-  //   message = `CON Who are you?
-  //   1. Farmer
-  //   2. Buyer
-  //   3. DEAN
-  //   `;
-  //   userDetailsRegister.role = text.split("*")[8];
-  //   res.send(message);
+    // } else if (textValue === 8) {
+    //   message = `CON Who are you?
+    //   1. Farmer
+    //   2. Buyer
+    //   3. DEAN
+    //   `;
+    //   userDetailsRegister.role = text.split("*")[8];
+    //   res.send(message);
   } else if (textValue === 8) {
     message = `CON Complete registration
     1. Yes
