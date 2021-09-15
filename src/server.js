@@ -23,6 +23,7 @@ app.post("/ussd", (req, res) => {
     location: "",
     password_confirmation: "",
   };
+  let responses = []
   let message = "";
 
   let userLogin = {
@@ -50,12 +51,14 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
+    responses.push(text.split("*")[1]) ;
     res.send(message);
-    userDetailsRegister["first_name"] = text.split("*")[1];
+   
   } else if (textValue === 2) {
-    message = `CON Enter your last name ${JSON.stringify(userDetailsRegister['first_name'])}`;
+    message = `CON Enter your last name ${responses}`;
+    responses.push(text.split("*")[2]);
     res.send(message);
-    userDetailsRegister.last_name = text.split("*")[2];
+    
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
     userDetailsRegister.id_no = text.split("*")[3];
