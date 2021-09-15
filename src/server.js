@@ -1,9 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
-import cookieParser from "cookie-parser";
-import csrf from "csurf";
-
+import userDetailsRegister from "./core/userdetails";
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
@@ -12,17 +10,7 @@ const app = express();
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-var userDetailsRegister = {
-  first_name: "",
-  last_name: "",
-  id_no: "",
-  phone_no: "",
-  gender: "",
-  email: "",
-  password: "",
-  location: "",
-  password_confirmation: "",
-};
+
 app.post("/ussd", (req, res) => {
   let message = "";
 
@@ -51,9 +39,8 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    userDetailsRegister['first_name'] = text.split("*")[1];
     res.send(message);
-    
+    userDetailsRegister['first_name'] = text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name ${ userDetailsRegister['first_name']}`;
     userDetailsRegister.last_name = text.split("*")[2];
