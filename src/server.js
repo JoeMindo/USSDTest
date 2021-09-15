@@ -20,6 +20,7 @@ app.post("/ussd", (req, res) => {
     last_name: "",
     id_no: "",
     phone_no: "",
+    gender: "",
     email: "",
     password: "",
     password_confirmation: "",
@@ -36,29 +37,47 @@ app.post("/ussd", (req, res) => {
 
     res.send(message);
   } else if (textValue === 1) {
-    message = `CON Enter your name`;
-    userDetails.name = text.split("*")[1];
+    message = `CON Enter your first name`;
+    userDetails.first_name = text.split("*")[1];
     res.send(message);
+
   } else if (textValue === 2) {
+    message = `CON Enter your last name`;
+    userDetails.last_name = text.split("*")[2]
+    res.send(message)
+  }
+  else if (textValue === 3) {
     message = `CON What is your ID number`;
-    userDetails.Id = text.split("*")[2];
-    res.send(message);
-  } else if (textValue === 3) {
-    message = `CON Which phone number would you like us to reach you at?`;
-    userDetails.phone = text.split("*")[3];
+    userDetails.id_no = text.split("*")[3];
     res.send(message);
   } else if (textValue === 4) {
-    message = `CON Enter your password`;
-    userDetails.password = text.split("*")[4];
+    message = `CON Which phone number would you like us to reach you at?`;
+    userDetails.phone_no = text.split("*")[4];
     res.send(message);
+
   } else if (textValue === 5) {
+    message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`
+    userDetails.gender = text.split("*")[5];
+    res.send(message)
+  }
+  else if (textValue === 6) {
+    message = `CON Enter your password`;
+    userDetails.password = text.split("*")[6];
+    res.send(message);
+  } else if (textValue === 7) {
+    message = `CON Confirm your password`
+    userDetails.password_confirmation = text.split("*")[7]
+    res.send(message);
+  }
+  else if (textValue === 8) {
     message = `CON Who are you?
     1. Farmer
     2. Buyer
+    3. DEAN
     `;
-    userDetails.role = text.split("*")[5];
+    userDetails.role = text.split("*")[8];
     res.send(message);
-  } else if (textValue === 6) {
+  } else if (textValue === 9) {
     message = `CON Complete registration
     1. Yes
     `;
