@@ -12,20 +12,20 @@ const app = express();
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+let userDetailsRegister = {
+  first_name: "",
+  last_name: "",
+  id_no: "",
+  phone_no: "",
+  gender: "",
+  email: "",
+  password: "",
+  location: "",
+  password_confirmation: "",
+};
 app.post("/ussd", (req, res) => {
   let message = "";
-  let userDetailsRegister = {
-    first_name: "",
-    last_name: "",
-    id_no: "",
-    phone_no: "",
-    gender: "",
-    email: "",
-    password: "",
-    location: "",
-    password_confirmation: "",
-  };
+
   let userLogin = {
     phone_no:"",
     password:"",
