@@ -8,12 +8,12 @@ import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
 const app = express();
-let csrfProtection = csrf({cookie: true})
+
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/ussd", csrfProtection, (req, res) => {
+app.post("/ussd", (req, res) => {
   let message = "";
   let userDetails = {
     first_name: "",
