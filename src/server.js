@@ -50,6 +50,8 @@ app.post("/ussd", (req, res) => {
     userDetailsRegister.first_name = text.split("*")[1];
     console.log("This is first name", text.split("*")[1]);
     console.log("This is text variable", text);
+    console.log("This is req.body.text variable", req.body.text);
+    console.log("This is req.body variable", req.body);
   } else if (textValue === 2) {
     message = `CON Enter your last name ${JSON.stringify(responses)}`;
     responses.push(text.split("*")[2]);
