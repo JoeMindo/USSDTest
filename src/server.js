@@ -43,18 +43,18 @@ app.post("/ussd", (req, res) => {
     res.send(message);
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
-    userLogin.phone_no = text.split("*")[1];
     res.send(message);
+    userLogin.phone_no = text.split("*")[1];
   } else if (textValue === 2 && text.split("*")[0] === "2") {
     message = `CON Enter password`;
-    userLogin.password = text.split("*")[2];
     res.send(message);
+    userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    userDetailsRegister['first_name'] = text.split("*")[1];
     res.send(message);
+    userDetailsRegister['first_name'] = text.split("*")[1];
   } else if (textValue === 2) {
-    message = `CON Enter your last name ${ text.split("*")[1]}`;
+    message = `CON Enter your last name ${ userDetailsRegister['first_name']}`;
     userDetailsRegister.last_name = text.split("*")[2];
     res.send(message);
   } else if (textValue === 3) {
