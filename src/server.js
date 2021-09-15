@@ -77,15 +77,15 @@ app.post("/ussd", (req, res) => {
     message = `CON Confirm your password`;
     userDetailsRegister.password_confirmation = text.split("*")[7];
     res.send(message);
+  // } else if (textValue === 8) {
+  //   message = `CON Who are you?
+  //   1. Farmer
+  //   2. Buyer
+  //   3. DEAN
+  //   `;
+  //   userDetailsRegister.role = text.split("*")[8];
+  //   res.send(message);
   } else if (textValue === 8) {
-    message = `CON Who are you?
-    1. Farmer
-    2. Buyer
-    3. DEAN
-    `;
-    userDetailsRegister.role = text.split("*")[8];
-    res.send(message);
-  } else if (textValue === 9) {
     message = `CON Complete registration
     1. Yes
     `;
