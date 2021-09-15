@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
-import userDetailsRegister from "./core/userdetails";
+import { userDetailsRegister } from "./core/userdetails";
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
