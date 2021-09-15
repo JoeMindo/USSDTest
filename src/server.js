@@ -1,37 +1,42 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
+import cookieParser from "cookie-parser";
+import csrf from "csurf";
+
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
 const app = express();
-
+let csrfProtection = csrf({cookie: true})
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/ussd", (req, res) => {
+app.post("/ussd", csrfProtection, (req, res) => {
   let message = "";
   let userDetails = {
-    name: "",
-    Id: "",
-    phone:"",
+    first_name: "",
+    last_name: "",
+    id_no: "",
+    phone_no: "",
+    email: "",
     password: "",
-    role: "",
+    password_confirmation: "",
   };
-  
-  let sessionId = req.body.sessionId
-  let text = req.body.text
-  let phoneNumber = req.body.phoneNumber
-  let serviceCode = req.body.serviceCode
+
+  let sessionId = req.body.sessionId;
+  let text = req.body.text;
+  let phoneNumber = req.body.phoneNumber;
+  let serviceCode = req.body.serviceCode;
 
   let textValue = text.split("*").length;
   if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Proceed`;
-    
+
     res.send(message);
   } else if (textValue === 1) {
-    message = `CON Enter your name`
+    message = `CON Enter your name`;
     userDetails.name = text.split("*")[1];
     res.send(message);
   } else if (textValue === 2) {
@@ -45,7 +50,7 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 4) {
     message = `CON Enter your password`;
     userDetails.password = text.split("*")[4];
-    res.send(message)
+    res.send(message);
   } else if (textValue === 5) {
     message = `CON Who are you?
     1. Farmer
@@ -60,7 +65,6 @@ app.post("/ussd", (req, res) => {
     registerUser(userDetails);
     clearData(userDetails);
     res.send(message);
-   
   } else {
     message = `END Thank you!`;
     res.send(message);

@@ -1,4 +1,8 @@
 import axios from "axios";
+// axios.defaults.headers.common = {
+//   'X-Requested-With': 'XMLHttpRequest',
+//   'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+// }
 let clearData = (details) => {
   details.name = "";
   details.Id = "";
@@ -9,7 +13,7 @@ let clearData = (details) => {
   return details;
 };
 let registerUser = (user) => {
-  axios.post('https://53b9-197-211-5-78.ngrok.io/register', user)
+  axios.post('https://a326-197-211-5-78.ngrok.io/api/register', user)
   .then((response) => {
   return response.data;
   })
@@ -17,4 +21,11 @@ let registerUser = (user) => {
     console.log(error);
   });
 };
+
+let logoutUser = (id) => {
+
+}
+let updateUser = (id) => {
+
+}
 export { clearData, registerUser };
