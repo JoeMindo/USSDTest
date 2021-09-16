@@ -31,4 +31,4 @@ let registerUser = async (regdata, phone) => {
   
 }
 
-export default { clearData, registerUser };
+export { clearData, registerUser };

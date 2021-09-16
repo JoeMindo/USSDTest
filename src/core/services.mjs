@@ -34,4 +34,4 @@ let patchrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
         console.log(error);
     }
 }
-export {postrequest, patchrequest}
+export default {postrequest, patchrequest}
