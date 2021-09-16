@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
-
+import session from 'express-session'
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
@@ -10,6 +10,11 @@ const app = express();
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+  secret: 'super_secret',
+  resave: false,
+  saveUninitialized: false
+}));
 
 
 app.post("/ussd", async (req, res) => {
@@ -30,58 +35,58 @@ app.post("/ussd", async (req, res) => {
     phone_no: "",
     password: "",
   };
-  
+
   let sessionId = req.body.sessionId;
   let text = req.body.text;
   let phoneNumber = req.body.phoneNumber;
   let serviceCode = req.body.serviceCode;
-
+  console.log("incoming text" + text);
   let textValue = await text.split("*").length;
   if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login`;
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
     userLogin.phone_no = await text.split("*")[1];
-  } else if (textValue === 2 && await text.split("*")[0] === "2") {
+  } else if (textValue === 2 && (await text.split("*")[0]) === "2") {
     message = `CON Enter password`;
     userLogin.password = await text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    userDetailsRegister.first_name =  await text.split("*")[1];
+    req.session.first_name = text.split("*")[1];
   } else if (textValue === 2) {
-    message = `CON Enter your last name }`;
-    userDetailsRegister.last_name = await text.split("*")[2];
+    message = `CON Enter your last name`;
+    req.session.last_name = text.split("*")[2];
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
-    userDetailsRegister.id_no = text.split("*")[3];
+    req.session.id_no = text.split("*")[3];
   } else if (textValue === 4) {
     message = `CON Which phone number would you like us to reach you at?`;
-    userDetailsRegister.phone_no =  text.split("*")[4];
+    req.session.phone_no = text.split("*")[4];
   } else if (textValue === 5) {
     message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
-    userDetailsRegister.gender =  text.split("*")[5];
+    req.session.gender = text.split("*")[5];
   } else if (textValue === 6) {
     message = `CON Enter your password`;
-    userDetailsRegister.password =  text.split("*")[6];
+    req.session.password = text.split("*")[6];
   } else if (textValue === 7) {
     message = `CON Confirm your password`;
-    userDetailsRegister.password_confirmation =  text.split("*")[7];
+    req.session.password_confirmation = text.split("*")[7];
     // } else if (textValue === 8) {
     //   message = `CON Who are you?
     //   1. Farmer
     //   2. Buyer
     //   3. DEAN
     //   `;
-    //   userDetailsRegister.role = await text.split("*")[8];
+    //   req.session.role = await text.split("*")[8];
     //     } else if (textValue === 8) {
     message = `CON Complete registration
     1. Yes
     `;
-    registerUser(userDetailsRegister,phoneNumber);
+    registerUser(userDetailsRegister, phoneNumber);
   } else {
-    message = `END Thank you! ${JSON.stringify(userDetailsRegister)}`;
+    let result = req.session.first_name + " " + req.session.last_name + " " + req.session.id_no + " " + req.session.phone_no + " " + req.session.password + " " + req.session.password_confirmation
+    message = `END Thank you! ${result}`;
   }
-  res.send(message);
 });
 
 app.listen(port, () => {
