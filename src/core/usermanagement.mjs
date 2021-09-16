@@ -1,5 +1,5 @@
 import axios from "axios";
-import postrequest from './services.mjs'
+import { postrequest } from './services.mjs'
 
 let clearData = (details) => {
   details.name = "";
