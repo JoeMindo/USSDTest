@@ -84,7 +84,7 @@ app.post("/ussd", (req, res) => {
     `;
     registerUser(userDetailsRegister, phoneNumber);
   } else {
-    message = `END Thank you! ${req.session}`;
+    message = `END Thank you! ${req.session.first_name}`;
   }
   res.send(message)
 });
