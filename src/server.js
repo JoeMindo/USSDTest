@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
+import cookieParser from "cookie-parser";
 import session from 'express-session'
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
@@ -10,6 +11,7 @@ const app = express();
 app.use(logger("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({secret: "Shh, its a secret!"}));
 app.post("/ussd",  (req, res) => {
