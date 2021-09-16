@@ -51,7 +51,6 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    req.session.first_name = text.split("*")[1]
     userDetailsRegister.first_name = text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name`;
@@ -84,7 +83,8 @@ app.post("/ussd", (req, res) => {
     `;
     registerUser(userDetailsRegister, phoneNumber);
   } else {
-    message = `END Thank you! ${req.session.first_name}`;
+    req.session.data = text.split("*")
+    message = `END Thank you! ${req.session.data}`;
   }
   res.send(message)
 });
