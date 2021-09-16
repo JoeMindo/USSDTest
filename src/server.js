@@ -36,15 +36,15 @@ app.post("/ussd",  (req, res) => {
   let phoneNumber = req.body.phoneNumber;
   let serviceCode = req.body.serviceCode;
   console.log("incoming text" + text);
-  let textValue = await text.split("*").length;
+  let textValue = text.split("*").length;
   if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login`;
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
-    userLogin.phone_no = await text.split("*")[1];
-  } else if (textValue === 2 && (await text.split("*")[0]) === "2") {
+    userLogin.phone_no = text.split("*")[1];
+  } else if (textValue === 2 && (text.split("*")[0]) === "2") {
     message = `CON Enter password`;
-    userLogin.password = await text.split("*")[2];
+    userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
     req.session.first_name = text.split("*")[1]
@@ -73,7 +73,7 @@ app.post("/ussd",  (req, res) => {
     //   2. Buyer
     //   3. DEAN
     //   `;
-    //   userDetailsRegister.role = await text.split("*")[8];
+    //   userDetailsRegister.role = text.split("*")[8];
     //     } else if (textValue === 8) {
     message = `CON Complete registration
     1. Yes
