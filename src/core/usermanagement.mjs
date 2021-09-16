@@ -29,6 +29,6 @@ let registerUser = async (regdata, phone) => {
   
   return false;
   
-},
+}
 
 export { clearData, registerUser };
