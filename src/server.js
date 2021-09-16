@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: 'sooper_secret',
   resave: false,
+  key: "sessions",
   saveUninitialized: false
 }));
 
@@ -52,7 +53,7 @@ app.post("/ussd", async (req, res) => {
     userLogin.password = await text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    req.sessions.first_name = text.split("*")[1];
+    req.session.first_name = text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name ${req.sessions.first_name}`;
     userDetailsRegister.last_name = text.split("*")[2];
