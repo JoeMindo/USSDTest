@@ -81,13 +81,17 @@ app.post("/ussd", (req, res) => {
     message = `CON Complete registration
     1. Yes
     `;
-    registerUser(userDetailsRegister, phoneNumber);
   } else {
     req.session.data = text.split("*")
     let userDetails = {
       "first_name": req.session.data[1],
       "last_name": req.session.data[2],
+      "id_no": req.session.data[3],
+      "phone_no": req.session.data[4],
+      "gender": "Male",
+      "password": req.session.data[5]
     }
+    registerUser(userDetails,phoneNumber)
     message = `END Thank you! ${userDetails.first_name}`;
   }
   res.send(message)
