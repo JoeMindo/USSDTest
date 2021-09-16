@@ -50,7 +50,7 @@ app.post("/ussd", async (req, res) => {
     userDetailsRegister.first_name =  await text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name }`;
-    responses.push(await text.split("*")[2]);
+    userDetailsRegister.last_name = await text.split("*")[2];
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
     userDetailsRegister.id_no = text.split("*")[3];
