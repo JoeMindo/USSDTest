@@ -1,16 +1,18 @@
 import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
+import session from 'expres-session'
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
 const app = express();
 
 app.use(logger("dev"));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.post("/ussd", async (req, res) => {
+app.use(session({secret: "Shh, its a secret!"}));
+app.post("/ussd",  (req, res) => {
   var userDetailsRegister = {
     first_name: "",
     last_name: "",
@@ -45,9 +47,10 @@ app.post("/ussd", async (req, res) => {
     userLogin.password = await text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
+    req.session.first_name = text.split("*")[1]
     userDetailsRegister.first_name = text.split("*")[1];
   } else if (textValue === 2) {
-    message = `CON Enter your last name`;
+    message = `CON Enter your last name ${req.session.first_name}`;
     userDetailsRegister.last_name = text.split("*")[2];
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
@@ -79,6 +82,7 @@ app.post("/ussd", async (req, res) => {
   } else {
     message = `END Thank you! ${JSON.stringify(userDetailsRegister)}`;
   }
+  res.send(message)
 });
 
 app.listen(port, () => {
