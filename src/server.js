@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: "secreet", key: 'session' }));
+app.use(session({ resave: true ,secret: '123456' , saveUninitialized: true}));
 
 app.post("/ussd", (req, res) => {
 
