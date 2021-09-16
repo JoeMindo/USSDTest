@@ -47,25 +47,25 @@ app.post("/ussd", async (req, res) => {
     userLogin.password = await text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    userDetailsRegister.first_name = await text.split("*")[1];
+    userDetailsRegister.first_name =  text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name ${JSON.stringify(responses)}`;
     responses.push(await text.split("*")[2]);
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
-    userDetailsRegister.id_no = await text.split("*")[3];
+    userDetailsRegister.id_no = text.split("*")[3];
   } else if (textValue === 4) {
     message = `CON Which phone number would you like us to reach you at?`;
-    userDetailsRegister.phone_no = await text.split("*")[4];
+    userDetailsRegister.phone_no =  text.split("*")[4];
   } else if (textValue === 5) {
     message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
-    userDetailsRegister.gender = await text.split("*")[5];
+    userDetailsRegister.gender =  text.split("*")[5];
   } else if (textValue === 6) {
     message = `CON Enter your password`;
-    userDetailsRegister.password = await text.split("*")[6];
+    userDetailsRegister.password =  text.split("*")[6];
   } else if (textValue === 7) {
     message = `CON Confirm your password`;
-    userDetailsRegister.password_confirmation = await text.split("*")[7];
+    userDetailsRegister.password_confirmation =  text.split("*")[7];
     // } else if (textValue === 8) {
     //   message = `CON Who are you?
     //   1. Farmer
