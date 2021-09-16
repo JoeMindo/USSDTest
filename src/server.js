@@ -14,9 +14,9 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: "secreet", key: 'session' }));
-let session;
+
 app.post("/ussd", (req, res) => {
-  session = req.session
+
   var userDetailsRegister = {
     first_name: "",
     last_name: "",
@@ -51,7 +51,7 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    session.first_name = text.split("*")[0]
+    req.session.first_name = text.split("*")[0]
     userDetailsRegister.first_name = text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name`;
