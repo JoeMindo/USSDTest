@@ -84,7 +84,11 @@ app.post("/ussd", (req, res) => {
     registerUser(userDetailsRegister, phoneNumber);
   } else {
     req.session.data = text.split("*")
-    message = `END Thank you! ${req.session.data}`;
+    let userDetails = {
+      "first_name": req.session.data[1],
+      "last_name": req.session.data[2],
+    }
+    message = `END Thank you! ${userDetails}`;
   }
   res.send(message)
 });
