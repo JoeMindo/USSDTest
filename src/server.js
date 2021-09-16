@@ -11,6 +11,7 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
 app.post("/ussd", async (req, res) => {
   var userDetailsRegister = {
     first_name: "",
@@ -23,65 +24,60 @@ app.post("/ussd", async (req, res) => {
     location: "",
     password_confirmation: "",
   };
-  let responses = [];
   let message = "";
 
   let userLogin = {
     phone_no: "",
     password: "",
   };
-
+  
   let sessionId = req.body.sessionId;
   let text = req.body.text;
   let phoneNumber = req.body.phoneNumber;
   let serviceCode = req.body.serviceCode;
 
-  let textValue = text.split("*").length;
+  let textValue = await text.split("*").length;
   if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login`;
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
-    userLogin.phone_no = text.split("*")[1];
-  } else if (textValue === 2 && text.split("*")[0] === "2") {
+    userLogin.phone_no = await text.split("*")[1];
+  } else if (textValue === 2 && await text.split("*")[0] === "2") {
     message = `CON Enter password`;
-    userLogin.password = text.split("*")[2];
+    userLogin.password = await text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
     userDetailsRegister.first_name = await text.split("*")[1];
-    console.log("This is first name", text.split("*")[1]);
-    console.log("This is text variable", text);
-    console.log("This is req.body.text variable", req.body.text);
-    console.log("This is req.body variable", req.body);
   } else if (textValue === 2) {
     message = `CON Enter your last name ${JSON.stringify(responses)}`;
-    responses.push(text.split("*")[2]);
+    responses.push(await text.split("*")[2]);
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
-    userDetailsRegister.id_no = text.split("*")[3];
+    userDetailsRegister.id_no = await text.split("*")[3];
   } else if (textValue === 4) {
     message = `CON Which phone number would you like us to reach you at?`;
-    userDetailsRegister.phone_no = text.split("*")[4];
+    userDetailsRegister.phone_no = await text.split("*")[4];
   } else if (textValue === 5) {
     message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
-    userDetailsRegister.gender = text.split("*")[5];
+    userDetailsRegister.gender = await text.split("*")[5];
   } else if (textValue === 6) {
     message = `CON Enter your password`;
-    userDetailsRegister.password = text.split("*")[6];
+    userDetailsRegister.password = await text.split("*")[6];
   } else if (textValue === 7) {
     message = `CON Confirm your password`;
-    userDetailsRegister.password_confirmation = text.split("*")[7];
+    userDetailsRegister.password_confirmation = await text.split("*")[7];
     // } else if (textValue === 8) {
     //   message = `CON Who are you?
     //   1. Farmer
     //   2. Buyer
     //   3. DEAN
     //   `;
-    //   userDetailsRegister.role = text.split("*")[8];
+    //   userDetailsRegister.role = await text.split("*")[8];
     //     } else if (textValue === 8) {
     message = `CON Complete registration
     1. Yes
     `;
-    registerUser(userDetailsRegister);
+    registerUser(userDetailsRegister,phoneNumber);
   } else {
     message = `END Thank you! ${JSON.stringify(userDetailsRegister)}`;
   }

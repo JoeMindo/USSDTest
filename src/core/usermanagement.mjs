@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.headers.post['header1'] = 'value' // for POST requests
+import postrequest from './services'
 
 let clearData = (details) => {
   details.name = "";
@@ -10,49 +10,25 @@ let clearData = (details) => {
 
   return details;
 };
-let registerUser = async (user) => {
-  axios
-    .post("https://a326-197-211-5-78.ngrok.io/api/register", {
-      first_name: user.first_name,
-      last_name: user.last_name,
-      phone_number: user.phone_number,
-      id_no: user.id_no,
-      email: user.email,
-      gender: user.gender,
-      password: user.password,
-      password_confirmation: user.password_confirmation,
-    })
-    .then((response) => {
-      console.log(response.data.message);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-let loginUser = (user) => {
-  axios
-    .post("https://a326-197-211-5-78.ngrok.io/api/login", user)
-    .then((response) => {
-      console.log(response.data.message);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
+let registerUser = async (regdata, phone) => {
+  var path = 'https://38ed-197-211-5-78.ngrok.io/api/register'
+  var postdata = {
+      "phone_no":phone,
+      "first_name":regdata.first_name,
+      "last_name":regdata.last_name,
+      "id_no":regdata.id_no,
+    "role": regdata.role,
+    "email": regdata.email,
+    "password": regdata.password,
+    "password_confirmation": password_confirmation,
+    "gender": regdata.gender
 
-let logoutUser = (id) => {};
-let updateUser = (id) => {};
+      
+  }
+  var registrationresponse = await postrequest(postdata,path);
+  
+  return false;
+  
+},
+
 export { clearData, registerUser };
-registerUser({
-  first_name: "Joe",
-  last_name: "Someone",
-  id_no: "357414700",
-  email: "joe@test.com",
-  password: "password123",
-  gender: "Male",
-  password_confirmation: "password123"
-}).then((response) => {
-  console.log(response)
-})

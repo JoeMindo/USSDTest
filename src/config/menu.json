@@ -1,0 +1,14 @@
+{
+    "footer":"\n\n0. Back\n00. Home",
+    "registration": "Welcome to Mamlaka Foods \nSelect Option:\n1. Register",
+    "register":{
+        "name":"Mamlaka Registration\nEnter your First Name",
+        "othernames":"Mamlaka Registration\nEnter your Other Names",
+        "idnumber":"Mamlaka Registration\nEnter your National ID Number",
+        "email":"Mamlaka Registration\nEnter your email address",
+        "gender": "Mamlaka Registration\nWhat is your gender?",
+        "location": "Mamlaka Registration\n Where are you located?",
+        "confirmation":"Welcome to Mamlaka\nRegistered Successfully, Your Password is placeholder, Thank you for choosing Mamlaka",
+        "failedconfirmation":"Mamlaka\nRegistration Unsuccessfull ,Please try gain Later"
+    }
+}
