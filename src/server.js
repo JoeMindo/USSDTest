@@ -88,7 +88,7 @@ app.post("/ussd", (req, res) => {
       "first_name": req.session.data[1],
       "last_name": req.session.data[2],
     }
-    message = `END Thank you! ${userDetails}`;
+    message = `END Thank you! ${userDetails.first_name}`;
   }
   res.send(message)
 });
