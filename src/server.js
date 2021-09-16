@@ -51,7 +51,7 @@ app.post("/ussd", (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    req.session.first_name = text.split("*")[0]
+    req.session.first_name = text.split("*")[1]
     userDetailsRegister.first_name = text.split("*")[1];
   } else if (textValue === 2) {
     message = `CON Enter your last name`;
