@@ -13,8 +13,10 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({secret: "Shh, its a secret!"}));
-app.post("/ussd",  (req, res) => {
+app.use(session({ secret: "secreet", key: 'session' }));
+let session;
+app.post("/ussd", (req, res) => {
+  session = req.session
   var userDetailsRegister = {
     first_name: "",
     last_name: "",
@@ -49,10 +51,10 @@ app.post("/ussd",  (req, res) => {
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
-    req.session.first_name = text.split("*")[1]
+    session.first_name = text.split("*")[0]
     userDetailsRegister.first_name = text.split("*")[1];
   } else if (textValue === 2) {
-    message = `CON Enter your last name ${req.session.first_name}`;
+    message = `CON Enter your last name`;
     userDetailsRegister.last_name = text.split("*")[2];
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
@@ -82,7 +84,7 @@ app.post("/ussd",  (req, res) => {
     `;
     registerUser(userDetailsRegister, phoneNumber);
   } else {
-    message = `END Thank you! ${JSON.stringify(userDetailsRegister)}`;
+    message = `END Thank you! ${req.session}`;
   }
   res.send(message)
 });
