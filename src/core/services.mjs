@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let postrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
+export let postrequest =  async (params, endpoint, phone = null, fcmtoken = null) => {
     try {
         if (fcmtoken) {
             let token = fcmtoken
@@ -18,7 +18,7 @@ let postrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
         console.log(error);
     }
 }
-let patchrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
+export let patchrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
     try {
         if (fcmtoken) {
             let token = fcmtoken
@@ -34,4 +34,3 @@ let patchrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
         console.log(error);
     }
 }
-export default {postrequest, patchrequest}
