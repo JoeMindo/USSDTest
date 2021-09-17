@@ -11,7 +11,7 @@ let clearData = (details) => {
   return details;
 };
 let registerUser = async (regdata, phone) => {
-  var path = 'https://38ed-197-211-5-78.ngrok.io/api/register'
+  var path = 'https://fc79-197-211-5-78.ngrok.io/api/register'
   var postdata = {
       "phone_no":phone,
       "first_name":regdata.first_name,
