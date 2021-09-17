@@ -13,6 +13,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set('trust proxy', 1);
 app.use(
   session({
     resave: true,
@@ -80,17 +81,17 @@ app.post("/ussd", (req, res) => {
     1. Yes
     `;
   } else {
-    req.session.data = text.split("*");
+    req.session.registration = text.split("*");
     let userDetails = {
-      first_name: req.session.data[1],
-      last_name: req.session.data[2],
-      id_no: req.session.data[3],
-      phone_no: req.session.data[4],
+      first_name: req.session.registration[1],
+      last_name: req.session.registration[2],
+      id_no: req.session.registration[3],
+      phone_no: req.session.registration[4],
       gender: "Male",
-      password: req.session.data[6],
-      password_confirmation: req.session.data[7],
-      role_id: req.session.data[8],
-      email: req.session.data[9],
+      password: req.session.registration[6],
+      password_confirmation: req.session.registration[7],
+      role_id: req.session.registration[8],
+      email: req.session.registration[9],
       
     };
     let out = registerUser(userDetails);
