@@ -26,7 +26,7 @@ let registerUser = async (regdata) => {
       
   }
   try {
-    var registrationresponse = await postrequest(postdata,path);
+    let registrationresponse = await postrequest(postdata,path);
   
     // if (registrationresponse.status === 'success') {
     //   return registrationresponse.status;
@@ -34,7 +34,7 @@ let registerUser = async (regdata) => {
     //   return registrationresponse.data.message;
     // }
     registrationresponse.then((response) => {
-      return response.data.message;
+      console.log(response.data.message);
     })
     
   } catch (error) {
