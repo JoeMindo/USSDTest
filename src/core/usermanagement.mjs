@@ -33,9 +33,9 @@ let registerUser = async (regdata) => {
     // } else {
     //   return registrationresponse.data.message;
     // }
-    registrationresponse.then((response) => {
-      console.log(response.data.message);
-    })
+    console.log(registrationresponse)
+    return registrationresponse
+    
     
   } catch (error) {
     console.log(error);
