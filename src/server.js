@@ -73,6 +73,9 @@ app.post("/ussd", (req, res) => {
       `;
     
   } else if (textValue === 9) {
+    message = `CON What is your email?`;
+    
+  } else if (textValue === 10) {
     message = `CON Complete registration
     1. Yes
     `;
@@ -85,7 +88,9 @@ app.post("/ussd", (req, res) => {
       phone_no: req.session.data[4],
       gender: "Male",
       password: req.session.data[6],
-      password_confirmation: req.session.data[7]
+      password_confirmation: req.session.data[7],
+      email: req.session.data[9],
+      role_id: req.session.data[8]
     };
     let out = registerUser(userDetails, phoneNumber);
     out.then((result) => {
