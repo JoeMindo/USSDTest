@@ -52,11 +52,7 @@ let loginUser = async (loginData) => {
   }
   try {
     var loginresponse = await postrequest(postdata, path);
-    if (loginresponse === 'success') {
-      return loginresponse.status;
-    } else {
-      return loginresponse.data.message;
-    }
+    return loginresponse
   } catch (error) {
     console.log(error);
   }
