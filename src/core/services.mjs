@@ -8,7 +8,7 @@ let createToken = async (payload) => {
         return token
 
     } catch (error) {
-        console.log(;
+        console.log(error);
     }
     
 
