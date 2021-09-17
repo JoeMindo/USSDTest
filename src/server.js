@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
-import session from 'express-session'
+import session from "express-session";
 import { registerUser, clearData } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
@@ -13,21 +13,16 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ resave: true ,secret: '123456' , path: '/',saveUninitialized: true}));
+app.use(
+  session({
+    resave: true,
+    secret: "123456",
+    path: "/",
+    saveUninitialized: true,
+  })
+);
 
 app.post("/ussd", (req, res) => {
-
-  var userDetailsRegister = {
-    first_name: "",
-    last_name: "",
-    id_no: "",
-    phone_no: "",
-    gender: "",
-    email: "",
-    password: "",
-    location: "",
-    password_confirmation: "",
-  };
   let message = "";
 
   let userLogin = {
@@ -46,7 +41,7 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
     userLogin.phone_no = text.split("*")[1];
-  } else if (textValue === 2 && (text.split("*")[0]) === "2") {
+  } else if (textValue === 2 && text.split("*")[0] === "2") {
     message = `CON Enter password`;
     userLogin.password = text.split("*")[2];
   } else if (textValue === 1) {
@@ -70,31 +65,32 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 7) {
     message = `CON Confirm your password`;
     userDetailsRegister.password_confirmation = text.split("*")[7];
-    // } else if (textValue === 8) {
-    //   message = `CON Who are you?
-    //   1. Farmer
-    //   2. Buyer
-    //   3. DEAN
-    //   `;
-    //   userDetailsRegister.role = text.split("*")[8];
-    //     } else if (textValue === 8) {
+  } else if (textValue === 8) {
+    message = `CON Who are you?
+      1. Farmer
+      2. Buyer
+      3. DEAN
+      `;
+    userDetailsRegister.role = text.split("*")[8];
+  } else if (textValue === 9) {
     message = `CON Complete registration
     1. Yes
     `;
   } else {
-    req.session.data = text.split("*")
+    req.session.data = text.split("*");
     let userDetails = {
-      "first_name": req.session.data[1],
-      "last_name": req.session.data[2],
-      "id_no": req.session.data[3],
-      "phone_no": req.session.data[4],
-      "gender": "Male",
-      "password": req.session.data[5]
-    }
-    registerUser(userDetails,phoneNumber)
-    message = `END Thank you! ${userDetails.first_name}`;
+      first_name: req.session.data[1],
+      last_name: req.session.data[2],
+      id_no: req.session.data[3],
+      phone_no: req.session.data[4],
+      gender: "Male",
+      password: req.session.data[5],
+      password_confirmation: req.session.data[6]
+    };
+    let out = registerUser(userDetails, phoneNumber);
+    message = `END Thank you! ${out}`;
   }
-  res.send(message)
+  res.send(message);
 });
 
 app.listen(port, () => {
