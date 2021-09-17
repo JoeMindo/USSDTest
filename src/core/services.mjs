@@ -8,7 +8,7 @@ let createToken = async (payload) => {
         return token
 
     } catch (error) {
-        Error.toString(error);
+        throw new Error(error);
     }
     
 
@@ -30,7 +30,7 @@ export let postrequest = async (params, endpoint, phone = null, fcmtoken = null)
     
         
     } catch (error) {
-        console.log(error);
+        throw new Error(error);
     }
 }
 export let patchrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
@@ -46,6 +46,6 @@ export let patchrequest = async (params, endpoint, phone = null, fcmtoken = null
             let response = await axios.patch(endpoint, params, { headers: {} });
         }
     } catch (error) {
-        console.log(error);
+        throw new Error(error);
     }
 }

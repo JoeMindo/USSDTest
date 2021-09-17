@@ -28,15 +28,34 @@ let registerUser = async (regdata) => {
   try {
     var registrationresponse = await postrequest(postdata,path);
   
-    registrationresponse.then((response) => {
-      return response
-    })
+    if (registrationresponse.status === 'success') {
+      return registrationresponse.status;
+    } else {
+      return registrationresponse.data.message;
+    }
     
   } catch (error) {
-    return JSON.stringify(error);
+    throw new Error(error);
   }
  
   
 }
 
+let loginUser = async (loginData) => {
+  var path = 'https://fc79-197-211-5-78.ngrok.io/api/login'
+  var postdata = {
+    "phone_no": loginData.phone_no,
+    "password": loginData.password,
+  }
+  try {
+    var loginresponse = await postrequest(postdata, path);
+    if (loginresponse === 'success') {
+      return loginresponse.status;
+    } else {
+      return loginresponse.data.message;
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+}
 export { clearData, registerUser };

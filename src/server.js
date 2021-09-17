@@ -41,10 +41,14 @@ app.post("/ussd", (req, res) => {
     message = `CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login`;
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
-    userLogin.phone_no = text.split("*")[1];
+
   } else if (textValue === 2 && text.split("*")[0] === "2") {
     message = `CON Enter password`;
-    userLogin.password = text.split("*")[2];
+    req.session.login = text.split("*");
+    userLogin.phone_no = req.session.login[0];
+    userLogin.password = req.session.login[1];
+    userLogin
+
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
     
