@@ -88,7 +88,10 @@ app.post("/ussd", (req, res) => {
       password_confirmation: req.session.data[6]
     };
     let out = registerUser(userDetails, phoneNumber);
-    message = `END Thank you! ${out}`;
+    out.then((result) => {
+      message = `END Thank you! ${out}`;
+    })
+    
   }
   res.send(message);
 });
