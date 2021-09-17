@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-export let postrequest =  async (params, endpoint, phone = null, fcmtoken = null) => {
+export let postrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
+    let token;
     try {
         if (fcmtoken) {
-            let token = fcmtoken
+            token = fcmtoken
         } else {
-            let token = null
+            token = null
         }
         if (token) {
             let response = await axios.post(endpoint, params, { headers: { 'Authorization': 'Bearer ' + token } })
