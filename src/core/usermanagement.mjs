@@ -36,7 +36,7 @@ let registerUser = async (regdata) => {
     return registrationresponse.data.message;
     
   } catch (error) {
-    throw new Error(error);
+    console.log(error);
   }
  
   
@@ -56,7 +56,7 @@ let loginUser = async (loginData) => {
       return loginresponse.data.message;
     }
   } catch (error) {
-    throw new Error(error);
+    console.log(error);
   }
 }
 export { clearData, registerUser,loginUser };
