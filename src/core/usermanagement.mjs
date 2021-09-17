@@ -28,11 +28,12 @@ let registerUser = async (regdata) => {
   try {
     var registrationresponse = await postrequest(postdata,path);
   
-    if (registrationresponse.status === 'success') {
-      return registrationresponse.status;
-    } else {
-      return registrationresponse.data.message;
-    }
+    // if (registrationresponse.status === 'success') {
+    //   return registrationresponse.status;
+    // } else {
+    //   return registrationresponse.data.message;
+    // }
+    return registrationresponse.data.message;
     
   } catch (error) {
     throw new Error(error);
@@ -58,4 +59,4 @@ let loginUser = async (loginData) => {
     throw new Error(error);
   }
 }
-export { clearData, registerUser, loginUser };
+export { clearData, registerUser };
