@@ -10,18 +10,18 @@ let clearData = (details) => {
 
   return details;
 };
-let registerUser = async (regdata, phone) => {
+let registerUser = async (regdata) => {
   var path = 'https://fc79-197-211-5-78.ngrok.io/api/register'
   var postdata = {
       "phone_no":regdata.phone_no,
-      "first_name":regdata.first_name,
+    "first_name": regdata.first_name,
       "last_name":regdata.last_name,
       "id_no":regdata.id_no,
     "role_id": regdata.role_id,
     "email": regdata.email,
     "password": regdata.password,
     "password_confirmation": regdata.password_confirmation,
-    "gender": regdata.gender
+    "gender": regdata.gender,
 
       
   }
@@ -33,7 +33,7 @@ let registerUser = async (regdata, phone) => {
     })
     
   } catch (error) {
-    return error
+    return JSON.stringify(error);
   }
  
   

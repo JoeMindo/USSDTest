@@ -93,7 +93,7 @@ app.post("/ussd", (req, res) => {
       email: req.session.data[9],
       
     };
-    let out = registerUser(userDetails, phoneNumber);
+    let out = registerUser(userDetails);
     out.then((result) => {
       message = `END Thank you! ${out}`;
     })
