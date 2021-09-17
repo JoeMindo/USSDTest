@@ -28,7 +28,9 @@ let registerUser = async (regdata, phone) => {
   try {
     var registrationresponse = await postrequest(postdata,path);
   
-    return registrationresponse;
+    registrationresponse.then((response) => {
+      return response
+    })
     
   } catch (error) {
     return error
