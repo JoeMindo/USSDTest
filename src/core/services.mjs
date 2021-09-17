@@ -1,12 +1,26 @@
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
+
+let createToken = async (payload) => {
+    try {
+        let token = await jwt.sign(payload, 'this is secret');
+        return token
+
+    } catch (error) {
+        Error.toString(error);
+    }
+    
+
+    
+}
 export let postrequest = async (params, endpoint, phone = null, fcmtoken = null) => {
-    let token;
+    let token = createToken(params).then((result) => {
+        return result
+    });
     try {
         if (fcmtoken) {
             token = fcmtoken
-        } else {
-            token = null
         }
         if (token) {
             let response = await axios.post(endpoint, params, { headers: { 'Authorization': 'Bearer ' + token } })
