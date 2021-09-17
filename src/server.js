@@ -88,7 +88,7 @@ app.post("/ussd", (req, res) => {
     req.session.registration = text.split("*");
     let userDetails = {
       first_name: req.session.registration[1],
-      last_name: req.session.registration[2],
+      last_name: req.session.registration[2] ,
       id_no: req.session.registration[3],
       phone_no: req.session.registration[4],
       gender: "Male",
@@ -100,7 +100,7 @@ app.post("/ussd", (req, res) => {
     };
     let out = registerUser(userDetails);
     out.then((result) => {
-      message = `END Thank you! ${out}`;
+      message = `END Thank you! ${result}`;
     })
     
   }
