@@ -33,7 +33,7 @@ let registerUser = async (regdata) => {
     // } else {
     //   return registrationresponse.data.message;
     // }
-    return registrationresponse;
+    return registrationresponse.data.message;
     
   } catch (error) {
     console.log(error);
