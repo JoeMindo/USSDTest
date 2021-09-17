@@ -17,7 +17,7 @@ let registerUser = async (regdata, phone) => {
       "first_name":regdata.first_name,
       "last_name":regdata.last_name,
       "id_no":regdata.id_no,
-    "role": regdata.role,
+    "role_id": regdata.role,
     "email": regdata.email,
     "password": regdata.password,
     "password_confirmation": regdata.password_confirmation,
