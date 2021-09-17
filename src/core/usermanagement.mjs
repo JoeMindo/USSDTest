@@ -34,11 +34,11 @@ let registerUser = async (regdata) => {
     //   return registrationresponse.data.message;
     // }
     registrationresponse.then((result) => {
-      return result
+      return result 
     })
     
   } catch (error) {
-    console.log(error);
+    console.log(error.error);
   }
  
   
