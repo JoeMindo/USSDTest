@@ -24,17 +24,14 @@ export let postrequest = async (params, endpoint, phone = null, fcmtoken = null)
         }
         if (token) {
             let response = await axios.post(endpoint, params, { headers: { 'Authorization': 'Bearer ' + token } })
-            response.then((output) => {
-                return output
-            })
+           
             
 
         } else  {
             let response = await axios.post(endpoint, params, { headers: {} });
-            response.then((output) => {
-                return output
-            })
+            
         }
+        return response
        
         
     } catch (error) {
