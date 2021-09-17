@@ -5,7 +5,7 @@ export let postrequest =  async (params, endpoint, phone = null, fcmtoken = null
         if (fcmtoken) {
             let token = fcmtoken
         } else {
-            let token = localStorage.getItem('token')
+            let token = null
         }
         if (token) {
             let response = await axios.post(endpoint, params, { headers: { 'Authorization': 'Bearer ' + token } })
