@@ -89,8 +89,9 @@ app.post("/ussd", (req, res) => {
       gender: "Male",
       password: req.session.data[6],
       password_confirmation: req.session.data[7],
+      role_id: req.session.data[8],
       email: req.session.data[9],
-      role_id: req.session.data[8]
+      
     };
     let out = registerUser(userDetails, phoneNumber);
     out.then((result) => {
