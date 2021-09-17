@@ -82,7 +82,7 @@ app.post("/ussd", (req, res) => {
       first_name: req.session.data[1],
       last_name: req.session.data[2],
       id_no: req.session.data[3],
-      phone_no: phoneNumber,
+      phone_no: req.session.data[4],
       gender: "Male",
       password: req.session.data[6],
       password_confirmation: req.session.data[7]
