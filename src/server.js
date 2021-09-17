@@ -101,6 +101,7 @@ app.post("/ussd", (req, res) => {
     let out = registerUser(userDetails);
     out.then((result) => {
       message = `END Thank you! ${result}`;
+      console.log(result)
     })
     
   }
