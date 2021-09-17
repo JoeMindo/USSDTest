@@ -58,4 +58,4 @@ let loginUser = async (loginData) => {
     throw new Error(error);
   }
 }
-export { clearData, registerUser };
+export { clearData, registerUser, loginUser };

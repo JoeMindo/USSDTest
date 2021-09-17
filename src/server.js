@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { registerUser, clearData } from "./core/usermanagement.mjs";
+import { registerUser, clearData, loginUser } from "./core/usermanagement.mjs";
 const port = process.env.PORT || 3030;
 
 const app = express();
@@ -47,7 +47,7 @@ app.post("/ussd", (req, res) => {
     req.session.login = text.split("*");
     userLogin.phone_no = req.session.login[0];
     userLogin.password = req.session.login[1];
-    userLogin
+    loginUser(userLogin);
 
   } else if (textValue === 1) {
     message = `CON Enter your first name`;

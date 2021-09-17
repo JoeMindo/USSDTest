@@ -27,7 +27,7 @@ export let postrequest = async (params, endpoint, phone = null, fcmtoken = null)
         } else  {
             let response = await axios.post(endpoint, params, { headers: {} });
         }
-    
+        return response.data
         
     } catch (error) {
         throw new Error(error);
@@ -45,6 +45,7 @@ export let patchrequest = async (params, endpoint, phone = null, fcmtoken = null
         } else {
             let response = await axios.patch(endpoint, params, { headers: {} });
         }
+        return response.data
     } catch (error) {
         throw new Error(error);
     }
