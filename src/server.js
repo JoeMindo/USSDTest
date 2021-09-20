@@ -48,6 +48,7 @@ app.post("/ussd", (req, res) => {
     userLogin.phone_no = req.session.login[0];
     userLogin.password = req.session.login[1];
     loginUser(userLogin);
+    break
 
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
