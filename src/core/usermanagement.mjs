@@ -52,7 +52,7 @@ let loginUser = async (loginData) => {
   }
   try {
     var loginresponse = await postrequest(postdata, path);
-    return loginresponse
+    return JSON.stringify(loginresponse)
   } catch (error) {
     console.log(error);
   }
