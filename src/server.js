@@ -47,10 +47,11 @@ app.post("/ussd", (req, res) => {
     req.session.login = text.split("*");
     userLogin.phone_no = req.session.login[0];
     userLogin.password = req.session.login[1];
-    loginUser(userLogin);
-    break
 
-  } else if (textValue === 1) {
+  } else if (textValue === 3 && text.split("*")[0] === "2") {
+    loginUser(userLogin);
+  }
+   else if (textValue === 1) {
     message = `CON Enter your first name`;
     
   } else if (textValue === 2) {
