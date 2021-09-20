@@ -9,6 +9,6 @@ async function fetchProducts() {
     });
     return results;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 }
