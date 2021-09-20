@@ -47,8 +47,8 @@ app.post("/ussd", (req, res) => {
 
   } else if (textValue === 3 && text.split("*")[0] === "2") {
     req.session.login = text.split("*");
-    userLogin.phone_no = req.session.login[0];
-    userLogin.password = req.session.login[1];
+    userLogin.phone_no = req.session.login[1];
+    userLogin.password = req.session.login[2];
     loginUser(userLogin);
   }
    else if (textValue === 1) {
