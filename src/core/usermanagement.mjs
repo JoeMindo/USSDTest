@@ -11,7 +11,7 @@ let clearData = (details) => {
   return details;
 };
 let registerUser = async (regdata) => {
-  var path = 'https://fc79-197-211-5-78.ngrok.io/api/register'
+  var path = 'https://3a40-197-211-5-78.ngrok.io/api/register'
   var postdata = {
       "phone_no":regdata.phone_no,
     "first_name": regdata.first_name,
@@ -45,13 +45,14 @@ let registerUser = async (regdata) => {
 }
 
 let loginUser = async (loginData) => {
-  var path = 'https://fc79-197-211-5-78.ngrok.io/api/login'
+  var path = 'https://3a40-197-211-5-78.ngrok.io/api/login'
   var postdata = {
     "phone_no": loginData.phone_no,
     "password": loginData.password,
   }
   try {
     var loginresponse = await postrequest(postdata, path);
+    console.log(loginresponse)
     return loginresponse
   } catch (error) {
     console.log(error);
