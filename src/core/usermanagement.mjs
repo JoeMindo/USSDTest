@@ -52,7 +52,8 @@ let loginUser = async (loginData) => {
   }
   try {
     var loginresponse = await postrequest(postdata, path);
-    return JSON.stringify(loginresponse)
+    console.log(loginresponse)
+    return loginresponse
   } catch (error) {
     console.log(error);
   }
