@@ -33,8 +33,8 @@ let registerUser = async (regdata) => {
     // } else {
     //   return registrationresponse.data.message;
     // }
-    console.log(registrationresponse)
-    return registrationresponse
+    
+    return registrationresponse.data
     
     
   } catch (error) {
@@ -52,8 +52,7 @@ let loginUser = async (loginData) => {
   }
   try {
     var loginresponse = await postrequest(postdata, path);
-    console.log(loginresponse)
-    return loginresponse
+    return loginresponse.data
   } catch (error) {
     console.log(error);
   }

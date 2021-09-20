@@ -67,7 +67,7 @@ app.post("/ussd", (req, res) => {
     message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
     
   } else if (textValue === 6) {
-    message = `CON Enter your password`;
+    message = `CON Enter your password (Atleast 8 characters)`;
     
   } else if (textValue === 7) {
     message = `CON Confirm your password`;
