@@ -1,6 +1,6 @@
 import axios from "axios";
 import { postrequest } from './services.mjs'
-import {BASEURL} from '../config/urls.js'
+import { BASEURL } from '../config/urls.js'
 
 let clearData = (details) => {
   details.name = "";
