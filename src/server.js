@@ -79,7 +79,7 @@ app.post("/ussd", (req, res) => {
     let counties = listLocations('counties');
     message = `CON Choose one ${counties}`
 
-  } else if (textValue === 1) {
+  } else if (textValue === 11) {
     message = `CON Complete registration
     1. Yes
     `;
