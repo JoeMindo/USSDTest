@@ -1,5 +1,6 @@
 import axios from "axios";
 import { postrequest } from './services.mjs'
+import {BASEURL} from '../config/urls.js'
 
 let clearData = (details) => {
   details.name = "";
@@ -11,7 +12,7 @@ let clearData = (details) => {
   return details;
 };
 let registerUser = async (regdata) => {
-  var path = 'https://987b-197-211-5-78.ngrok.io/api/register'
+  var path = `${BASEURL}/api/register`
   var postdata = {
       "phone_no":regdata.phone_no,
     "first_name": regdata.first_name,
@@ -45,7 +46,7 @@ let registerUser = async (regdata) => {
 }
 
 let loginUser = async (loginData) => {
-  var path = 'https://987b-197-211-5-78.ngrok.io/api/login'
+  var path = `${BASEURL}/api/login`
   var postdata = {
     "phone_no": loginData.phone_no,
     "password": loginData.password,
