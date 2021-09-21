@@ -77,11 +77,9 @@ app.post("/ussd", (req, res) => {
     message = `CON What is your email?`;
 
   } else if (textValue === 10) {
-    let locations = listLocations('counties').then((data) => {
-      return data;
-    });
-    locations.forEach((location) => {
-      return message += `CON ${location.county_name}`;
+    let locations = listLocations('counties');
+    locations.then((response) => {
+      message = `CON ${response}`
     })
 
     
