@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "mocha",
-    "start": "node src/server.js"
+    "start": "redis-server 2>&1 node src/server.js "
   },
   "repository": {
     "type": "git",
