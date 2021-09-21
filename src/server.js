@@ -77,7 +77,7 @@ app.post("/ussd", (req, res) => {
     message = `CON What is your email?`;
   } else if (textValue === 10) {
     listLocations('counties').then((data) => {
-      message = `CON Choose one ${counties}`
+      message = `CON Choose one ${data}`
       return message
     });
     
