@@ -9,7 +9,6 @@ export let listLocations = async (locationtype, id = null) => {
     let test = await axios.get(`${BASEURL}/api/${locationtype}/`);
     test.data.forEach((location) => {
       locations.push(location);
-      console.log(locations);
       menu += `\n${locations.indexOf(location)}. ${location.county_name}`
       return menu
     })
