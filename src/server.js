@@ -76,12 +76,12 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 9) {
     message = `CON What is your email?`;
   } else if (textValue === 10) {
-    let counties = listLocations('counties');
-    counties.then((response) => {
-      message = `CON Choose one ${response}`
-
-    })
+    listLocations('counties').then((data) => {
+      message = `CON Choose one ${counties}`
+      return message
+    });
     
+   
 
   } else if (textValue === 11) {
     message = `CON Complete registration
