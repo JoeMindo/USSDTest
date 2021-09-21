@@ -3,10 +3,11 @@ import { BASEURL } from "../config/urls.js";
 
 export let listLocations = async (locationtype, id = null) => {
   let menu = ''
-  let test;
+  
   try {
-    test = await axios.get(`${BASEURL}/api/${locationtype}/`);
+    let test = await axios.get(`${BASEURL}/api/${locationtype}/`);
     test.data.forEach((location) => {
+      console.log(location);
       menu += `\n${test.data.indexOf(location)}. ${location.county_name}`
       return menu
     })
