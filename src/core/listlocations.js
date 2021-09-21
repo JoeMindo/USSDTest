@@ -7,7 +7,7 @@ export let listLocations = async (locationtype, id = null) => {
   try {
     test = await axios.get(`${BASEURL}/api/${locationtype}/`);
     test.data.forEach((location) => {
-      menu += `\n${indexOf(location)}. ${location.county_name}`
+      menu += `\n${test.data.indexOf(location)}. ${location.county_name}`
       return menu
     })
     
