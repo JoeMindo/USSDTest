@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BASEURL } from "../config/urls";
 
-let listLocations = (locationtype, id = null) => {
+let listLocations = async (locationtype, id = null) => {
   let menu = ''
   let test;
   try {
