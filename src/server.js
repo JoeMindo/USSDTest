@@ -82,7 +82,10 @@ app.post("/ussd", (req, res) => {
      return output
     });
     
-    message = `CON Select your region ${result}`
+    result.then((output) => {
+      console.log(output);
+      message = `CON Select your region\n${output}`;
+    })
     
 
   } else if (textValue === 11) {
