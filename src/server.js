@@ -78,8 +78,9 @@ app.post("/ussd", (req, res) => {
     
   } else if (textValue === 10) {
     let regions = getRegions();
+    message = `CON Select your region`
     regions.then((output) => {
-     console.log(output);
+     message+=output;
     });
     
 
