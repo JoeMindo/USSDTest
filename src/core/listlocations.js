@@ -24,7 +24,7 @@ export let getRegions = async () => {
 
 
 
-export let getLocations = async (type,id,identifier) => {
+export let getLocations = async (type,id,identifier,idsArr) => {
   
   let locationType = []
   let menuItems = ''
@@ -37,6 +37,7 @@ export let getLocations = async (type,id,identifier) => {
     })
     locationType.forEach((value,index) => {
       let name = value[identifier]
+      idsArr.push({'id':`${value['id']}`})
       menuItems += `${index}. ${name}\n`
     })
     return menuItems
@@ -45,6 +46,8 @@ export let getLocations = async (type,id,identifier) => {
     throw new Error(error);
   }
 }
+
+
 export let splitText = (text, index) => {
   return text.split("*")[index]
 }

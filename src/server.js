@@ -6,11 +6,14 @@ import session from "express-session";
 import redis from "redis";
 import connectRedis from "connect-redis";
 import { registerUser, clearData, loginUser } from "./core/usermanagement.mjs";
-import { getRegions, getLocations, splitText } from "./core/listlocations.js";
+import { getRegions, getLocations, splitText, getLocationIds } from "./core/listlocations.js";
 
 const port = process.env.PORT || 3030;
 
 const app = express();
+let countyIDs = []
+let subcountyIDS = []
+let locationIDs = []
 
 const RedisStore = connectRedis(session);
 app.use(logger("dev"));
@@ -98,12 +101,12 @@ app.post("/ussd", (req, res) => {
       res.send(message);
     });
   } else if (textValue === 11) {
-    console.log('TextValue',textValue)
+    console.log('TextValue', textValue)
     let countyID = splitText(text,10);
     countyID = parseInt(countyID)
     countyID += 1
     console.log('County ID', countyID)
-    let counties = getLocations("counties", countyID,'county_name');
+    let counties = getLocations("counties", countyID,'county_name',countyIDS);
     let output = counties.then((data) => {
       return data;
     });
@@ -115,8 +118,10 @@ app.post("/ussd", (req, res) => {
   }
   // Sub county
   else if (textValue === 12) {
-    let subcountyID = splitText(text, 12);
-    let subcounties = getLocations("subcounties", subcountyID);
+    let subcountyPos = splitText(text, 11);
+    subcountyPos = parseInt(subcountyPos);
+    let subcountyID = countyIDS[subcountyPos]
+    let subcounties = getLocations("subcounties", subcountyID,'subcounty_name',subcountyIDS);
     let output = subcounties.then((data) => {
       return data;
     });
@@ -127,8 +132,11 @@ app.post("/ussd", (req, res) => {
   }
   // Location
   else if (textValue === 13) {
-    let locationID = splitText(text, 13);
-    let locations = getLocations("locations", locationID);
+    let locationPos = splitText(text, 12);
+    locationPos = parseInt(locationPos);
+    let locationID = subcountyIDS[locationPos]
+
+    let locations = getLocations("locations", locationID,'location_name',locationIDS);
     let output = locations.then((data) => {
       return data;
     });
