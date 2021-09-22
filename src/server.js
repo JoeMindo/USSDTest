@@ -78,14 +78,14 @@ app.post("/ussd", (req, res) => {
     
   } else if (textValue === 10) {
     let regions = getRegions();
-    let result = regions.then((output) => {
-     return output
+    let result = regions.then(() => {
+    }).then((data) => {
+      return data
+
     });
+    message = `CON Select region\n ${result}`
     
-    result.then((output) => {
-      console.log(output);
-      message = `CON Select your region\n${output}`;
-    })
+    
     
 
   } else if (textValue === 11) {
