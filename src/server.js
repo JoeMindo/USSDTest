@@ -101,7 +101,7 @@ app.post("/ussd", (req, res) => {
     console.log('TextValue',textValue)
     let countyID = text.split("*")[10];
     console.log('County ID', countyID)
-    let counties = getLocations("counties", countyID,'county_name');
+    let counties = getLocations("counties", countyID+1,'county_name');
     let output = counties.then((data) => {
       return data;
     });
