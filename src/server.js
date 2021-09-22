@@ -77,15 +77,10 @@ app.post("/ussd", (req, res) => {
     message = `CON What is your email?`;
     
   } else if (textValue === 10) {
-    let regions = getRegions();
-    let result = regions.then(() => {
-    }).then((data) => {
-      return data
-
-    });
-    message = `CON Select region\n ${result}`
+    let regions = await getRegions();
     
     
+    message = `CON Select your region ${regions}`
     
 
   } else if (textValue === 11) {
