@@ -75,22 +75,19 @@ app.post("/ussd", (req, res) => {
       `;
   } else if (textValue === 9) {
     message = `CON What is your email?`;
-    console.log(textValue)
+    console.log(textValue);
   } else if (textValue === 10) {
     let regions = getRegions();
-    let menuItems = ''
+    let menuItems = "";
     regions.then((output) => {
       output.forEach((value, index) => {
         // console.log(index, value.region_name)
         menuItems += `${index}. ${value.region_name}\n`;
-        
-
       });
-      message = `CON Choose your region\n${menuItems}`;
-     
     });
-   
-    console.log('This is the message',message)
+    message = `CON Choose your region\n${menuItems}`;
+
+    console.log("This is the message", message);
   } else if (textValue === 11) {
     message = `CON Complete registration
     1. Yes
