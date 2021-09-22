@@ -81,7 +81,7 @@ app.post("/ussd", (req, res) => {
     let response = regions.then((output) => {
       return output;
     })
-    message = `CON Select your region\n${response}`;
+    message = `CON Select your region\n${response.then((data) => {return data})}`;
     
     
 
