@@ -98,13 +98,15 @@ app.post("/ussd", (req, res) => {
       res.send(message);
     });
   } else if (textValue === 11) {
+    console.log('TextValue',textValue)
     let countyID = splitText(text, 11);
+    console.log('County ID', countyID)
     let counties = getLocations("counties", countyID+1);
     let output = counties.then((data) => {
       return data;
     });
     output.then((list) => {
-      console.log(list)
+      console.log('List',list)
       message = `CON Select county\n ${list}`;
       res.send(message);
     });
