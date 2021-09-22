@@ -78,14 +78,17 @@ app.post("/ussd", (req, res) => {
     console.log(textValue)
   } else if (textValue === 10) {
     let regions = getRegions();
+    let menuItems = ''
     regions.then((output) => {
       output.forEach((value, index) => {
         // console.log(index, value.region_name)
-        message = `CON Select the region you are from\n ${index}. ${value.region_name}`;
-        console.log(message);
+        menuItems += `Select the region you are from\n ${index}. ${value.region_name}`;
+        console.log(menuItems);
 
       });
     });
+    message = `CON ${menuItems}`;
+    console.log('This is the message',message)
   } else if (textValue === 11) {
     message = `CON Complete registration
     1. Yes
