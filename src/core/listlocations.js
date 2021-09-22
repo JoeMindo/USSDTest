@@ -3,15 +3,19 @@ import { BASEURL } from "../config/urls.js";
 
 export let getRegions = async () => {
   
-  
+  let regions = []
+  let menuItems = ''
   try {
-    let regions = []
+    
     let regionsResult = await axios.get(`${BASEURL}/api/regions/`);
 
     regionsResult.data.forEach((location) => {
       regions.push(location);
     })
-    return regions;
+    regions.forEach((value,index) => {
+      menuItems += `${index}. ${value.region_name}\n`
+    })
+    return menuItems
     
   } catch (error) {
     throw new Error(error);
