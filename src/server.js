@@ -35,13 +35,13 @@ app.post("/ussd", (req, res) => {
     phone_no: "",
     password: "",
   };
-  let countyIDS = [];
-  let subcountyIDS = [];
+  var countyIDS = [];
+  var subcountyIDS = [];
   let sessionId = req.body.sessionId;
   let text = req.body.text;
   let phoneNumber = req.body.phoneNumber;
   let serviceCode = req.body.serviceCode;
-  let locationIDS = [];
+  var locationIDS = [];
   console.log("incoming text" + text);
   let textValue = text.split("*").length;
   if (text === "") {
@@ -118,7 +118,7 @@ app.post("/ussd", (req, res) => {
   else if (textValue === 12) {
     let subcountyPos = splitText(text, 11);
     subcountyPos = parseInt(subcountyPos);
-    let subcountyID = countyIDS[subcountyPos];
+    let subcountyID = countyIDS[subcountyPos].id;
     console.log("CountyIDS", countyIDS)
     console.log('Subcounty ID', subcountyID)
     let subcounties = getLocations(
