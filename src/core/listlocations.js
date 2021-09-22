@@ -36,7 +36,7 @@ export let getLocations = async (type,id,identifier,idsArr) => {
     })
     locationType.forEach((value,index) => {
       let name = value[identifier]
-      menuItems += `${index}. ${name}:${value.id}\n`
+      menuItems += `${index}. ${name}:${id}\n`
       
     })
     return menuItems
