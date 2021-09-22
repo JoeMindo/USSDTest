@@ -1,17 +1,17 @@
 import axios from "axios";
 import { BASEURL } from "../config/urls.js";
 
-export let listLocations = async (locationtype, id = null) => {
+export let getRegions = async () => {
   
   
   try {
-    let locations = []
-    let menu = ''
-    let test = await axios.get(`${BASEURL}/api/${locationtype}/`);
-    test.data.forEach((location) => {
-      locations.push(location);
-      menu += `${location.county_name}. ${location.county_name}`
+    let regions = []
+    let regionsResult = await axios.get(`${BASEURL}/api/regions/`);
+
+    regionsResult.data.forEach((location) => {
+      regions.push(location);
     })
+    return regions;
     
   } catch (error) {
     throw new Error(error);
@@ -19,3 +19,19 @@ export let listLocations = async (locationtype, id = null) => {
 };
 
 
+
+export let getLocations = async () => {
+  
+  try {
+    let locations = []
+    let locationsResult = await axios.get(`${BASEURL}/api/locations/${region}`);
+
+    locationsResult.data.forEach((location) => {
+      locations.push(location);
+    })
+    return locations;
+    
+  } catch (error) {
+    throw new Error(error);
+  }
+}

@@ -6,7 +6,7 @@ import session from "express-session";
 import redis from "redis";
 import connectRedis from "connect-redis";
 import { registerUser, clearData, loginUser } from "./core/usermanagement.mjs";
-import { listLocations } from './core/listlocations.js';
+import { listLocations } from "./core/listlocations.js";
 
 const port = process.env.PORT || 3030;
 
@@ -75,16 +75,14 @@ app.post("/ussd", (req, res) => {
       `;
   } else if (textValue === 9) {
     message = `CON What is your email?`;
-
   } else if (textValue === 10) {
-    let locations = listLocations('counties');
-    locations.then((response) => {
-      message = `CON ${response}`
-    })
-
-    
-   
-
+    let regions = getRegions();
+    regions.then((output) => {
+      output.forEach((value, index) => {
+        // console.log(index, value.region_name)
+        message = `CON Select the region you are from\n ${index}. ${value.region_name}`;
+      });
+    });
   } else if (textValue === 11) {
     message = `CON Complete registration
     1. Yes
