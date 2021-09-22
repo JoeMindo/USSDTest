@@ -11,9 +11,6 @@ import { getRegions, getLocations, splitText } from "./core/listlocations.js";
 const port = process.env.PORT || 3030;
 
 const app = express();
-let countyIDs = []
-let subcountyIDS = []
-let locationIDs = []
 
 const RedisStore = connectRedis(session);
 app.use(logger("dev"));
@@ -38,7 +35,8 @@ app.post("/ussd", (req, res) => {
     phone_no: "",
     password: "",
   };
-
+  let countyIDS = [];
+  let subcountyIDS = [];
   let sessionId = req.body.sessionId;
   let text = req.body.text;
   let phoneNumber = req.body.phoneNumber;
@@ -101,17 +99,17 @@ app.post("/ussd", (req, res) => {
       res.send(message);
     });
   } else if (textValue === 11) {
-    console.log('TextValue', textValue)
-    let countyID = splitText(text,10);
-    countyID = parseInt(countyID)
-    countyID += 1
-    console.log('County ID', countyID)
-    let counties = getLocations("counties", countyID,'county_name',countyIDS);
+    console.log("TextValue", textValue);
+    let countyID = splitText(text, 10);
+    countyID = parseInt(countyID);
+    countyID += 1;
+    console.log("County ID", countyID);
+    let counties = getLocations("counties", countyID, "county_name", countyIDS);
     let output = counties.then((data) => {
       return data;
     });
     output.then((list) => {
-      console.log('List',list)
+      console.log("List", list);
       message = `CON Select county\n ${list}`;
       res.send(message);
     });
@@ -120,8 +118,13 @@ app.post("/ussd", (req, res) => {
   else if (textValue === 12) {
     let subcountyPos = splitText(text, 11);
     subcountyPos = parseInt(subcountyPos);
-    let subcountyID = countyIDS[subcountyPos]
-    let subcounties = getLocations("subcounties", subcountyID,'subcounty_name',subcountyIDS);
+    let subcountyID = countyIDS[subcountyPos];
+    let subcounties = getLocations(
+      "subcounties",
+      subcountyID,
+      "subcounty_name",
+      subcountyIDS
+    );
     let output = subcounties.then((data) => {
       return data;
     });
@@ -134,9 +137,14 @@ app.post("/ussd", (req, res) => {
   else if (textValue === 13) {
     let locationPos = splitText(text, 12);
     locationPos = parseInt(locationPos);
-    let locationID = subcountyIDS[locationPos]
+    let locationID = subcountyIDS[locationPos];
 
-    let locations = getLocations("locations", locationID,'location_name',locationIDS);
+    let locations = getLocations(
+      "locations",
+      locationID,
+      "location_name",
+      locationIDS
+    );
     let output = locations.then((data) => {
       return data;
     });
