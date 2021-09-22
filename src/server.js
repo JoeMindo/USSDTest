@@ -82,10 +82,11 @@ app.post("/ussd", (req, res) => {
     regions.then((output) => {
       output.forEach((value, index) => {
         // console.log(index, value.region_name)
-        menuItems += `Select the region you are from\n ${index}. ${value.region_name}`;
-        console.log(menuItems);
+        menuItems += `${index}. ${value.region_name}`;
+        
 
       });
+      console.log(menuItems);
     });
     message = `CON ${menuItems}`;
     console.log('This is the message',message)
