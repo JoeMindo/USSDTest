@@ -82,13 +82,14 @@ app.post("/ussd", (req, res) => {
     regions.then((output) => {
       output.forEach((value, index) => {
         // console.log(index, value.region_name)
-        menuItems += `${index}. ${value.region_name}`;
+        menuItems += `${index}. ${value.region_name}\n`;
         
 
       });
-      console.log(menuItems);
+      message = `CON Choose your region\n${menuItems}`;
+     
     });
-    message = `CON ${menuItems}`;
+   
     console.log('This is the message',message)
   } else if (textValue === 11) {
     message = `CON Complete registration
