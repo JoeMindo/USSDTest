@@ -84,8 +84,8 @@ app.post("/ussd", (req, res) => {
         // console.log(index, value.region_name)
         menuItems += `${index}. ${value.region_name}\n`;
       });
-      message = `CON Choose your region\n${menuItems}`;
     });
+    message = `CON Choose your region\n${menuItems}`;
 
   } else if (textValue === 11) {
     message = `CON Complete registration
