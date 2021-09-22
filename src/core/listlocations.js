@@ -24,18 +24,26 @@ export let getRegions = async () => {
 
 
 
-// export let getLocations = async () => {
+export let getLocations = async (type,id) => {
   
-//   try {
-//     let locations = []
-//     let locationsResult = await axios.get(`${BASEURL}/api/locations/${region}`);
-
-//     locationsResult.data.forEach((location) => {
-//       locations.push(location);
-//     })
-//     return locations;
+  let locationType = []
+  let menuItems = ''
+  try {
     
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// }
+    let locationResult = await axios.get(`${BASEURL}/api/${type}/${id}`);
+
+    locationResult.data.forEach((location) => {
+      locationType.push(location);
+    })
+    locationType.forEach((value,index) => {
+      menuItems += `${index}. ${value.region_name}\n`
+    })
+    return menuItems
+    
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+export let splitText = (text, index) => {
+  return text.split("*")[index]
+}
