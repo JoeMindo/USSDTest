@@ -103,8 +103,8 @@ app.post("/ussd", (req, res) => {
     let output = counties.then((data) => {
       return data;
     });
-    console.log(output)
     output.then((list) => {
+      console.log(list)
       message = `CON Select county\n ${list}`;
       res.send(message);
     });
