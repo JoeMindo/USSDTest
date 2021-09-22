@@ -4,7 +4,7 @@ import { BASEURL } from "../config/urls.js";
 export let getRegions = async () => {
   
   let regions = []
-  let menuItems = {}
+  let menuItems = ''
   try {
     
     let regionsResult = await axios.get(`${BASEURL}/api/regions/`);
@@ -13,7 +13,7 @@ export let getRegions = async () => {
       regions.push(location);
     })
     regions.forEach((value,index) => {
-      menuItems[index] = value.region_name
+      menuItems += `${index}. ${value.region_name}\n`
     })
     return menuItems
     
