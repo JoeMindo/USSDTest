@@ -25,7 +25,6 @@ export let getRegions = async () => {
 
 
 export let getLocations = async (type,id,identifier,idsArr) => {
-  
   let locationType = []
   let menuItems = ''
   try {
@@ -37,8 +36,8 @@ export let getLocations = async (type,id,identifier,idsArr) => {
     })
     locationType.forEach((value,index) => {
       let name = value[identifier]
-      idsArr.push({'id':`${value['id']}`})
-      menuItems += `${index}. ${name}\n`
+      menuItems += `${index}. ${name}:${value.id}\n`
+      
     })
     return menuItems
     

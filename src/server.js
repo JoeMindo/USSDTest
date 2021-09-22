@@ -99,12 +99,12 @@ app.post("/ussd", (req, res) => {
       res.send(message);
     });
   } else if (textValue === 11) {
-    console.log("TextValue", textValue);
+    // console.log("TextValue", textValue);
     let countyID = splitText(text, 10);
     countyID = parseInt(countyID);
     countyID += 1;
     console.log("County ID", countyID);
-    let counties = getLocations("counties", countyID, "county_name", countyIDS);
+    let counties = getLocations("counties", countyID, "county_name");
     let output = counties.then((data) => {
       return data;
     });
@@ -115,56 +115,56 @@ app.post("/ussd", (req, res) => {
     });
   }
   // Sub county
-  else if (textValue === 12) {
-    let subcountyPos = splitText(text, 11);
-    subcountyPos = parseInt(subcountyPos);
-    let subcountyID = countyIDS[subcountyPos].id;
-    console.log("CountyIDS", countyIDS)
-    console.log('Subcounty ID', subcountyID)
-    let subcounties = getLocations(
-      "subcounties",
-      subcountyID,
-      "subcounty_name",
-      subcountyIDS
-    );
-    let output = subcounties.then((data) => {
-      return data;
-    });
-    output.then((list) => {
-      message = `CON Select subcounty\n ${list}`;
-      res.send(message);
-    });
-  }
+  // else if (textValue === 12) {
+  //   let subcountyPos = splitText(text, 11);
+  //   subcountyPos = parseInt(subcountyPos);
+  //   let subcountyID = countyIDS[subcountyPos];
+  //   console.log("CountyIDS", countyIDS)
+  //   console.log('Subcounty ID', subcountyID)
+  //   let subcounties = getLocations(
+  //     "subcounties",
+  //     subcountyID,
+  //     "subcounty_name",
+  //   );
+  //   let output = subcounties.then((data) => {
+  //     return data;
+  //   });
+  //   output.then((list) => {
+  //     message = `CON Select subcounty\n ${list}`;
+  //     res.send(message);
+  //   });
+  // }
   // Location
-  else if (textValue === 13) {
-    let locationPos = splitText(text, 12);
-    locationPos = parseInt(locationPos);
-    let locationID = subcountyIDS[locationPos];
+  // else if (textValue === 13) {
+  //   let locationPos = splitText(text, 12);
+  //   locationPos = parseInt(locationPos);
+  //   let locationID = subcountyIDS[locationPos];
 
-    let locations = getLocations(
-      "locations",
-      locationID,
-      "location_name",
-      locationIDS
-    );
-    let output = locations.then((data) => {
-      return data;
-    });
-    output.then((list) => {
-      message = `CON Select location\n ${list}`;
-      res.send(message);
-    });
-  }
+  //   let locations = getLocations(
+  //     "locations",
+  //     locationID,
+  //     "location_name",
+  //     locationIDS
+  //   );
+  //   let output = locations.then((data) => {
+  //     return data;
+  //   });
+  //   output.then((list) => {
+  //     message = `CON Select location\n ${list}`;
+  //     res.send(message);
+  //   });
+  // }
   // Area
-  else if (textValue === 14) {
-    message = "CON Enter area";
-    res.send(message);
-  }
+  // else if (textValue === 14) {
+  //   message = "CON Enter area";
+  //   res.send(message);
+  // }
   // Complete
-  else if (textValue === 15) {
-    message = "CON Finish Registration\n 1. Yes\n 2.No";
-    res.send(message);
-  } else if (textValue === 16) {
+  // else if (textValue === 15) {
+  //   message = "CON Finish Registration\n 1. Yes\n 2.No";
+  //   res.send(message);
+  // }
+  else if (textValue === 12) {
     message = `END Thank you`;
     res.send(message);
   } else {
