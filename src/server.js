@@ -44,10 +44,13 @@ app.post("/ussd", (req, res) => {
   let textValue = text.split("*").length;
   if (text === "") {
     message = `CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login`;
+    res.send(message)
   } else if (textValue === 1 && text == "2") {
     message = `CON Enter phone`;
+    res.send(message)
   } else if (textValue === 2 && text.split("*")[0] === "2") {
     message = `CON Enter password`;
+    res.send(message)
   } else if (textValue === 3 && text.split("*")[0] === "2") {
     req.session.login = text.split("*");
     userLogin.phone_no = req.session.login[1];
@@ -55,34 +58,44 @@ app.post("/ussd", (req, res) => {
     loginUser(userLogin);
   } else if (textValue === 1) {
     message = `CON Enter your first name`;
+    res.send(message)
   } else if (textValue === 2) {
     message = `CON Enter your last name`;
+    res.send(message)
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
+    res.send(message)
   } else if (textValue === 4) {
     message = `CON Which phone number would you like us to reach you at?`;
+    res.send(message)
   } else if (textValue === 5) {
     message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
+    res.send(message)
   } else if (textValue === 6) {
     message = `CON Enter your password (Atleast 8 characters)`;
+    res.send(message)
   } else if (textValue === 7) {
     message = `CON Confirm your password`;
+    res.send(message)
   } else if (textValue === 8) {
     message = `CON Who are you?
       1. Farmer
       2. Buyer
       3. DEAN
       `;
+      res.send(message)
   } else if (textValue === 9) {
     message = `CON What is your email?`;
+    res.send(message)
     
   } else if (textValue === 10) {
     let regions = getRegions().then((data) => {
       return data
     });
-    console.log(regions)
+    
     
     message = `CON Select region\n ${regions}`
+    res.send(message)
     
     
 
@@ -90,6 +103,7 @@ app.post("/ussd", (req, res) => {
     message = `CON Complete registration
     1. Yes
     `;
+    res.send(message)
   } else {
     req.session.registration = text.split("*");
     let userDetails = {
@@ -109,7 +123,7 @@ app.post("/ussd", (req, res) => {
       console.log(result);
     });
   }
-  res.send(message);
+  
 });
 
 app.listen(port, () => {
