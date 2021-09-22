@@ -99,7 +99,7 @@ app.post("/ussd", (req, res) => {
     });
   } else if (textValue === 11) {
     let countyID = splitText(text, 11);
-    let counties = getLocations("counties", countyID);
+    let counties = getLocations("counties", countyID+1);
     let output = counties.then((data) => {
       return data;
     });
