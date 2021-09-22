@@ -75,8 +75,9 @@ app.post("/ussd", (req, res) => {
       `;
   } else if (textValue === 9) {
     message = `CON What is your email?`;
-    console.log(textValue);
+    
   } else if (textValue === 10) {
+    console.log(textValue);
     let regions = getRegions();
     let menuItems = "";
     regions.then((output) => {
