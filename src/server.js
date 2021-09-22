@@ -100,7 +100,8 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 11) {
     console.log('TextValue',textValue)
     let countyID = text.split("*")[10];
-    countyID+=1
+    countyID = parseInt(countyID)
+    countyID += 1
     console.log('County ID', countyID)
     let counties = getLocations("counties", countyID,'county_name');
     let output = counties.then((data) => {
