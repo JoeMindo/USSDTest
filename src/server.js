@@ -77,7 +77,6 @@ app.post("/ussd", (req, res) => {
     message = `CON What is your email?`;
     
   } else if (textValue === 10) {
-    console.log(textValue);
     let regions = getRegions();
     let menuItems = "";
     regions.then((output) => {
@@ -86,12 +85,8 @@ app.post("/ussd", (req, res) => {
         menuItems += `${index}. ${value.region_name}\n`;
       });
       message = `CON Choose your region\n${menuItems}`;
-      console.log('Message:',message)
     });
-   
-    
 
-  
   } else if (textValue === 11) {
     message = `CON Complete registration
     1. Yes
