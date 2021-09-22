@@ -85,6 +85,7 @@ app.post("/ussd", (req, res) => {
         menuItems += `${index}. ${value.region_name}\n`;
       });
     });
+    console.log(menuItems);
     message = `CON Choose your region\n${menuItems}`;
 
     console.log("This is the message", message);
