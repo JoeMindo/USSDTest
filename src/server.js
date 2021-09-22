@@ -99,7 +99,7 @@ app.post("/ussd", (req, res) => {
     });
   } else if (textValue === 11) {
     console.log('TextValue',textValue)
-    let countyID = splitText(req.body.text, 11);
+    let countyID = text.split("*")[11];
     console.log('County ID', countyID)
     let counties = getLocations("counties", countyID+1);
     let output = counties.then((data) => {
