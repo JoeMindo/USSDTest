@@ -126,6 +126,7 @@ app.post("/ussd", (req, res) => {
       subcountyIDS
     );
     let output = subcounties.then((data) => {
+      console.log(data)
       return data;
     });
     output.then((list) => {
