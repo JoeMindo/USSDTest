@@ -119,6 +119,7 @@ app.post("/ussd", (req, res) => {
     let subcountyPos = splitText(text, 11);
     subcountyPos = parseInt(subcountyPos);
     let subcountyID = countyIDS[subcountyPos];
+    console.log("CountyIDS", countyIDS)
     console.log('Subcounty ID', subcountyID)
     let subcounties = getLocations(
       "subcounties",
