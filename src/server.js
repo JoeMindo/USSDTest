@@ -86,7 +86,7 @@ app.post("/ussd", (req, res) => {
       });
       return menuItems;
     });
-    console.log('Items',menuItems);
+    console.log('Items'+menuItems);
     message = `CON Choose your region\n${menuItems}`;
 
   } else if (textValue === 11) {
