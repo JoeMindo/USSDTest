@@ -6,7 +6,7 @@ import session from "express-session";
 import redis from "redis";
 import connectRedis from "connect-redis";
 import { registerUser, clearData, loginUser } from "./core/usermanagement.mjs";
-import { listLocations } from "./core/listlocations.js";
+import { getRegions } from "./core/listlocations.js";
 
 const port = process.env.PORT || 3030;
 
