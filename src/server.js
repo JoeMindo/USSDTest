@@ -114,10 +114,10 @@ app.post("/ussd", (req, res) => {
     })
 
     let counties = getLocations("counties", county_id[userInput], "county_name");
-    let output = counties.then((data) => {
+    let county_data = counties.then((data) => {
       return data;
     });
-    output.then((list) => {
+    county_data.then((list) => {
       console.log("List", list);
       message = `CON Select county\n ${list.items}`;
       res.send(message);
