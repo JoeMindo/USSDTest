@@ -122,15 +122,15 @@ app.post("/ussd", (req, res) => {
      
     })
     
-    let counties = getLocations("counties", county_id[userInput], "county_name");
-    let county_data = counties.then((data) => {
-      return data;
-    });
-    county_data.then((list) => {
-      console.log("List", list);
-      message = `CON Select county\n ${list.items}`;
-      res.send(message);
-    });
+    // let counties = getLocations("counties", county_id[userInput], "county_name");
+    // let county_data = counties.then((data) => {
+    //   return data;
+    // });
+    // county_data.then((list) => {
+    //   console.log("List", list);
+    //   message = `CON Select county\n ${list.items}`;
+    //   res.send(message);
+    // });
   }
   // Sub county
   // else if (textValue === 12) {
