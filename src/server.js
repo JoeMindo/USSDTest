@@ -198,7 +198,8 @@ app.post("/ussd", (req, res) => {
           console.log('Subcounty list', location_ids.ids)
           let locations = getLocations(
             "locations",
-            location_ids.ids[(subcountyInput, "location_name")]
+            location_ids.ids[subcountyInput]
+            , "location_name"
           );
           let location_data = locations.then((data) => {
             return data;
