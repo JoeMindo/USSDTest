@@ -69,8 +69,9 @@ app.post("/ussd", (req, res) => {
     req.session.login = text.split("*");
     userLogin.phone_no = req.session.login[1];
     userLogin.password = req.session.login[2];
-    loginUser(userLogin).then(() => {
-      message = `END Thank you for registering`
+    loginUser(userLogin).then((response) => {
+      message = `CON Welcome`
+      console.log(response)
       res.send(message)
     });
     console.log('Login response',loginUser(userLogin))
