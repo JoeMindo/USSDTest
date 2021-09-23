@@ -14,7 +14,7 @@ const app = express();
 
 // const RedisStore = connectRedis(session);
 
-let client = redis.createClient();
+let client = redis.createClient('redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100');
 client.on('connect', () =>{
   console.log('connected');
 });
