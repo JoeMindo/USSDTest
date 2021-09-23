@@ -17,7 +17,7 @@ export let getRegions = async () => {
       menuItems += `${index}. ${value.region_name}\n`
       menuIDs.push(value.id_region)
     })
-    return [menuItems, menuIDS]
+    return [menuItems, menuIDs]
     
   } catch (error) {
     throw new Error(error);
