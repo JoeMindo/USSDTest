@@ -73,7 +73,7 @@ app.post("/ussd", (req, res) => {
       message = `END Thank you for registering`
       res.send(message)
     });
-    console.log(loginUser(userLogin))
+    console.log('Login response',loginUser(userLogin))
 
     // } else if (textValue === 3 && text.split("*")[0] === "2") {
     //   if(loginUser(userDetails))
