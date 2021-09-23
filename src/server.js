@@ -92,8 +92,8 @@ app.post("/ussd", (req, res) => {
   
         res.send(message);
       });
-    } else if (textValue === 10) {
-      let userInput = splitText(text, 9);
+    } else if (textValue === 5 && text.split("*")[0] === "2") {
+      let userInput = splitText(text, 4);
       userInput = parseInt(userInput);
       // Get regionID
       let regions = getRegions();
