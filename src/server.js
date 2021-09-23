@@ -72,7 +72,7 @@ app.post("/ussd", (req, res) => {
     loginUser(userLogin).then((response) => {
       message = `CON Welcome`
       if (response.data.geo_status === false && response.data.location === false) {
-        message = `1. Update location`
+        message = `CON 1. Update location`
         res.send(message)
 
 
