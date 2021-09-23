@@ -118,6 +118,7 @@ app.post("/ussd", (req, res) => {
       county_data.then((list) => {
         console.log("List", list);
         countyIDS.push(list.ids)
+        console.log('Ids',countyIDS)
         message = `CON Select county\n ${list.items}`;
         res.send(message);
       });
