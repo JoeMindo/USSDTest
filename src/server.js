@@ -69,7 +69,10 @@ app.post("/ussd", (req, res) => {
     req.session.login = text.split("*");
     userLogin.phone_no = req.session.login[1];
     userLogin.password = req.session.login[2];
-    loginUser(userLogin);
+    loginUser(userLogin).then(() => {
+      message = `END Thank you for registering`
+      res.send(message)
+    });
     console.log(loginUser(userLogin))
 
     // } else if (textValue === 3 && text.split("*")[0] === "2") {
