@@ -15,12 +15,12 @@ const app = express();
 // const RedisStore = connectRedis(session);
 
 // let client = redis.createClient('https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100');
-const client = redis.createClient({
-  host: "https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100",
-  port: 6379,
-  no_ready_check: true,
-  auth_pass: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH'
-});
+// const client = redis.createClient({
+//   host: "https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100",
+//   port: 6379,
+//   no_ready_check: true,
+//   auth_pass: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH'
+// });
 
 client.on('connect', () =>{
   console.log('connected');
