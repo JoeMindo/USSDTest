@@ -96,8 +96,7 @@ app.post("/ussd", (req, res) => {
     });
     output.then((list) => {
       message = `CON Select region\n ${list.items}`;
-      console.log(list.ids)
-      
+      console.log(list.ids);
 
       res.send(message);
     });
@@ -110,25 +109,28 @@ app.post("/ussd", (req, res) => {
       return data;
     });
     output.then((region_ids) => {
-      let counties = getLocations("counties", region_ids.ids[userInput], "county_name");
+      let counties = getLocations(
+        "counties",
+        region_ids.ids[userInput],
+        "county_name"
+      );
       let county_data = counties.then((data) => {
-        console.log(data)
+        console.log(data);
         return data;
       });
       county_data.then((list) => {
         console.log("List", list);
-        countyIDS.push(list.ids)
-        console.log('Ids',countyIDS)
+        countyIDS.push(list.ids);
+        console.log("Ids", countyIDS);
         message = `CON Select county\n ${list.items}`;
         res.send(message);
       });
-     
-    })
+    });
   }
-    // Sub county list
+  // Sub county list
   else if (textValue === 12) {
     let regionInput = splitText(text, 10);
-    let countyInput = splitText(text,11)
+    let countyInput = splitText(text, 11);
     regionInput = parseInt(regionInput);
     // Get regionID
     let regions = getRegions();
@@ -136,31 +138,78 @@ app.post("/ussd", (req, res) => {
       return data;
     });
     output.then((region_ids) => {
-      let counties = getLocations("counties", region_ids.ids[regionInput], "county_name");
+      let counties = getLocations(
+        "counties",
+        region_ids.ids[regionInput],
+        "county_name"
+      );
       let county_data = counties.then((data) => {
-        console.log(data)
+        console.log(data);
         return data;
       });
       county_data.then((county_ids) => {
-        let subcounties = getLocations("subcounties", county_ids.ids[countyInput], "sub_county_name")
+        let subcounties = getLocations(
+          "subcounties",
+          county_ids.ids[countyInput],
+          "sub_county_name"
+        );
         let subcounty_data = subcounties.then((data) => {
           return data;
-        })
+        });
         subcounty_data.then((list) => {
           console.log("List", list.ids);
           message = `CON Select subcounty\n ${list.items}`;
           res.send(message);
         });
-        
       });
-     
-    })
-    
+    });
   }
-
+  // Locations
   else if (textValue === 13) {
-    message = `END Thank you`;
-    res.send(message);
+    let regionInput = splitText(text, 10);
+    let countyInput = splitText(text, 11);
+    let subcountyInput = splitText(text, 12);
+    regionInput = parseInt(regionInput);
+    // Get regionID
+    let regions = getRegions();
+    let output = regions.then((data) => {
+      return data;
+    });
+    output.then((region_ids) => {
+      let counties = getLocations(
+        "counties",
+        region_ids.ids[regionInput],
+        "county_name"
+      );
+      let county_data = counties.then((data) => {
+        console.log(data);
+        return data;
+      });
+      county_data.then((county_ids) => {
+        let subcounties = getLocations(
+          "subcounties",
+          county_ids.ids[countyInput],
+          "sub_county_name"
+        );
+        let subcounty_data = subcounties.then((data) => {
+          return data;
+        });
+        subcounty_data.then((location_ids) => {
+          let locations = getLocations(
+            "locations",
+            location_ids.ids[(subcountyInput, "location_name")]
+          );
+          let location_data = locations.then((data) => {
+            return data;
+          });
+          location_data.then((list) => {
+            console.log("Locations", list);
+            message = `CON Select locations\n ${list.items}`;
+            res.send(message);
+          });
+        });
+      });
+    });
   } else {
     req.session.registration = text.split("*");
     let userDetails = {
