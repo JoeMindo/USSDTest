@@ -116,7 +116,7 @@ app.post("/ussd", (req, res) => {
       return response
 
     })
-    console.log(resolvedIds)
+    console.log('Resolved IDS', resolvedIds)
     let counties = getLocations("counties", county_id[userInput], "county_name");
     let county_data = counties.then((data) => {
       return data;
