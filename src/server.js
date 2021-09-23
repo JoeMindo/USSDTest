@@ -95,7 +95,7 @@ app.post("/ussd", (req, res) => {
       return data;
     });
     output.then((list) => {
-      message = `CON Select region\n ${list[0],list[1]}`;
+      message = `CON Select region\n ${list.items}`;
       res.send(message);
     });
   } else if (textValue === 11) {
