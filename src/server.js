@@ -96,6 +96,7 @@ app.post("/ussd", (req, res) => {
     });
     output.then((list) => {
       message = `CON Select region\n ${list.items}`;
+      console.log(list.ids)
       
 
       res.send(message);
