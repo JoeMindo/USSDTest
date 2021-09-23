@@ -110,7 +110,7 @@ app.post("/ussd", (req, res) => {
       return data;
     });
     output.then((region_ids) => {
-      let counties = getLocations("counties", region_ids[userInput], "county_name");
+      let counties = getLocations("counties", region_ids.ids[userInput], "county_name");
       let county_data = counties.then((data) => {
         console.log(data)
         return data;
