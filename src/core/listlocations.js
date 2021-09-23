@@ -15,7 +15,7 @@ export let getRegions = async () => {
     regions.forEach((value,index) => {
       menuItems += `${index}. ${value.region_name}: ${value.id_regions}\n`
     })
-    return menuItems
+    return menuItems.split(":")[0]
     
   } catch (error) {
     throw new Error(error);
