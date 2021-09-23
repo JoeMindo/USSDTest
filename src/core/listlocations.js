@@ -48,6 +48,12 @@ export let getLocations = async (type, id, identifier) => {
   }
 };
 
+export let userSpecificSelection = (index, text) => {
+  if (text.split(".")[0] === index) {
+    return text.split('. ')[1]
+    
+  }
+}
 export let splitText = (text, index) => {
   return text.split("*")[index];
 };

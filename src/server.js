@@ -6,13 +6,16 @@ import session from "express-session";
 import redis from "redis";
 import connectRedis from "connect-redis";
 import { registerUser, clearData, loginUser } from "./core/usermanagement.mjs";
-import { getRegions, getLocations, splitText } from "./core/listlocations.js";
+import { getRegions, getLocations, splitText, userSpecificSelection } from "./core/listlocations.js";
 
 const port = process.env.PORT || 3030;
 
 const app = express();
 
-const RedisStore = connectRedis(session);
+// const RedisStore = connectRedis(session);
+
+let client = redis.createClient();
+
 app.use(logger("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -58,7 +61,13 @@ app.post("/ussd", (req, res) => {
     userLogin.phone_no = req.session.login[1];
     userLogin.password = req.session.login[2];
     loginUser(userLogin);
-  } else if (textValue === 1) {
+    console.log(loginUser(userLogin))
+
+    // } else if (textValue === 3 && text.split("*")[0] === "2") {
+    //   if(loginUser(userDetails))
+    
+    // }
+  }else if (textValue === 1) {
     message = `CON Enter your first name`;
     res.send(message);
   } else if (textValue === 2) {
@@ -87,9 +96,6 @@ app.post("/ussd", (req, res) => {
       `;
     res.send(message);
   } else if (textValue === 9) {
-    message = `CON What is your email?`;
-    res.send(message);
-  } else if (textValue === 10) {
     let regions = getRegions();
     let output = regions.then((data) => {
       return data;
@@ -100,8 +106,8 @@ app.post("/ussd", (req, res) => {
 
       res.send(message);
     });
-  } else if (textValue === 11) {
-    let userInput = splitText(text, 10);
+  } else if (textValue === 10) {
+    let userInput = splitText(text, 9);
     userInput = parseInt(userInput);
     // Get regionID
     let regions = getRegions();
@@ -128,9 +134,9 @@ app.post("/ussd", (req, res) => {
     });
   }
   // Sub county list
-  else if (textValue === 12) {
-    let regionInput = splitText(text, 10);
-    let countyInput = splitText(text, 11);
+  else if (textValue === 11) {
+    let regionInput = splitText(text, 9);
+    let countyInput = splitText(text, 10);
     regionInput = parseInt(regionInput);
     // Get regionID
     let regions = getRegions();
@@ -165,10 +171,10 @@ app.post("/ussd", (req, res) => {
     });
   }
   // Locations
-  else if (textValue === 13) {
-    let regionInput = splitText(text, 10);
-    let countyInput = splitText(text, 11);
-    let subcountyInput = splitText(text, 12);
+  else if (textValue === 12) {
+    let regionInput = splitText(text, 9);
+    let countyInput = splitText(text, 10);
+    let subcountyInput = splitText(text, 11);
     regionInput = parseInt(regionInput);
     // Get regionID
     let regions = getRegions();
@@ -212,10 +218,10 @@ app.post("/ussd", (req, res) => {
         });
       });
     });
-  } else if (textValue === 14) {
+  } else if (textValue === 13) {
     message = `CON Enter your area`
     res.send(message)
-  } else if (textValue === 15) {
+  } else if (textValue === 14) {
     message = `END Thank you, please wait for verification so you can start adding products`
     res.send(message)
   }
@@ -230,7 +236,7 @@ app.post("/ussd", (req, res) => {
       password: req.session.registration[6],
       password_confirmation: req.session.registration[7],
       role_id: req.session.registration[8],
-      email: req.session.registration[9],
+      // email: req.session.registration[9],
     };
     let out = registerUser(userDetails);
     out.then((result) => {
