@@ -24,7 +24,7 @@ export let getRegions = async () => {
 
 
 
-export let getLocations = async (type,id,identifier,idsArr) => {
+export let getLocations = async (type,id,identifier) => {
   let locationType = []
   let menuItems = ''
   try {
@@ -36,6 +36,7 @@ export let getLocations = async (type,id,identifier,idsArr) => {
     })
     locationType.forEach((value,index) => {
       let name = value[identifier]
+      let id = value['id']
       menuItems += `${index}. ${name}:${id}\n`
       
     })
