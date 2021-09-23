@@ -120,9 +120,9 @@ app.post("/ussd", (req, res) => {
       });
     }
     // Sub county list
-    else if (textValue === 11) {
-      let regionInput = splitText(text, 9);
-      let countyInput = splitText(text, 10);
+    else if (textValue === 6 && text.split("*")[0] === "2") {
+      let regionInput = splitText(text, 4);
+      let countyInput = splitText(text, 5);
       regionInput = parseInt(regionInput);
       // Get regionID
       let regions = getRegions();
@@ -157,10 +157,10 @@ app.post("/ussd", (req, res) => {
       });
     }
     // Locations
-    else if (textValue === 12) {
-      let regionInput = splitText(text, 9);
-      let countyInput = splitText(text, 10);
-      let subcountyInput = splitText(text, 11);
+    else if (textValue === 7 && text.split("*")[0] === "2") {
+      let regionInput = splitText(text, 4);
+      let countyInput = splitText(text, 5);
+      let subcountyInput = splitText(text, 6);
       regionInput = parseInt(regionInput);
       // Get regionID
       let regions = getRegions();
@@ -204,10 +204,10 @@ app.post("/ussd", (req, res) => {
           });
         });
       });
-    } else if (textValue === 13) {
+    } else if (textValue === 8 && text.split("*")[0] === "2") {
       message = `CON Enter your area`
       res.send(message)
-    } else if (textValue === 14) {
+    } else if (textValue === 9 && text.split("*")[0] === "2") {
       message = `END Thank you, please wait for verification so you can start adding products`
       res.send(message)
     
