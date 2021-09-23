@@ -96,23 +96,30 @@ app.post("/ussd", (req, res) => {
     });
     output.then((list) => {
       message = `CON Select region\n ${list.items}`;
-      console.log(list.ids)
+      
 
       res.send(message);
     });
   } else if (textValue === 11) {
-    // console.log("TextValue", textValue);
-    let countyID = splitText(text, 10);
-    countyID = parseInt(countyID);
-    countyID += 1;
-    console.log("County ID", countyID);
-    let counties = getLocations("counties", countyID, "county_name");
+    let userInput = splitText(text, 10);
+    userInput = parseInt(userInput);
+    console.log("County ID", userInput);
+    // Get regionID
+    let regions = getRegions();
+    let output = regions.then((data) => {
+      return data;
+    });
+    let county_id = output.then((ids) => {
+      return ids
+    })
+
+    let counties = getLocations("counties", county_id[userInput], "county_name");
     let output = counties.then((data) => {
       return data;
     });
     output.then((list) => {
       console.log("List", list);
-      message = `CON Select county\n ${list}`;
+      message = `CON Select county\n ${list.items}`;
       res.send(message);
     });
   }
