@@ -15,7 +15,9 @@ const app = express();
 // const RedisStore = connectRedis(session);
 
 let client = redis.createClient();
-
+client.on('connect', () =>{
+  console.log('connected');
+});
 app.use(logger("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -95,14 +97,35 @@ app.post("/ussd", (req, res) => {
       3. DEAN
       `;
     res.send(message);
-  } else if (textValue === 9) {
+  } else if (textValue === 9 && text.split("*")[0] === "1") {
+    req.session.registration = text.split("*");
+    let userDetails = {
+      first_name: req.session.registration[1],
+      last_name: req.session.registration[2],
+      id_no: req.session.registration[3],
+      phone_no: req.session.registration[4],
+      gender: "Male",
+      password: req.session.registration[6],
+      password_confirmation: req.session.registration[7],
+      role_id: req.session.registration[8],
+      // email: req.session.registration[9],
+    };
+    let out = registerUser(userDetails);
+    out.then((result) => {
+      message = `END Thank you! ${result}`;
+      console.log(result);
+      res.send(message);
+    });
+    
+  }
+  else if (textValue === 9) {
     let regions = getRegions();
     let output = regions.then((data) => {
       return data;
     });
     output.then((list) => {
       message = `CON Select region\n ${list.items}`;
-      console.log(list.ids);
+      
 
       res.send(message);
     });
@@ -226,23 +249,8 @@ app.post("/ussd", (req, res) => {
     res.send(message)
   }
   else {
-    req.session.registration = text.split("*");
-    let userDetails = {
-      first_name: req.session.registration[1],
-      last_name: req.session.registration[2],
-      id_no: req.session.registration[3],
-      phone_no: req.session.registration[4],
-      gender: "Male",
-      password: req.session.registration[6],
-      password_confirmation: req.session.registration[7],
-      role_id: req.session.registration[8],
-      // email: req.session.registration[9],
-    };
-    let out = registerUser(userDetails);
-    out.then((result) => {
-      message = `END Thank you! ${result}`;
-      console.log(result);
-    });
+    message = `Hmm someting went wrong`
+    res.send(message)
   }
 });
 
