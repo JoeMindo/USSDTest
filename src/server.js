@@ -127,30 +127,38 @@ app.post("/ussd", (req, res) => {
   }
     // Sub county list
   else if (textValue === 12) {
-    console.log(countyIDS)
-    let userInput = splitText(text, 10);
-    userInput = parseInt(userInput);
+    let regionInput = splitText(text, 10);
+    let countyInput = splitText(text,11)
+    regionInput = parseInt(regionInput);
     // Get regionID
     let regions = getRegions();
     let output = regions.then((data) => {
       return data;
     });
     output.then((region_ids) => {
-      let counties = getLocations("counties", region_ids.ids[userInput], "county_name");
+      let counties = getLocations("counties", region_ids.ids[regionInput], "county_name");
       let county_data = counties.then((data) => {
         console.log(data)
         return data;
       });
-      county_data.then((list) => {
-        console.log("List", list);
-        message = `CON Select county\n ${list.items}`;
+      county_data.then((county_ids) => {
+        let subcounties = getLocations("subcounties", county_ids.ids[countyInput], "sub_county_name")
+        let subcounty_data = subcounties.then((data) => {
+          return data;
+        })
+        subcounty_data.then((list) => {
+          console.log("List", list.ids);
+          message = `CON Select subcounty\n ${list.items}`;
+          res.send(message);
+        });
         res.send(message);
       });
      
     })
+    
   }
 
-  else if (textValue === 12) {
+  else if (textValue === 13) {
     message = `END Thank you`;
     res.send(message);
   } else {
