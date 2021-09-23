@@ -13,7 +13,7 @@ export let getRegions = async () => {
       regions.push(location);
     })
     regions.forEach((value,index) => {
-      menuItems += `${index}. ${value.region_name}: ${value.id}\n`
+      menuItems += `${index}. ${value.region_name}: ${value.id_regions}\n`
     })
     return menuItems
     
