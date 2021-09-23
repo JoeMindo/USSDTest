@@ -22,9 +22,9 @@ const app = express();
 //   auth_pass: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH'
 // });
 
-client.on('connect', () =>{
-  console.log('connected');
-});
+// client.on('connect', () =>{
+//   console.log('connected');
+// });
 app.use(logger("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
