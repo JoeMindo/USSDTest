@@ -109,9 +109,17 @@ app.post("/ussd", (req, res) => {
     let output = regions.then((data) => {
       return data;
     });
-    let county_id = output.then((ids) => {
-      console.log('county_ids', ids.ids)
-      return ids.ids
+    output.then((region_ids) => {
+      let counties = getLocations("counties", region_ids[userInput], "county_name");
+      let county_data = counties.then((data) => {
+        return data;
+      });
+      county_data.then((list) => {
+        console.log("List", list);
+        message = `CON Select county\n ${list.items}`;
+        res.send(message);
+      });
+     
     })
     
     let counties = getLocations("counties", county_id[userInput], "county_name");
