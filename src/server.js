@@ -151,7 +151,7 @@ app.post("/ussd", (req, res) => {
           message = `CON Select subcounty\n ${list.items}`;
           res.send(message);
         });
-        res.send(message);
+        
       });
      
     })
