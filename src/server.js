@@ -117,7 +117,6 @@ app.post("/ussd", (req, res) => {
       });
       county_data.then((list) => {
         console.log("List", list);
-        countyIDS.push(list.ids);
         console.log("Ids", countyIDS);
         message = `CON Select county\n ${list.items}`;
         res.send(message);
@@ -215,7 +214,7 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 9 && text.split("*")[0] === "2") {
     message = `END Thank you, please wait for verification so you can start adding products`;
     req.session.location = text.split("*");
-    let locationDetails = {}
+    
     res.send(message);
   } else if (textValue === 4) {
     message = `CON Enter your first name`;
@@ -260,8 +259,8 @@ app.post("/ussd", (req, res) => {
     };
     let out = registerUser(userDetails);
     out.then((result) => {
-      message = `END Thank you! ${result}`;
-      console.log(result);
+      message = `END Thank you!`;
+      
       res.send(message);
     });
   } else {
