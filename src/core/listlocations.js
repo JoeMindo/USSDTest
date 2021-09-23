@@ -5,7 +5,7 @@ export let getRegions = async () => {
   
   let regions = []
   let menuItems = ''
-  let menuIDs = [];
+  let menuIDs = '';
   try {
     
     let regionsResult = await axios.get(`${BASEURL}/api/regions/`);
@@ -15,7 +15,7 @@ export let getRegions = async () => {
     })
     regions.forEach((value,index) => {
       menuItems += `${index}. ${value.region_name}\n`
-      menuIDs.push(value.id_region)
+      menuIDs+=`${value.id_regions}`
     })
     return {
       items: menuItems,
