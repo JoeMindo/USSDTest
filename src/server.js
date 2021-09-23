@@ -212,7 +212,14 @@ app.post("/ussd", (req, res) => {
         });
       });
     });
-  } else {
+  } else if (textValue === 14) {
+    message = `CON Enter your area`
+    res.send(message)
+  } else if (textValue === 15) {
+    message = `END Thank you, please wait for verification so you can start adding products`
+    res.send(message)
+  }
+  else {
     req.session.registration = text.split("*");
     let userDetails = {
       first_name: req.session.registration[1],
