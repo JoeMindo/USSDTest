@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import { postrequest } from './services.mjs'
 import { BASEURL } from '../config/urls.js'
 
@@ -58,4 +58,18 @@ let loginUser = async (loginData) => {
     console.log(error);
   }
 }
-export { clearData, registerUser,loginUser };
+let addLocation = async (locationData,id) => {
+ 
+  
+  var path = `${BASEURL}/api/geoarea/${id}`
+  
+  try {
+    var locationResponse = await postrequest(locationData, path);
+    return locationResponse
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+export { clearData, registerUser,loginUser, addLocation };
