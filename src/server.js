@@ -4,20 +4,18 @@ import logger from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import redis from "redis";
-import connectRedis from "connect-redis";
-import { registerUser, clearData, loginUser } from "./core/usermanagement.mjs";
+
+import { registerUser, loginUser } from "./core/usermanagement.mjs";
 import {
   getRegions,
   getLocations,
   splitText,
-  userSpecificSelection,
 } from "./core/listlocations.js";
 
 const port = process.env.PORT || 3030;
 
 const app = express();
 
-const RedisStore = connectRedis(session);
 
 // let client = redis.createClient('https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100');
 const client = redis.createClient({
@@ -53,12 +51,7 @@ app.post("/ussd", (req, res) => {
     password: "",
   };
   var userID = [];
-  var subcountyIDS = [];
-  let sessionId = req.body.sessionId;
   let text = req.body.text;
-  let phoneNumber = req.body.phoneNumber;
-  let serviceCode = req.body.serviceCode;
-  var locationIDS = [];
   console.log("incoming text" + text);
   let textValue = text.split("*").length;
   if (text === "") {
@@ -257,7 +250,7 @@ app.post("/ussd", (req, res) => {
       // email: req.session.registration[9],
     };
     let out = registerUser(userDetails);
-    out.then((result) => {
+    out.then(() => {
       message = `END Thank you!`;
       
       res.send(message);
