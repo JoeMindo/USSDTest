@@ -19,7 +19,7 @@ const app = express();
 
 const RedisStore = connectRedis(session);
 
-let client = redis.createClient('https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100');
+// let client = redis.createClient('https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100');
 const client = redis.createClient({
   host: "https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100",
   port: 6379,
