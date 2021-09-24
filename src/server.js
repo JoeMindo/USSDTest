@@ -6,27 +6,16 @@ import session from "express-session";
 import redis from "redis";
 
 import { registerUser, loginUser } from "./core/usermanagement.mjs";
-import {
-  getRegions,
-  getLocations,
-  splitText,
-} from "./core/listlocations.js";
+import { getRegions, getLocations, splitText } from "./core/listlocations.js";
 
 const port = process.env.PORT || 3030;
 
 const app = express();
 
+const client = redis.createClient();
 
-// let client = redis.createClient('https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100');
-const client = redis.createClient({
-  host: "https://redis-19100.c251.east-us-mz.azure.cloud.redislabs.com:19100",
-  port: 6379,
-  no_ready_check: true,
-  auth_pass: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH'
-});
-
-client.on('connect', () =>{
-  console.log('connected');
+client.on("connect", () => {
+  console.log("connected");
 });
 app.use(logger("dev"));
 app.use(cookieParser());
@@ -74,13 +63,13 @@ app.post("/ussd", (req, res) => {
         response.data.location === false
       ) {
         message = `CON 1. Update location\n2. Add Products`;
-        userID.push(response.user_id)
-        console.log('User ID Promise', userID)
+        userID.push(response.user_id);
+        console.log("User ID Promise", userID);
         res.send(message);
       }
     });
   } else if (textValue === 4 && text.split("*")[0] === "2") {
-    console.log(userID)
+    console.log(userID);
     let regions = getRegions();
     let output = regions.then((data) => {
       return data;
@@ -206,7 +195,7 @@ app.post("/ussd", (req, res) => {
   } else if (textValue === 9 && text.split("*")[0] === "2") {
     message = `END Thank you, please wait for verification so you can start adding products`;
     req.session.location = text.split("*");
-    
+
     res.send(message);
   } else if (textValue === 4) {
     message = `CON Enter your first name`;
@@ -216,9 +205,6 @@ app.post("/ussd", (req, res) => {
     res.send(message);
   } else if (textValue === 3) {
     message = `CON What is your ID number`;
-    res.send(message);
-  } else if (textValue === 4) {
-    message = `CON Which phone number would you like us to reach you at?`;
     res.send(message);
   } else if (textValue === 5) {
     message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
@@ -252,7 +238,7 @@ app.post("/ussd", (req, res) => {
     let out = registerUser(userDetails);
     out.then(() => {
       message = `END Thank you!`;
-      
+
       res.send(message);
     });
   } else {
