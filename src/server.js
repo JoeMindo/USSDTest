@@ -12,7 +12,9 @@ import { ussdRouter } from 'ussd-router';
 import { registerUser, loginUser, addLocation } from './core/usermanagement.mjs';
 
 import { getRegions, getLocations, splitText } from './core/listlocations.js';
-import { fetchCategories, fetchProducts, addProduct } from './core/productmanagement.js';
+import {
+  fetchCategories, fetchProducts, addProduct, getSpecificProduct,
+} from './core/productmanagement.js';
 import { addFarm } from './core/farmmanagement.js';
 
 const port = process.env.PORT || 3030;
@@ -52,12 +54,20 @@ app.post('/ussd', (req, res) => {
     phone_no: '',
     password: '',
   };
+  const grades = {
+    1: 'A',
+    2: 'B',
+    3: 'C',
+    4: 'D',
+    5: 'E',
+  };
   const rawtext = req.body.text;
   const text = ussdRouter(rawtext, '98', '99');
   // TODO: Migrate this to usermanagement
   const isRegistration = text.split('*')[0] === '1';
   const isLogin = text.split('*')[0] === '2';
   const isAddFarmDetails = text.split('*')[3] === '2';
+  const isAddProduct = text.split('*')[3] === '3';
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
 
@@ -83,14 +93,10 @@ app.post('/ussd', (req, res) => {
         response.data.geo_status === false
         && response.data.location === false
       ) {
-        message = 'CON 1. Update location\n 2. Add Farm details\n';
+        message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products';
         message += footer;
         res.send(message);
         client.set('user_id', `${response.data.user_id}`, redis.print);
-      } else {
-        message = 'CON 1. Update location\n 2. Add products\n';
-        message += footer;
-        res.send(message);
       }
     });
   } else if (textValue === 4 && isLogin && isAddFarmDetails) {
@@ -151,8 +157,52 @@ app.post('/ussd', (req, res) => {
       console.log(farmDetails);
 
       addFarm(farmDetails).then((response) => {
-        console.log(response);
+        console.log('Farm response ID', response.data.success.id);
+        client.set('farm_id', response.data.success.id);
         message = 'END Farm added successfully';
+        res.send(message);
+      });
+    });
+  } else if (textValue === 4 && isLogin && isAddProduct) {
+    const getFarmProduce = () => {
+      const productId = client.getAsync('productID').then((reply) => reply);
+      return Promise.all([productId]);
+    };
+    getFarmProduce().then((results) => {
+      const productID = results[0];
+      getSpecificProduct(productID).then((response) => {
+        console.log(response);
+        message = `CON Enter the quantity of ${response.data.product_name}`;
+        message += footer;
+        res.send(message);
+      });
+    });
+  } else if (textValue === 5 && isLogin && isAddProduct) {
+    const units = text.split('*')[4];
+    client.set('units', units);
+
+    message = `CON How would you grade your produce?\n1.${grades[1]}\n2.${grades[2]}\n3.${grades[3]}\n4. ${grades[4]}\n5. ${grades[5]}`;
+    message += footer;
+    res.send(message);
+  } else if (textValue === 6 && isLogin && isAddProduct) {
+    const grade = text.split('*')[5];
+    const units = text.split('*')[4];
+    const getFarmValues = () => {
+      const farmId = client.getAsync('farm_id').then((reply) => reply);
+      const productId = client.getAsync('productID').then((reply) => reply);
+      return Promise.all([farmId, productId]);
+    };
+    getFarmValues().then((results) => {
+      const produceDetails = {
+        farm_id: results[0],
+        product_id: results[1],
+        units,
+        grade: grades[grade],
+      };
+      console.log(produceDetails);
+      addProduct(produceDetails).then((response) => {
+        console.log(response);
+        message = 'END Produce added successfully';
         res.send(message);
       });
     });

@@ -52,6 +52,7 @@ const loginUser = async (loginData) => {
     console.log(error);
   }
 };
+
 const addLocation = async (locationData, id) => {
   const path = `${BASEURL}/api/geoarea/${id}`;
 

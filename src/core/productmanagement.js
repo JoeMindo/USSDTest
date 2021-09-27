@@ -66,12 +66,22 @@ async function fetchProducts(id) {
 
 const addProduct = async (productdata) => {
   try {
-    const newProduct = axios.post(`${BASEURL}/api/farmcatalogs/save`, productdata);
+    const newProduct = axios.post(`${BASEURL}/api/farmcatalog/save`, productdata);
+    console.log(newProduct);
     return newProduct;
   } catch (err) {
     throw new Error(err);
   }
 };
+
+const getSpecificProduct = async (id) => {
+  try {
+    const specificProduct = axios.get(`${BASEURL}/api/product/${id}`);
+    return specificProduct;
+  } catch (err) {
+    throw new Error(err);
+  }
+}
 export {
-  fetchCategories, fetchProducts,addProduct,
+  fetchCategories, fetchProducts,addProduct, getSpecificProduct,
 };
