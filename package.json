@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "mocha",
-    "start": "nodemon src/server.js "
+    "start": "nodemon src/server.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Adalabsafricaltd/Mamlaka-USSD#readme",
   "devDependencies": {
     "async-redis": "^2.0.0",
+    "babel-eslint": "^10.1.0",
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
     "eslint": "^7.32.0",
@@ -29,7 +30,11 @@
     "mocha": "^9.0.3",
     "mocha-axios": "^1.4.2",
     "nodemon": "^2.0.13",
-    "sinon": "^11.1.2"
+    "sinon": "^11.1.2",
+    "stylelint": "^13.13.1",
+    "stylelint-config-standard": "^21.0.0",
+    "stylelint-csstree-validator": "^1.9.0",
+    "stylelint-scss": "^3.21.0"
   },
   "dependencies": {
     "axios": "^0.21.4",
@@ -45,6 +50,8 @@
     "express-session": "^1.17.2",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
-    "redis": "^3.1.2"
+    "redis": "^3.1.2",
+    "ussd-router": "^0.1.6",
+    "uuid": "^8.3.2"
   }
 }

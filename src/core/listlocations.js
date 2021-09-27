@@ -1,12 +1,12 @@
-import axios from "axios";
-import { BASEURL } from "../config/urls.js";
+import axios from 'axios';
+import { BASEURL } from '../config/urls.js';
 
-export let getRegions = async () => {
-  let regions = [];
-  let menuItems = "";
-  let menuIDs = [];
+export const getRegions = async () => {
+  const regions = [];
+  let menuItems = '';
+  const menuIDs = [];
   try {
-    let regionsResult = await axios.get(`${BASEURL}/api/regions/`);
+    const regionsResult = await axios.get(`${BASEURL}/api/regions/`);
 
     regionsResult.data.forEach((location) => {
       regions.push(location);
@@ -24,18 +24,18 @@ export let getRegions = async () => {
   }
 };
 
-export let getLocations = async (type, id, identifier) => {
-  let locationType = [];
-  let menuItems = "";
-  let menuIDs = [];
+export const getLocations = async (type, id, identifier) => {
+  const locationType = [];
+  let menuItems = '';
+  const menuIDs = [];
   try {
-    let locationResult = await axios.get(`${BASEURL}/api/${type}/${id}`);
+    const locationResult = await axios.get(`${BASEURL}/api/${type}/${id}`);
 
     locationResult.data.forEach((location) => {
       locationType.push(location);
     });
     locationType.forEach((value, index) => {
-      let name = value[identifier];
+      const name = value[identifier];
       menuItems += `${index}. ${name}\n`;
       menuIDs.push(value.id);
     });
@@ -48,12 +48,9 @@ export let getLocations = async (type, id, identifier) => {
   }
 };
 
-export let userSpecificSelection = (index, text) => {
-  if (text.split(".")[0] === index) {
-    return text.split('. ')[1]
-    
+export const userSpecificSelection = (index, text) => {
+  if (text.split('.')[0] === index) {
+    return text.split('. ')[1];
   }
-}
-export let splitText = (text, index) => {
-  return text.split("*")[index];
 };
+export const splitText = (text, index) => text.split('*')[index];

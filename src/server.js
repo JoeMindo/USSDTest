@@ -1,16 +1,19 @@
-import express from "express";
-import bodyParser from "body-parser";
-import logger from "morgan";
-import cookieParser from "cookie-parser";
-import session from "express-session";
-import redis from "redis";
+/* eslint-disable import/extensions */
+/* eslint-disable prefer-destructuring */
+import express from 'express';
+import bodyParser from 'body-parser';
+import logger from 'morgan';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import redis from 'redis';
+import bluebird from 'bluebird';
+import { ussdRouter } from 'ussd-router';
 
-import bluebird from "bluebird";
+import { registerUser, loginUser, addLocation } from './core/usermanagement.mjs';
 
-import { registerUser, loginUser } from "./core/usermanagement.mjs";
-
-import { getRegions, getLocations, splitText } from "./core/listlocations.js";
-import { addLocation } from "./core/usermanagement.mjs";
+import { getRegions, getLocations, splitText } from './core/listlocations.js';
+import { fetchCategories, fetchProducts, addProduct } from './core/productmanagement.js';
+import { addFarm } from './core/farmmanagement.js';
 
 const port = process.env.PORT || 3030;
 
@@ -19,352 +22,398 @@ const app = express();
 const client = redis.createClient();
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
-client.on("connect", () => {
-  console.log("connected");
+client.on('connect', () => {
+  console.log('connected');
 });
-client.on("error", (error) => {
+client.on('error', (error) => {
   throw new Error(error);
 });
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.set("trust proxy", 1);
+app.set('trust proxy', 1);
 app.use(
   session({
     resave: true,
-    secret: "123456",
-    path: "/",
+    secret: '123456',
+    path: '/',
     saveUninitialized: true,
-  })
+  }),
 );
 
-app.post("/ussd", (req, res) => {
-  let message = "";
+app.post('/ussd', (req, res) => {
+  let message = '';
+  const footer = '\n98: Back 99: Home';
 
-  let userLogin = {
-    phone_no: "",
-    password: "",
+  const userLogin = {
+    phone_no: '',
+    password: '',
   };
-  let text = req.body.text;
+  const rawtext = req.body.text;
+  const text = ussdRouter(rawtext, '98', '99');
   // TODO: Migrate this to usermanagement
-  let isRegistration = text.split("*")[0] === "1"
-  let isLogin = text.split("*")[0] === "2"
-  let isEditProfile = text.split("*")[3] === "2"
-  console.log("incoming text " + text);
-  let textValue = text.split("*").length;
+  const isRegistration = text.split('*')[0] === '1';
+  const isLogin = text.split('*')[0] === '2';
+  const isAddFarmDetails = text.split('*')[3] === '2';
+  console.log(`incoming text ${text}`);
+  const textValue = text.split('*').length;
 
-  if (text === "") {
-    message = `CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login`;
+  if (text === '') {
+    message = 'CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login';
+
     res.send(message);
-  } else if (textValue === 1 && text == "2") {
-    message = `CON Enter phone`;
+  } else if (textValue === 1 && text === '2') {
+    message = 'CON Enter phone';
+    message += footer;
     res.send(message);
   } else if (textValue === 2 && isLogin) {
-    message = `CON Enter password`;
+    message = 'CON Enter password';
+    message += footer;
     res.send(message);
   } else if (textValue === 3 && isLogin) {
-    req.session.login = text.split("*");
-    userLogin.phone_no = req.session.login[1];
-    userLogin.password = req.session.login[2];
+    req.session.login = text.split('*');
+    [userLogin.phone_no, userLogin.password] = [req.session.login[1], req.session.login[2]];
     loginUser(userLogin).then((response) => {
       console.log(response);
-      message = `CON Welcome`;
+      message = 'CON Welcome';
       if (
-        response.data.geo_status === false &&
-        response.data.location === false
+        response.data.geo_status === false
+        && response.data.location === false
       ) {
-        message = `CON 1. Update location\n 2. Edit Profile`;
+        message = 'CON 1. Update location\n 2. Add Farm details\n';
+        message += footer;
         res.send(message);
-        client.set("user_id", `${response.data.user_id}`, redis.print);
-
+        client.set('user_id', `${response.data.user_id}`, redis.print);
       } else {
-        message = `CON 1. Add products\n 2. Edit Profile`
-        res.send(message)
+        message = 'CON 1. Update location\n 2. Add products\n';
+        message += footer;
+        res.send(message);
       }
     });
-  } else if (textValue === 4 && isLogin) {
-    let regions = getRegions();
-    let output = regions.then((data) => {
-      return data;
+  } else if (textValue === 4 && isLogin && isAddFarmDetails) {
+    message = 'CON Enter farm name';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 5 && isLogin && isAddFarmDetails) {
+    const farmName = text.split('*')[4];
+    client.set('farm_name', farmName, redis.print);
+    message = 'CON Enter farm location';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 6 && isLogin && isAddFarmDetails) {
+    const farmLocation = text.split('*')[5];
+    client.set('farm_location', farmLocation);
+    const categories = fetchCategories();
+    categories.then((data) => {
+      message = `Choose a category\n ${data}`;
+      message += footer;
+      res.send(message);
     });
+  } else if (textValue === 7 && isLogin && isAddFarmDetails) {
+    const category = text.split('*')[6];
+    const products = fetchProducts(category);
+    products.then((data) => {
+      message = `Choose a product\n ${data}`;
+      message += footer;
+      res.send(message);
+    });
+  } else if (textValue === 8 && isLogin && isAddFarmDetails) {
+    const productID = text.split('*')[7];
+    client.set('productID', productID);
+    message = 'CON What is the capacity per harvest';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 9 && isLogin && isAddFarmDetails) {
+    const capacity = text.split('*')[8];
+    client.set('capacity', capacity);
+    const farmName = text.split('*')[4];
+    const farmLocation = text.split('*')[5];
+    const productID = text.split('*')[7];
+    const capacityPerHarvest = text.split('*')[8];
+    const getFarmValues = () => {
+      const userId = client.getAsync('user_id').then((reply) => reply);
+      return Promise.all([userId]);
+    };
+    getFarmValues().then((results) => {
+      const capturedUser = {};
+      capturedUser.user_id = results[0];
+
+      const farmDetails = {
+        farm_name: farmName,
+        farm_location: farmLocation,
+        product_id: productID,
+        capacity: capacityPerHarvest,
+        user_id: capturedUser.user_id,
+      };
+      console.log(farmDetails);
+
+      addFarm(farmDetails).then((response) => {
+        console.log(response);
+        message = 'END Farm added successfully';
+        res.send(message);
+      });
+    });
+  } else if (textValue === 4 && isRegistration) {
+    message = 'CON Enter phone';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 4 && isLogin) {
+    const regions = getRegions();
+    const output = regions.then((data) => data);
     output.then((list) => {
       message = `CON Select region\n ${list.items}`;
+      message += footer;
 
       res.send(message);
     });
   } else if (textValue === 5 && isLogin) {
     let userInput = splitText(text, 4);
-    userInput = parseInt(userInput);
+    userInput = parseInt(userInput, 10);
     // Get regionID
-    let regions = getRegions();
-    let output = regions.then((data) => {
-      return data;
-    });
-    output.then((region_ids) => {
-
-      let counties = getLocations(
-        "counties",
-        region_ids.ids[userInput],
-        "county_name"
+    const regions = getRegions();
+    const output = regions.then((data) => data);
+    output.then((regionIDs) => {
+      const counties = getLocations(
+        'counties',
+        regionIDs.ids[userInput],
+        'county_name',
       );
-      client.set("region_id", region_ids.ids[userInput]);
-      let county_data = counties.then((data) => {
+      client.set('region_id', regionIDs.ids[userInput]);
+      const countyData = counties.then((data) => {
         console.log(data);
         return data;
       });
-      county_data.then((list) => {
-        console.log("List", list);
+      countyData.then((list) => {
+        console.log('List', list);
         message = `CON Select county\n ${list.items}`;
+        message += footer;
         res.send(message);
       });
     });
   }
   // Sub county list
-  else if (textValue === 6 && text.split("*")[0] === "2") {
+  else if (textValue === 6 && text.split('*')[0] === '2') {
     let regionInput = splitText(text, 4);
-    let countyInput = splitText(text, 5);
-    regionInput = parseInt(regionInput);
+    const countyInput = splitText(text, 5);
+    regionInput = parseInt(regionInput, 10);
     // Get regionID
-    let regions = getRegions();
-    let output = regions.then((data) => {
-      return data;
-    });
-    output.then((region_ids) => {
-      let counties = getLocations(
-        "counties",
-        region_ids.ids[regionInput],
-        "county_name"
+    const regions = getRegions();
+    const output = regions.then((data) => data);
+    output.then((regionIDs) => {
+      const counties = getLocations(
+        'counties',
+        regionIDs.ids[regionInput],
+        'county_name',
       );
-      let county_data = counties.then((data) => {
+      const countyData = counties.then((data) => {
         console.log(data);
         return data;
       });
-      county_data.then((county_ids) => {
-        let subcounties = getLocations(
-          "subcounties",
-          county_ids.ids[countyInput],
-          "sub_county_name"
+      countyData.then((countyIds) => {
+        const subcounties = getLocations(
+          'subcounties',
+          countyIds.ids[countyInput],
+          'sub_county_name',
         );
-        client.set("county_id", county_ids.ids[countyInput]);
-        let subcounty_data = subcounties.then((data) => {
-          return data;
-        });
-        subcounty_data.then((list) => {
-          console.log("List", list.ids);
+        client.set('county_id', countyIds.ids[countyInput]);
+        const subcountyData = subcounties.then((data) => data);
+        subcountyData.then((list) => {
+          console.log('List', list.ids);
           message = `CON Select subcounty\n ${list.items}`;
+          message += footer;
           res.send(message);
         });
       });
     });
   }
   // Locations
-  else if (textValue === 7 && text.split("*")[0] === "2") {
+  else if (textValue === 7 && text.split('*')[0] === '2') {
     let regionInput = splitText(text, 4);
-    let countyInput = splitText(text, 5);
-    let subcountyInput = splitText(text, 6);
-    regionInput = parseInt(regionInput);
+    const countyInput = splitText(text, 5);
+    const subcountyInput = splitText(text, 6);
+    regionInput = parseInt(regionInput, 10);
     // Get regionID
-    let regions = getRegions();
-    let output = regions.then((data) => {
-      return data;
-    });
-    output.then((region_ids) => {
-      let counties = getLocations(
-        "counties",
-        region_ids.ids[regionInput],
-        "county_name"
+    const regions = getRegions();
+    const output = regions.then((data) => data);
+    output.then((regionIDs) => {
+      const counties = getLocations(
+        'counties',
+        regionIDs.ids[regionInput],
+        'county_name',
       );
-      let county_data = counties.then((data) => {
+      const countyData = counties.then((data) => {
         console.log(data);
         return data;
       });
-      county_data.then((county_ids) => {
-        let subcounties = getLocations(
-          "subcounties",
-          county_ids.ids[countyInput],
-          "sub_county_name"
+      countyData.then((countyIds) => {
+        const subcounties = getLocations(
+          'subcounties',
+          countyIds.ids[countyInput],
+          'sub_county_name',
         );
 
-        let subcounty_data = subcounties.then((data) => {
-          return data;
-        });
-        subcounty_data.then((location_ids) => {
-          console.log("Subcounty list", location_ids.ids);
-          let locations = getLocations(
-            "locations",
-            location_ids.ids[subcountyInput],
-            "location_name"
+        const subcountyData = subcounties.then((data) => data);
+        subcountyData.then((locationIds) => {
+          console.log('Subcounty list', locationIds.ids);
+          const locations = getLocations(
+            'locations',
+            locationIds.ids[subcountyInput],
+            'location_name',
           );
-          client.set("subcounty_id", location_ids.ids[subcountyInput]);
-          let location_data = locations.then((data) => {
-            return data;
-          });
-          location_data.then((list) => {
-            console.log("Locations", list);
+          client.set('subcounty_id', locationIds.ids[subcountyInput]);
+          const locationData = locations.then((data) => data);
+          locationData.then((list) => {
+            console.log('Locations', list);
 
             message = `CON Select locations\n ${list.items}`;
+            message += footer;
             res.send(message);
           });
         });
       });
     });
-  } else if (textValue === 8 && text.split("*")[0] === "2") {
+  } else if (textValue === 8 && text.split('*')[0] === '2') {
     let regionInput = splitText(text, 4);
-    let countyInput = splitText(text, 5);
-    let subcountyInput = splitText(text, 6);
-    let locationInput = splitText(text, 7)
-    regionInput = parseInt(regionInput);
+    const countyInput = splitText(text, 5);
+    const subcountyInput = splitText(text, 6);
+    const locationInput = splitText(text, 7);
+    regionInput = parseInt(regionInput, 10);
     // Get regionID
-    let regions = getRegions();
-    let output = regions.then((data) => {
-      return data;
-    });
-    output.then((region_ids) => {
-      let counties = getLocations(
-        "counties",
-        region_ids.ids[regionInput],
-        "county_name"
+    const regions = getRegions();
+    const output = regions.then((data) => data);
+    output.then((regionIDs) => {
+      const counties = getLocations(
+        'counties',
+        regionIDs.ids[regionInput],
+        'county_name',
       );
-      let county_data = counties.then((data) => {
+      const countyData = counties.then((data) => {
         console.log(data);
         return data;
       });
-      county_data.then((county_ids) => {
-        let subcounties = getLocations(
-          "subcounties",
-          county_ids.ids[countyInput],
-          "sub_county_name"
+      countyData.then((countyIds) => {
+        const subcounties = getLocations(
+          'subcounties',
+          countyIds.ids[countyInput],
+          'sub_county_name',
         );
 
-        let subcounty_data = subcounties.then((data) => {
-          return data;
-        });
-        subcounty_data.then((location_ids) => {
-          console.log("Subcounty list", location_ids.ids);
-          let locations = getLocations(
-            "locations",
-            location_ids.ids[subcountyInput],
-            "location_name"
+        const subcountyData = subcounties.then((data) => data);
+        subcountyData.then((locationIds) => {
+          console.log('Subcounty list', locationIds.ids);
+          const locations = getLocations(
+            'locations',
+            locationIds.ids[subcountyInput],
+            'location_name',
           );
-          client.set("subcounty_id", location_ids.ids[subcountyInput]);
-          let location_data = locations.then((data) => {
-            return data;
-          });
-          location_data.then((final_location_ids) => {
-            client.set("location_id", final_location_ids.ids[locationInput])
+          client.set('subcounty_id', locationIds.ids[subcountyInput]);
+          const locationData = locations.then((data) => data);
+          locationData.then((finalLocationIds) => {
+            client.set('location_id', finalLocationIds.ids[locationInput]);
 
-            message = `CON Enter your area`;
+            message = 'CON Enter your area';
+            message += footer;
             res.send(message);
           });
         });
       });
     });
-
-
   } else if (textValue === 9 && isLogin) {
-    message = `END Thank you, please wait for verification so you can start adding products`;
-    client.set("area", text.split("*")[8])
-    let getLabelValues = () => {
-      var user_id = client.getAsync("user_id").then((reply) => {
-        return reply;
-      });
-      var region_id = client.getAsync("region_id").then((reply) => {
-        return reply;
-      });
-      var county_id = client.getAsync("county_id").then((reply) => {
-        return reply;
-      });
-      var subcounty_id = client.getAsync("subcounty_id").then((reply) => {
-        return reply;
-      });
-      var location_id = client.getAsync("location_id").then((reply) => {
-        return reply;
-      });
-      var area = client.getAsync("area").then((reply) => {
-        return reply;
-      });
-      return Promise.all([user_id, region_id, county_id, subcounty_id, location_id, area]);
+    message = 'END Thank you, please wait for verification so you can start adding products';
+    client.set('area', text.split('*')[8]);
+    const getLabelValues = () => {
+      const userId = client.getAsync('user_id').then((reply) => reply);
+      const regionId = client.getAsync('region_id').then((reply) => reply);
+      const countyId = client.getAsync('county_id').then((reply) => reply);
+      const subcountyId = client.getAsync('subcounty_id').then((reply) => reply);
+      const locationId = client.getAsync('location_id').then((reply) => reply);
+      const area = client.getAsync('area').then((reply) => reply);
+      return Promise.all([userId, regionId, countyId, subcountyId, locationId, area]);
     };
     getLabelValues().then((results) => {
-      let captured_location = {};
+      const capturedLocation = {};
 
+      capturedLocation.user_id = results[0];
+      capturedLocation.region_id = results[1];
+      capturedLocation.county_id = results[2];
+      capturedLocation.subcounty_id = results[3];
+      capturedLocation.location_id = results[4];
+      capturedLocation.area = results[5];
 
-      captured_location['user_id'] = results[0];
-      captured_location['region_id'] = results[1];
-      captured_location['county_id'] = results[2];
-      captured_location['subcounty_id'] = results[3];
-      captured_location['location_id'] = results[4];
-      captured_location['area'] = results[5];
+      const postLocation = {
+        sub_county_id: capturedLocation.subcounty_id,
+        location_id: capturedLocation.location_id,
+        area: capturedLocation.area,
 
-      let post_location = {
-        "sub_county_id": captured_location['subcounty_id'],
-        "location_id": captured_location['location_id'],
-        "area": captured_location['area']
-
-      }
-      let post_id = parseInt(captured_location['user_id'])
-      addLocation(post_location, post_id).then((response) => {
-        console.log(response)
-      })
-
-
+      };
+      const postID = parseInt(capturedLocation.user_id, 10);
+      addLocation(postLocation, postID).then((response) => {
+        console.log(response);
+      });
     });
 
     res.send(message);
   } else if ((textValue === 1 && isRegistration) || (isLogin && textValue === 4 && isEditProfile)) {
-    message = `CON Enter your first name`;
+    message = 'CON Enter your first name';
+    message += footer;
     res.send(message);
-  } else if ((textValue === 2 && isRegistration) || (isLogin && textValue === 5 )) {
-    message = `CON Enter your last name`;
+  } else if ((textValue === 2 && isRegistration) || (isLogin && textValue === 5)) {
+    message = 'CON Enter your last name';
+    message += footer;
     res.send(message);
-  } else if ((textValue === 3 && isRegistration) || (isLogin && textValue === 6 )) {
-    message = `CON What is your ID number`;
+  } else if ((textValue === 3 && isRegistration) || (isLogin && textValue === 6)) {
+    message = 'CON What is your ID number';
+    message += footer;
     res.send(message);
-  } else if ((textValue === 4 && isRegistration)|| (isLogin && textValue === 7 )) {
-    message = `CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say`;
+  } else if ((textValue === 4 && isRegistration) || (isLogin && textValue === 7)) {
+    message = 'CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say';
+    message += footer;
     res.send(message);
-  } else if ((textValue === 5 && isRegistration) || (isLogin && textValue === 8 )) {
-    message = `CON Enter your password (Atleast 8 characters)`;
+  } else if ((textValue === 5 && isRegistration) || (isLogin && textValue === 8)) {
+    message = 'CON Enter your password (Atleast 8 characters)';
+    message += footer;
     res.send(message);
-  } else if ((textValue === 6 && isRegistration)|| (isLogin && textValue === 9 )) {
-    message = `CON Confirm your password`;
+  } else if ((textValue === 6 && isRegistration) || (isLogin && textValue === 9)) {
+    message = 'CON Confirm your password';
+    message += footer;
     res.send(message);
-  } else if ((textValue === 7 && isRegistration) || (isLogin && textValue === 10 )) {
+  } else if ((textValue === 7 && isRegistration) || (isLogin && textValue === 10)) {
     message = `CON Who are you?
       1. Farmer
       2. Buyer
       3. DEAN
       `;
+    message += footer;
     res.send(message);
   } else if (textValue === 8) {
-    message = `CON Enter phone`;
+    message = 'CON Enter phone';
+    message += footer;
     res.send(message);
-  } else if (textValue === 9 && text.split("*")[0] === "1") {
-    req.session.registration = text.split("*");
-    let userDetails = {
+  } else if (textValue === 9 && text.split('*')[0] === '1') {
+    req.session.registration = text.split('*');
+    const userDetails = {
       first_name: req.session.registration[1],
       last_name: req.session.registration[2],
       id_no: req.session.registration[3],
-      gender: "Male",
+      gender: 'Male',
       password: req.session.registration[5],
       password_confirmation: req.session.registration[6],
       role_id: req.session.registration[7],
       phone_no: req.session.registration[8],
       // email: req.session.registration[9],
     };
-    let out = registerUser(userDetails);
+    const out = registerUser(userDetails);
     out.then((response) => {
-      message = `END Thank you!`;
+      message = 'END Thank you!';
       console.log(response.status);
 
       res.send(message);
     });
   } else {
-
-    message = `Hmm someting went wrong`;
+    message = 'Hmm someting went wrong';
     res.send(message);
   }
 });
