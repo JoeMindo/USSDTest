@@ -109,7 +109,7 @@ app.post('/ussd', (req, res) => {
     client.set('farm_location', farmLocation);
     const categories = fetchCategories();
     categories.then((data) => {
-      message = `CON Choose a category\n ${data}`;
+      message = `CON Choose a category of foods that you grow\n ${data}`;
       message += footer;
       res.send(message);
     });
@@ -124,7 +124,7 @@ app.post('/ussd', (req, res) => {
   } else if (textValue === 8 && isLogin && isAddFarmDetails) {
     const productID = text.split('*')[7];
     client.set('productID', productID);
-    message = 'CON What is the capacity per harvest';
+    message = 'CON What is the capacity per harvest in bags';
     message += footer;
     res.send(message);
   } else if (textValue === 9 && isLogin && isAddFarmDetails) {
