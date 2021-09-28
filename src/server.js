@@ -93,12 +93,12 @@ app.post('/ussd', (req, res) => {
         response.data.geo_status === false
         && response.data.location === false
       ) {
-        message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products';
+        message = 'CON 1. Add location\n 2. Add Farm details\n 3. Add products';
         message += footer;
         res.send(message);
         client.set('user_id', `${response.data.user_id}`, redis.print);
       } else {
-        message = 'CON 2. Add Farm details\n 3. Add products';
+        message = 'CON 1. Update Location 2. Add Farm details\n 3. Add products';
         message += footer;
         res.send(message);
         client.set('user_id', `${response.data.user_id}`, redis.print);
