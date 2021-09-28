@@ -88,21 +88,11 @@ app.post('/ussd', (req, res) => {
     [userLogin.phone_no, userLogin.password] = [req.session.login[1], req.session.login[2]];
     loginUser(userLogin).then((response) => {
       console.log(response);
-      message = 'CON Welcome';
-      if (
-        response.data.geo_status === false
-        && response.data.location === false
-      ) {
-        message = 'CON 1. Add location\n 2. Add Farm details\n 3. Add products';
-        message += footer;
-        res.send(message);
-        client.set('user_id', `${response.data.user_id}`, redis.print);
-      } else {
-        message = 'CON 1. Update Location 2. Add Farm details\n 3. Add products';
-        message += footer;
-        res.send(message);
-        client.set('user_id', `${response.data.user_id}`, redis.print);
-      }
+
+      message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products';
+      message += footer;
+      res.send(message);
+      client.set('user_id', `${response.data.user_id}`, redis.print);
     });
   } else if (textValue === 4 && isLogin && isAddFarmDetails) {
     message = 'CON Enter farm name';
@@ -182,7 +172,7 @@ app.post('/ussd', (req, res) => {
         res.send(message);
       });
     });
-  } else if (textValue === 5 && isLogin && isAddProduct ) {
+  } else if (textValue === 5 && isLogin && isAddProduct) {
     const units = text.split('*')[4];
     client.set('units', units);
 
