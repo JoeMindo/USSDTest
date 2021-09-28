@@ -109,7 +109,7 @@ app.post('/ussd', (req, res) => {
     client.set('farm_location', farmLocation);
     const categories = fetchCategories();
     categories.then((data) => {
-      message = `Choose a category\n ${data}`;
+      message = `CON Choose a category\n ${data}`;
       message += footer;
       res.send(message);
     });
@@ -117,7 +117,7 @@ app.post('/ussd', (req, res) => {
     const category = text.split('*')[6];
     const products = fetchProducts(category);
     products.then((data) => {
-      message = `Choose a product\n ${data}`;
+      message = `CON Choose a product\n ${data}`;
       message += footer;
       res.send(message);
     });
