@@ -55,11 +55,11 @@ app.post('/ussd', (req, res) => {
     password: '',
   };
   const grades = {
-    1: 'A',
-    2: 'B',
-    3: 'C',
-    4: 'D',
-    5: 'E',
+    1: 'GRADE A',
+    2: 'GRADE B',
+    3: 'GRADE C',
+    4: 'GRADE D',
+    5: 'GRADE E',
   };
   const rawtext = req.body.text;
   const text = ussdRouter(rawtext, '99', '98');
