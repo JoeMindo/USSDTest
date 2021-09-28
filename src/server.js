@@ -367,7 +367,7 @@ app.post('/ussd', (req, res) => {
       });
     });
   } else if (textValue === 9 && isLogin) {
-    message = 'END Thank you, please wait for verification so you can start adding products';
+    message = 'END Thank you for registering with Mamlaka ';
     client.set('area', text.split('*')[8]);
     const getLabelValues = () => {
       const userId = client.getAsync('user_id').then((reply) => reply);
