@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable import/extensions */
 /* eslint-disable prefer-destructuring */
 import express from 'express';
@@ -15,7 +16,7 @@ import { getRegions, getLocations, splitText } from './core/listlocations.js';
 import {
   fetchCategories, fetchProducts, addProduct, getSpecificProduct,
 } from './core/productmanagement.js';
-import { addFarm } from './core/farmmanagement.js';
+import { addFarm, addFarmerKYC } from './core/farmmanagement.js';
 
 const port = process.env.PORT || 3031;
 
@@ -68,6 +69,7 @@ app.post('/ussd', (req, res) => {
   const isLogin = text.split('*')[0] === '2';
   const isAddFarmDetails = text.split('*')[3] === '2';
   const isAddProduct = text.split('*')[3] === '3';
+  const isUpdateFarmerDetails = text.split('*')[3] === '4';
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
 
@@ -89,7 +91,7 @@ app.post('/ussd', (req, res) => {
     loginUser(userLogin).then((response) => {
       console.log(response);
 
-      message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products';
+      message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products\n 4. Update farmer details';
       message += footer;
       res.send(message);
       client.set('user_id', `${response.data.user_id}`, redis.print);
@@ -155,6 +157,103 @@ app.post('/ussd', (req, res) => {
         console.log('Farm response ID', response.data.success.id);
         client.set('farm_id', response.data.success.id);
         message = 'END Farm added successfully';
+        res.send(message);
+      });
+    });
+  } else if (textValue === 4 && isLogin && isUpdateFarmerDetails) {
+    message = 'CON Enter the variety of produce you grow';
+
+    message += footer;
+    res.send(message);
+  } else if (textValue === 5 && isLogin && isUpdateFarmerDetails) {
+    const variety = text.split('*')[4];
+    client.set('variety', variety);
+    message = 'CON Enter the number of bags per harvest';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 6 && isLogin && isUpdateFarmerDetails) {
+    const bagsPerHarvest = text.split('*')[5];
+    client.set('bagsPerHarvest', bagsPerHarvest);
+    message = 'CON What is the total size of land you own';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 7 && isLogin && isUpdateFarmerDetails) {
+    const landSize = text.split('*')[6];
+    client.set('landSize', landSize);
+    message = 'CON What is your KRA-PIN?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 8 && isLogin && isUpdateFarmerDetails) {
+    const krapin = text.split('*')[7];
+    client.set('krapin', krapin);
+    message = 'CON What sort of equipment do you own (Separate them by commas)?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 9 && isLogin && isUpdateFarmerDetails) {
+    const equipment = text.split('*')[8];
+    client.set('equipment', equipment);
+    message = 'CON What is your produce return levels ?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 10 && isLogin && isUpdateFarmerDetails) {
+    const returnLevel = text.split('*')[9];
+    client.set('returnLevel', returnLevel);
+    message = 'CON What is your land ownership status?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 11 && isLogin && isUpdateFarmerDetails) {
+    const landOwnership = text.split('*')[10];
+    client.set('landOwnership', landOwnership);
+    message = 'CON What is your business registration status?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 12 && isLogin && isUpdateFarmerDetails) {
+    const businessRegistration = text.split('*')[11];
+    client.set('businessRegistration', businessRegistration);
+    message = 'CON What is your group membership status?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 13 && isLogin && isUpdateFarmerDetails) {
+    const groupMembership = text.split('*')[12];
+    client.set('groupMembership', groupMembership);
+    message = 'CON What is your total production cost per season?';
+    message += footer;
+    res.send(message);
+  } else if (textValue === 14 && isLogin && isUpdateFarmerDetails) {
+    const productionCost = text.split('*')[13];
+    client.set('productionCost', productionCost);
+
+    const getFarmerKYC = () => {
+      const varieties = client.getAsync('variety').then((reply) => reply);
+      const quantity = client.getAsync('bagsPerHarvest').then((reply) => reply);
+      const size = client.getAsync('landSize').then((reply) => reply);
+      const krapin = client.getAsync('krapin').then((reply) => reply);
+      const equipment = client.getAsync('equipment').then((reply) => reply);
+      const returnLevel = client.getAsync('returnLevel').then((reply) => reply);
+      const landOwnership = client.getAsync('landOwnership').then((reply) => reply);
+      const businessRegistration = client.getAsync('businessRegistration').then((reply) => reply);
+      const groupMembership = client.getAsync('groupMembership').then((reply) => reply);
+      const productionCostGiven = client.getAsync('productionCost').then((reply) => reply);
+      const userId = client.getAsync('user_id').then((reply) => reply);
+      return Promise.all([varieties, quantity, size, krapin, equipment, returnLevel, landOwnership, businessRegistration, groupMembership, productionCostGiven,userId]);
+    };
+    getFarmerKYC().then((results) => {
+      const farmerKyc = {
+        product_varieties: results[0],
+        product_quantities: results[1],
+        land_size: results[2],
+        kra_pin: results[3],
+        equipment_owned: results[4],
+        produce_return_levels: results[5],
+        land_ownership_status: results[6],
+        business_reg_status: results[7],
+        group_membership_status: results[8],
+        production_cost: results[9],
+      };
+      const id = results[10];
+      addFarmerKYC(farmerKyc, id).then((response) => {
+        console.log('Farmer KYC response', response);
+        message = 'END Farmer KYC added successfully';
         res.send(message);
       });
     });
