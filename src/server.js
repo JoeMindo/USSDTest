@@ -17,11 +17,11 @@ import {
 } from './core/productmanagement.js';
 import { addFarm } from './core/farmmanagement.js';
 
-const port = process.env.PORT || 3030;
+const port = process.env.PORT || 3031;
 
 const app = express();
 
-const client = redis.createClient();
+const client = redis.createClient({ host: 'redis-19100.c251.east-us-mz.azure.cloud.redislabs.com', port: 19100, password: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH' });
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
 client.on('connect', () => {
@@ -94,6 +94,11 @@ app.post('/ussd', (req, res) => {
         && response.data.location === false
       ) {
         message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products';
+        message += footer;
+        res.send(message);
+        client.set('user_id', `${response.data.user_id}`, redis.print);
+      } else {
+        message = 'CON 1. Add Farm details\n 3. Add products';
         message += footer;
         res.send(message);
         client.set('user_id', `${response.data.user_id}`, redis.print);
@@ -177,7 +182,7 @@ app.post('/ussd', (req, res) => {
         res.send(message);
       });
     });
-  } else if (textValue === 5 && isLogin && isAddProduct) {
+  } else if (textValue === 5 && isLogin && isAddProduct ) {
     const units = text.split('*')[4];
     client.set('units', units);
 
@@ -406,7 +411,7 @@ app.post('/ussd', (req, res) => {
     });
 
     res.send(message);
-  } else if ((textValue === 1 && isRegistration) || (isLogin && textValue === 4 && isEditProfile)) {
+  } else if ((textValue === 1 && isRegistration) || (isLogin && textValue === 4)) {
     message = 'CON Enter your first name';
     message += footer;
     res.send(message);
@@ -438,11 +443,7 @@ app.post('/ussd', (req, res) => {
       `;
     message += footer;
     res.send(message);
-  } else if (textValue === 8) {
-    message = 'CON Enter phone';
-    message += footer;
-    res.send(message);
-  } else if (textValue === 9 && text.split('*')[0] === '1') {
+  } else if (textValue === 8 && text.split('*')[0] === '1') {
     req.session.registration = text.split('*');
     const userDetails = {
       first_name: req.session.registration[1],
@@ -452,7 +453,7 @@ app.post('/ussd', (req, res) => {
       password: req.session.registration[5],
       password_confirmation: req.session.registration[6],
       role_id: req.session.registration[7],
-      phone_no: req.session.registration[8],
+      phone_no: req.session.registration[4],
       // email: req.session.registration[9],
     };
     const out = registerUser(userDetails);
