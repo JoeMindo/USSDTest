@@ -98,7 +98,7 @@ app.post('/ussd', (req, res) => {
         res.send(message);
         client.set('user_id', `${response.data.user_id}`, redis.print);
       } else {
-        message = 'CON 1. Add Farm details\n 3. Add products';
+        message = 'CON 2. Add Farm details\n 3. Add products';
         message += footer;
         res.send(message);
         client.set('user_id', `${response.data.user_id}`, redis.print);
