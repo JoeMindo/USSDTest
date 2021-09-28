@@ -48,7 +48,7 @@ app.use(
 
 app.post('/ussd', (req, res) => {
   let message = '';
-  const footer = '\n98: Back 99: Home';
+  const footer = '\n99: Back 98: Home';
 
   const userLogin = {
     phone_no: '',
@@ -62,7 +62,7 @@ app.post('/ussd', (req, res) => {
     5: 'E',
   };
   const rawtext = req.body.text;
-  const text = ussdRouter(rawtext, '98', '99');
+  const text = ussdRouter(rawtext, '99', '98');
   // TODO: Migrate this to usermanagement
   const isRegistration = text.split('*')[0] === '1';
   const isLogin = text.split('*')[0] === '2';
