@@ -235,7 +235,7 @@ app.post('/ussd', (req, res) => {
       const groupMembership = client.getAsync('groupMembership').then((reply) => reply);
       const productionCostGiven = client.getAsync('productionCost').then((reply) => reply);
       const userId = client.getAsync('user_id').then((reply) => reply);
-      return Promise.all([varieties, quantity, size, krapin, equipment, returnLevel, landOwnership, businessRegistration, groupMembership, productionCostGiven,userId]);
+      return Promise.all([varieties, quantity, size, krapin, equipment, returnLevel, landOwnership, businessRegistration, groupMembership, productionCostGiven, userId]);
     };
     getFarmerKYC().then((results) => {
       const farmerKyc = {
