@@ -161,20 +161,20 @@ app.post('/ussd', (req, res) => {
       });
     });
   } else if (textValue === 4 && isLogin && isUpdateFarmerDetails) {
-    message = 'CON Enter the variety of produce you grow';
+    message = 'CON What kind of crops do you grow';
 
     message += footer;
     res.send(message);
   } else if (textValue === 5 && isLogin && isUpdateFarmerDetails) {
     const variety = text.split('*')[4];
     client.set('variety', variety);
-    message = 'CON Enter the number of bags per harvest';
+    message = 'CON What is the quantity of produce per product per harvest';
     message += footer;
     res.send(message);
   } else if (textValue === 6 && isLogin && isUpdateFarmerDetails) {
     const bagsPerHarvest = text.split('*')[5];
     client.set('bagsPerHarvest', bagsPerHarvest);
-    message = 'CON What is the total size of land you own';
+    message = 'CON What is your land size in acres';
     message += footer;
     res.send(message);
   } else if (textValue === 7 && isLogin && isUpdateFarmerDetails) {
@@ -186,37 +186,37 @@ app.post('/ussd', (req, res) => {
   } else if (textValue === 8 && isLogin && isUpdateFarmerDetails) {
     const krapin = text.split('*')[7];
     client.set('krapin', krapin);
-    message = 'CON What sort of equipment do you own (Separate them by commas)?';
+    message = 'CON What kind of infrastructure/equipment do you own (Separate them by commas)?';
     message += footer;
     res.send(message);
   } else if (textValue === 9 && isLogin && isUpdateFarmerDetails) {
     const equipment = text.split('*')[8];
     client.set('equipment', equipment);
-    message = 'CON What is your produce return levels ?';
+    message = 'CON What is the income level per product per harvest ?';
     message += footer;
     res.send(message);
   } else if (textValue === 10 && isLogin && isUpdateFarmerDetails) {
     const returnLevel = text.split('*')[9];
     client.set('returnLevel', returnLevel);
-    message = 'CON What is your land ownership status?';
+    message = 'CON Do you own the land where you farm (Yes/No)?';
     message += footer;
     res.send(message);
   } else if (textValue === 11 && isLogin && isUpdateFarmerDetails) {
     const landOwnership = text.split('*')[10];
     client.set('landOwnership', landOwnership);
-    message = 'CON What is your business registration status?';
+    message = 'CON Do you have a registered business entity?(Yes/No)';
     message += footer;
     res.send(message);
   } else if (textValue === 12 && isLogin && isUpdateFarmerDetails) {
     const businessRegistration = text.split('*')[11];
     client.set('businessRegistration', businessRegistration);
-    message = 'CON What is your group membership status?';
+    message = 'CON Are you a member of any farmer group?(Yes/No)';
     message += footer;
     res.send(message);
   } else if (textValue === 13 && isLogin && isUpdateFarmerDetails) {
     const groupMembership = text.split('*')[12];
     client.set('groupMembership', groupMembership);
-    message = 'CON What is your total production cost per season?';
+    message = 'CON What is the cost of production for a single harvest in KES?';
     message += footer;
     res.send(message);
   } else if (textValue === 14 && isLogin && isUpdateFarmerDetails) {
@@ -250,6 +250,7 @@ app.post('/ussd', (req, res) => {
         group_membership_status: results[8],
         production_cost: results[9],
       };
+      console.log(farmerKyc);
       const id = results[10];
       addFarmerKYC(farmerKyc, id).then((response) => {
         console.log('Farmer KYC response', response);
