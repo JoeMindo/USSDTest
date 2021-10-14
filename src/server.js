@@ -49,7 +49,7 @@ app.use(
 
 app.post('/ussd', (req, res) => {
   let message = '';
-  const footer = '\n99: Back 98: Home';
+  const footer = '\n99: Home 98: Back';
 
   const userLogin = {
     phone_no: '',
