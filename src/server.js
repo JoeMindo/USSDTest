@@ -9,7 +9,7 @@ import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
 import { ussdRouter } from 'ussd-router';
-
+import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser, addLocation } from './core/usermanagement.mjs';
 
 import { getRegions, getLocations, splitText } from './core/listlocations.js';
@@ -77,25 +77,35 @@ app.post('/ussd', (req, res) => {
     message = 'CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login';
 
     res.send(message);
-  } else if (textValue === 1 && text === '2') {
-    message = 'CON Enter phone';
-    message += footer;
-    res.send(message);
-  } else if (textValue === 2 && isLogin) {
-    message = 'CON Enter password';
-    message += footer;
-    res.send(message);
-  } else if (textValue === 3 && isLogin) {
-    req.session.login = text.split('*');
-    [userLogin.phone_no, userLogin.password] = [req.session.login[1], req.session.login[2]];
-    loginUser(userLogin).then((response) => {
-      console.log(response);
-
-      message = 'CON 1. Update location\n 2. Add Farm details\n 3. Add products\n 4. Update farmer details';
-      message += footer;
-      res.send(message);
-      client.set('user_id', `${response.data.user_id}`, redis.print);
-    });
+  } else if (isLogin) {
+    let error = 'END ';
+    const menus = menuItems.renderLoginMenus(textValue);
+    let message = menus.message;
+    if (menus.completedStatus === true) {
+      message = 'END Success';
+      req.session.login = text.split('*');
+      userLogin.phone_no = req.body.phoneNumber;
+      userLogin.password = req.session.login[1];
+      console.log(userLogin.phone_no);
+      const result = loginUser(userLogin).then((response) => {
+        console.log('Login Response', response);
+        if (response.status === 'error') {
+          Object.keys(response.errors).forEach((key) => {
+            error += `${response.errors[key].toString()}`;
+            console.log(key, response.errors[key].toString());
+          });
+          return error;
+        }
+        client.set('user_id', `${response.data.user_id}`, redis.print);
+        client.set('userLoggedIn', true);
+        message = menuItems.renderFarmerMenus();
+        return message;
+      });
+      result.then((response) => {
+        console.log('Message at login end', response);
+        res.send(response);
+      });
+    }
   } else if (textValue === 4 && isLogin && isAddFarmDetails) {
     message = 'CON Enter farm name';
     message += footer;
@@ -300,10 +310,6 @@ app.post('/ussd', (req, res) => {
         res.send(message);
       });
     });
-  } else if (textValue === 4 && isRegistration) {
-    message = 'CON Enter phone';
-    message += footer;
-    res.send(message);
   } else if (textValue === 4 && isLogin) {
     const regions = getRegions();
     const output = regions.then((data) => data);
@@ -500,61 +506,44 @@ app.post('/ussd', (req, res) => {
     });
 
     res.send(message);
-  } else if ((textValue === 1 && isRegistration) || (isLogin && textValue === 4)) {
-    message = 'CON Enter your first name';
-    message += footer;
-    res.send(message);
-  } else if ((textValue === 2 && isRegistration) || (isLogin && textValue === 5)) {
-    message = 'CON Enter your last name';
-    message += footer;
-    res.send(message);
-  } else if ((textValue === 3 && isRegistration) || (isLogin && textValue === 6)) {
-    message = 'CON What is your ID number';
-    message += footer;
-    res.send(message);
-  } else if ((textValue === 4 && isRegistration) || (isLogin && textValue === 7)) {
-    message = 'CON What is your gender?\n1.Male\n2.Female\n3.Prefer not to say';
-    message += footer;
-    res.send(message);
-  } else if ((textValue === 5 && isRegistration) || (isLogin && textValue === 8)) {
-    message = 'CON Enter your password (Atleast 8 characters)';
-    message += footer;
-    res.send(message);
-  } else if ((textValue === 6 && isRegistration) || (isLogin && textValue === 9)) {
-    message = 'CON Confirm your password';
-    message += footer;
-    res.send(message);
-  } else if ((textValue === 7 && isRegistration) || (isLogin && textValue === 10)) {
-    message = `CON Who are you?
-      1. Farmer
-      2. Buyer
-      3. DEAN
-      `;
-    message += footer;
-    res.send(message);
-  } else if (textValue === 8 && text.split('*')[0] === '1') {
-    req.session.registration = text.split('*');
-    const userDetails = {
-      first_name: req.session.registration[1],
-      last_name: req.session.registration[2],
-      id_no: req.session.registration[3],
-      gender: 'Male',
-      password: req.session.registration[5],
-      password_confirmation: req.session.registration[6],
-      role_id: req.session.registration[7],
-      phone_no: req.session.registration[4],
-      // email: req.session.registration[9],
-    };
-    const out = registerUser(userDetails);
-    out.then((response) => {
-      message = 'END Thank you!';
-      console.log(response.status);
+  } else if ((isRegistration)) {
+    let error = 'END ';
+    const menus = menuItems.renderRegisterMenu(textValue);
+    let message = menus.message;
+    if (menus.completedStatus === true) {
+      message = 'END Success';
+      req.session.registration = text.split('*');
+      const userDetails = {
+        first_name: req.session.registration[1],
+        last_name: req.session.registration[2],
+        id_no: req.session.registration[3],
+        gender: 'Male',
+        password: req.session.registration[5],
+        password_confirmation: req.session.registration[6],
+        role_id: req.session.registration[7],
+        // email: req.session.registration[9],
+      };
+      console.log('DetailsHere', userDetails);
+      const out = registerUser(userDetails);
+      const result = out.then((response) => {
+        console.log('Registation', response);
+        if (response.status === 'error') {
+          Object.keys(response.errors).forEach((key) => {
+            error += `${response.errors[key].toString()}`;
 
+            console.log(key, response.errors[key].toString());
+          });
+          return error;
+        }
+        return message;
+      });
+      result.then((response) => {
+        console.log('Message at end', response);
+        res.send(response);
+      });
+    } else {
       res.send(message);
-    });
-  } else {
-    message = 'Hmm someting went wrong';
-    res.send(message);
+    }
   }
 });
 

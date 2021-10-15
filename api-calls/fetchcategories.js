@@ -16,3 +16,4 @@ async function fetchCategories() {
 }
 
 export { fetchCategories };
+>

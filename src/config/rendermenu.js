@@ -1,88 +1,66 @@
-const { is } = require('bluebird');
-const menus = require('../../config/menus.json');
+/* eslint-disable import/prefer-default-export */
+import { text } from 'express';
+import { menus } from './menus.js';
 
 const con = () => 'CON';
 const end = () => 'END';
 let message = '';
 
-// Register Menus
-const renderRegisterMenu = (selection, textValue) => {
-  if (selection === isRegistration && textValue === 1) {
-    let menuPrompt = `${con()} ${menus.register.firstname}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 2) {
-    let menuPrompt = `${con()} ${menus.register.lastname}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 3) {
-    let menuPrompt = `${con()} ${menus.register.idNumber}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 4) {
-    let menuPrompt = `${con()} ${menus.register.gender}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 5) {
-    let menuPrompt = `${con()} ${menus.register.password}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 6) {
-    let menuPrompt = `${con()} ${menus.register.confirmPassword}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 7) {
-    let menuPrompt = `${con()} ${menus.register.role}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  }
-};
+let isLogin;
 
-// Login Menu
-const renderRegisterMenus = (selection, textValue) => {
-  if (selection === isRegistration && textValue === 1) {
+// Register Menus
+let completedStatus = false;
+export const renderRegisterMenu = (textValue) => {
+  if (textValue === 1) {
     let menuPrompt = `${con()} ${menus.register.firstname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 2) {
+  } else if (textValue === 2) {
     let menuPrompt = `${con()} ${menus.register.lastname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 3) {
+  } else if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.register.idNumber}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 4) {
+  } else if (textValue === 4) {
     let menuPrompt = `${con()} ${menus.register.gender}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 5) {
+  } else if (textValue === 5) {
     let menuPrompt = `${con()} ${menus.register.password}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 6) {
+  } else if (textValue === 6) {
     let menuPrompt = `${con()} ${menus.register.confirmPassword}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (selection === isRegistration && textValue === 7) {
+  } else if (textValue === 7) {
     let menuPrompt = `${con()} ${menus.register.role}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  }
-  return message;
-};
-// Login Menu
-const renderLoginMenus = (selection, textValue) => {
-  if (selection === isLogin && textValue === 1) {
-    let menuPrompt = `${con()} ${menus.login.phone}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
   } else {
+    let menuPrompt = `${con()} ${menus.submitDetails}`;
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    completedStatus = true;
+  }
+  return {
+    message,
+    completedStatus,
+  };
+};
+
+// Login Menu
+export const renderLoginMenus = (textValue) => {
+  if (textValue === 1) {
     let menuPrompt = `${con()} ${menus.login.password}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
+  } else {
+    completedStatus = true;
   }
-  return message;
+  return { message, completedStatus };
 };
 
 // Farmer Menus
@@ -111,5 +89,19 @@ const renderFarmerUpdateDetailsMenu = () => {
   return message;
 };
 
+const renderFarmerAddProductMenu = () => {
+  let menuPrompt = `${con()} ${menus.farmer.addProduct}`;
+  menuPrompt += menus.footer;
+  message = menuPrompt;
+  return message;
+};
 
-export default { renderRegisterMenu, renderLoginMenus };
+export const renderFarmerMenus = () => {
+  let menuPrompt = `${con()} ${menus.farmer.updateLocation}`;
+  menuPrompt += menus.farmer.addFarmDetails;
+  menuPrompt += menus.farmer.addProduct;
+  menuPrompt += menus.farmer.updateDetails;
+  menuPrompt += menus.footer;
+  message = menuPrompt;
+  return message;
+};
