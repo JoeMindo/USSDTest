@@ -1,4 +1,4 @@
-import { postrequest } from './services.mjs';
+import { postrequest } from './services.js';
 import { BASEURL } from '../config/urls.js';
 
 const clearData = (details) => {

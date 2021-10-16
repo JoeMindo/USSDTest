@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 /* eslint-disable max-len */
 /* eslint-disable import/extensions */
 /* eslint-disable prefer-destructuring */
@@ -10,8 +11,8 @@ import redis from 'redis';
 import bluebird from 'bluebird';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
-import { registerUser, loginUser, addLocation } from './core/usermanagement.mjs';
-
+import { registerUser, loginUser, addLocation } from './core/usermanagement.js';
+import { retreiveCachedItems } from './core/services.js';
 import { getRegions, getLocations, splitText } from './core/listlocations.js';
 import {
   fetchCategories, fetchProducts, addProduct, getSpecificProduct,
@@ -22,7 +23,7 @@ const port = process.env.PORT || 3031;
 
 const app = express();
 
-const client = redis.createClient({ host: 'redis-19100.c251.east-us-mz.azure.cloud.redislabs.com', port: 19100, password: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH' });
+export const client = redis.createClient({ host: 'redis-19100.c251.east-us-mz.azure.cloud.redislabs.com', port: 19100, password: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH' });
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
 client.on('connect', () => {
@@ -67,17 +68,19 @@ app.post('/ussd', (req, res) => {
   // TODO: Migrate this to usermanagement
   const isRegistration = text.split('*')[0] === '1';
   const isLogin = text.split('*')[0] === '2';
-  const isAddFarmDetails = text.split('*')[3] === '2';
+  const isUpdateLocation = text.split('*')[2] === '1';
+  const isAddFarmDetails = text.split('*')[2] === '2';
   const isAddProduct = text.split('*')[3] === '3';
   const isUpdateFarmerDetails = text.split('*')[3] === '4';
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
+  console.log(textValue);
 
   if (text === '') {
     message = 'CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login';
 
     res.send(message);
-  } else if (isLogin) {
+  } else if (isLogin && textValue <= 2) {
     let error = 'END ';
     const menus = menuItems.renderLoginMenus(textValue);
     let message = menus.message;
@@ -86,13 +89,11 @@ app.post('/ussd', (req, res) => {
       req.session.login = text.split('*');
       userLogin.phone_no = req.body.phoneNumber;
       userLogin.password = req.session.login[1];
-      console.log(userLogin.phone_no);
+
       const result = loginUser(userLogin).then((response) => {
-        console.log('Login Response', response);
         if (response.status === 'error') {
           Object.keys(response.errors).forEach((key) => {
             error += `${response.errors[key].toString()}`;
-            console.log(key, response.errors[key].toString());
           });
           return error;
         }
@@ -102,80 +103,85 @@ app.post('/ussd', (req, res) => {
         return message;
       });
       result.then((response) => {
-        console.log('Message at login end', response);
         res.send(response);
       });
     }
-  } else if (textValue === 4 && isLogin && isAddFarmDetails) {
-    message = 'CON Enter farm name';
-    message += footer;
-    res.send(message);
-  } else if (textValue === 5 && isLogin && isAddFarmDetails) {
-    const farmName = text.split('*')[4];
-    client.set('farm_name', farmName, redis.print);
-    message = 'CON Enter farm location';
-    message += footer;
-    res.send(message);
-  } else if (textValue === 6 && isLogin && isAddFarmDetails) {
-    const farmLocation = text.split('*')[5];
-    client.set('farm_location', farmLocation);
-    const categories = fetchCategories();
-    categories.then((data) => {
-      message = `CON Choose a category of foods that you grow\n ${data}`;
-      message += footer;
-      res.send(message);
-    });
-  } else if (textValue === 7 && isLogin && isAddFarmDetails) {
-    const category = text.split('*')[6];
-    const products = fetchProducts(category);
-    products.then((data) => {
-      message = `CON Choose a product\n ${data}`;
-      message += footer;
-      res.send(message);
-    });
-  } else if (textValue === 8 && isLogin && isAddFarmDetails) {
-    const productID = text.split('*')[7];
-    client.set('productID', productID);
-    message = 'CON What is the capacity per harvest in bags';
-    message += footer;
-    res.send(message);
-  } else if (textValue === 9 && isLogin && isAddFarmDetails) {
-    const capacity = text.split('*')[8];
-    client.set('capacity', capacity);
-    const farmName = text.split('*')[4];
-    const farmLocation = text.split('*')[5];
-    const productID = text.split('*')[7];
-    const capacityPerHarvest = text.split('*')[8];
-    const getFarmValues = () => {
-      const userId = client.getAsync('user_id').then((reply) => reply);
-      return Promise.all([userId]);
-    };
-    getFarmValues().then((results) => {
-      const capturedUser = {};
-      capturedUser.user_id = results[0];
+  } else if (isUpdateLocation) {
+    menuItems.checkFarmerSelection(text, res, textValue);
+  } else if (isAddFarmDetails) {
+    menuItems.checkFarmerSelection(text, res, textValue);
+  }
+  // else if (textValue === 4 && isLogin && isAddFarmDetails) {
+  //   message = 'CON Enter farm name';
+  //   message += footer;
+  //   res.send(message);
+  // } else if (textValue === 5 && isLogin && isAddFarmDetails) {
+  //   const farmName = text.split('*')[4];
+  //   client.set('farm_name', farmName, redis.print);
+  //   message = 'CON Enter farm location';
+  //   message += footer;
+  //   res.send(message);
+  // } else if (textValue === 6 && isLogin && isAddFarmDetails) {
+  //   const farmLocation = text.split('*')[5];
+  //   client.set('farm_location', farmLocation);
+  //   const categories = fetchCategories();
+  //   categories.then((data) => {
+  //     message = `CON Choose a category of foods that you grow\n ${data}`;
+  //     message += footer;
+  //     res.send(message);
+  //   });
+  // } else if (textValue === 7 && isLogin && isAddFarmDetails) {
+  //   const category = text.split('*')[6];
+  //   const products = fetchProducts(category);
+  //   products.then((data) => {
+  //     message = `CON Choose a product\n ${data}`;
+  //     message += footer;
+  //     res.send(message);
+  //   });
+  // } else if (textValue === 8 && isLogin && isAddFarmDetails) {
+  //   const productID = text.split('*')[7];
+  //   client.set('productID', productID);
+  //   message = 'CON What is the capacity per harvest in bags';
+  //   message += footer;
+  //   res.send(message);
+  // } else if (textValue === 9 && isLogin && isAddFarmDetails) {
+  //   const capacity = text.split('*')[8];
+  //   client.set('capacity', capacity);
+  //   const farmName = text.split('*')[4];
+  //   const farmLocation = text.split('*')[5];
+  //   const productID = text.split('*')[7];
+  //   const capacityPerHarvest = text.split('*')[8];
+  //   const getFarmValues = () => {
+  //     const userId = client.getAsync('user_id').then((reply) => reply);
+  //     return Promise.all([userId]);
+  //   };
+  //   getFarmValues().then((results) => {
+  //     const capturedUser = {};
+  //     capturedUser.user_id = results[0];
 
-      const farmDetails = {
-        farm_name: farmName,
-        farm_location: farmLocation,
-        product_id: productID,
-        capacity: capacityPerHarvest,
-        user_id: capturedUser.user_id,
-      };
-      console.log(farmDetails);
+  //     const farmDetails = {
+  //       farm_name: farmName,
+  //       farm_location: farmLocation,
+  //       product_id: productID,
+  //       capacity: capacityPerHarvest,
+  //       user_id: capturedUser.user_id,
+  //     };
+  //     console.log(farmDetails);
 
-      addFarm(farmDetails).then((response) => {
-        console.log('Farm response ID', response.data.success.id);
-        client.set('farm_id', response.data.success.id);
-        message = 'END Farm added successfully';
-        res.send(message);
-      });
-    });
-  } else if (textValue === 4 && isLogin && isUpdateFarmerDetails) {
-    message = 'CON Enter the variety of produce you grow';
+  //     addFarm(farmDetails).then((response) => {
+  //       console.log('Farm response ID', response.data.success.id);
+  //       client.set('farm_id', response.data.success.id);
+  //       message = 'END Farm added successfully';
+  //       res.send(message);
+  //     });
+  //   });
+  // } else if (textValue === 4 && isLogin && isUpdateFarmerDetails) {
+  //   message = 'CON Enter the variety of produce you grow';
 
-    message += footer;
-    res.send(message);
-  } else if (textValue === 5 && isLogin && isUpdateFarmerDetails) {
+  //   message += footer;
+  //   res.send(message);
+  // }
+  else if (textValue === 5 && isLogin && isUpdateFarmerDetails) {
     const variety = text.split('*')[4];
     client.set('variety', variety);
     message = 'CON Enter the number of bags per harvest';
@@ -234,21 +240,13 @@ app.post('/ussd', (req, res) => {
     client.set('productionCost', productionCost);
 
     const getFarmerKYC = () => {
-      const varieties = client.getAsync('variety').then((reply) => reply);
-      const quantity = client.getAsync('bagsPerHarvest').then((reply) => reply);
-      const size = client.getAsync('landSize').then((reply) => reply);
-      const krapin = client.getAsync('krapin').then((reply) => reply);
-      const equipment = client.getAsync('equipment').then((reply) => reply);
-      const returnLevel = client.getAsync('returnLevel').then((reply) => reply);
-      const landOwnership = client.getAsync('landOwnership').then((reply) => reply);
-      const businessRegistration = client.getAsync('businessRegistration').then((reply) => reply);
-      const groupMembership = client.getAsync('groupMembership').then((reply) => reply);
-      const productionCostGiven = client.getAsync('productionCost').then((reply) => reply);
-      const userId = client.getAsync('user_id').then((reply) => reply);
-      return Promise.all([varieties, quantity, size, krapin, equipment, returnLevel, landOwnership, businessRegistration, groupMembership, productionCostGiven, userId]);
+      const kycFields = ['variety', 'bagsPerHarvest', 'landSize', 'krapin', 'equipment', 'returnLevel', 'landOwnerShip', 'businessRegistration', 'groupMembership', 'productionCost'];
+      const farmerKyc = retreiveCachedItems(client, kycFields);
+
+      return farmerKyc;
     };
     getFarmerKYC().then((results) => {
-      const farmerKyc = {
+      const retreivedfarmerKyc = {
         product_varieties: results[0],
         product_quantities: results[1],
         land_size: results[2],
@@ -260,8 +258,9 @@ app.post('/ussd', (req, res) => {
         group_membership_status: results[8],
         production_cost: results[9],
       };
+      console.log(retreivedfarmerKyc);
       const id = results[10];
-      addFarmerKYC(farmerKyc, id).then((response) => {
+      addFarmerKYC(retreivedfarmerKyc, id).then((response) => {
         console.log('Farmer KYC response', response);
         message = 'END Farmer KYC added successfully';
         res.send(message);
@@ -310,202 +309,6 @@ app.post('/ussd', (req, res) => {
         res.send(message);
       });
     });
-  } else if (textValue === 4 && isLogin) {
-    const regions = getRegions();
-    const output = regions.then((data) => data);
-    output.then((list) => {
-      message = `CON Select region\n ${list.items}`;
-      message += footer;
-
-      res.send(message);
-    });
-  } else if (textValue === 5 && isLogin) {
-    let userInput = splitText(text, 4);
-    userInput = parseInt(userInput, 10);
-    // Get regionID
-    const regions = getRegions();
-    const output = regions.then((data) => data);
-    output.then((regionIDs) => {
-      const counties = getLocations(
-        'counties',
-        regionIDs.ids[userInput],
-        'county_name',
-      );
-      client.set('region_id', regionIDs.ids[userInput]);
-      const countyData = counties.then((data) => {
-        console.log(data);
-        return data;
-      });
-      countyData.then((list) => {
-        console.log('List', list);
-        message = `CON Select county\n ${list.items}`;
-        message += footer;
-        res.send(message);
-      });
-    });
-  }
-  // Sub county list
-  else if (textValue === 6 && text.split('*')[0] === '2') {
-    let regionInput = splitText(text, 4);
-    const countyInput = splitText(text, 5);
-    regionInput = parseInt(regionInput, 10);
-    // Get regionID
-    const regions = getRegions();
-    const output = regions.then((data) => data);
-    output.then((regionIDs) => {
-      const counties = getLocations(
-        'counties',
-        regionIDs.ids[regionInput],
-        'county_name',
-      );
-      const countyData = counties.then((data) => {
-        console.log(data);
-        return data;
-      });
-      countyData.then((countyIds) => {
-        const subcounties = getLocations(
-          'subcounties',
-          countyIds.ids[countyInput],
-          'sub_county_name',
-        );
-        client.set('county_id', countyIds.ids[countyInput]);
-        const subcountyData = subcounties.then((data) => data);
-        subcountyData.then((list) => {
-          console.log('List', list.ids);
-          message = `CON Select subcounty\n ${list.items}`;
-          message += footer;
-          res.send(message);
-        });
-      });
-    });
-  }
-  // Locations
-  else if (textValue === 7 && text.split('*')[0] === '2') {
-    let regionInput = splitText(text, 4);
-    const countyInput = splitText(text, 5);
-    const subcountyInput = splitText(text, 6);
-    regionInput = parseInt(regionInput, 10);
-    // Get regionID
-    const regions = getRegions();
-    const output = regions.then((data) => data);
-    output.then((regionIDs) => {
-      const counties = getLocations(
-        'counties',
-        regionIDs.ids[regionInput],
-        'county_name',
-      );
-      const countyData = counties.then((data) => {
-        console.log(data);
-        return data;
-      });
-      countyData.then((countyIds) => {
-        const subcounties = getLocations(
-          'subcounties',
-          countyIds.ids[countyInput],
-          'sub_county_name',
-        );
-
-        const subcountyData = subcounties.then((data) => data);
-        subcountyData.then((locationIds) => {
-          console.log('Subcounty list', locationIds.ids);
-          const locations = getLocations(
-            'locations',
-            locationIds.ids[subcountyInput],
-            'location_name',
-          );
-          client.set('subcounty_id', locationIds.ids[subcountyInput]);
-          const locationData = locations.then((data) => data);
-          locationData.then((list) => {
-            console.log('Locations', list);
-
-            message = `CON Select locations\n ${list.items}`;
-            message += footer;
-            res.send(message);
-          });
-        });
-      });
-    });
-  } else if (textValue === 8 && text.split('*')[0] === '2') {
-    let regionInput = splitText(text, 4);
-    const countyInput = splitText(text, 5);
-    const subcountyInput = splitText(text, 6);
-    const locationInput = splitText(text, 7);
-    regionInput = parseInt(regionInput, 10);
-    // Get regionID
-    const regions = getRegions();
-    const output = regions.then((data) => data);
-    output.then((regionIDs) => {
-      const counties = getLocations(
-        'counties',
-        regionIDs.ids[regionInput],
-        'county_name',
-      );
-      const countyData = counties.then((data) => {
-        console.log(data);
-        return data;
-      });
-      countyData.then((countyIds) => {
-        const subcounties = getLocations(
-          'subcounties',
-          countyIds.ids[countyInput],
-          'sub_county_name',
-        );
-
-        const subcountyData = subcounties.then((data) => data);
-        subcountyData.then((locationIds) => {
-          console.log('Subcounty list', locationIds.ids);
-          const locations = getLocations(
-            'locations',
-            locationIds.ids[subcountyInput],
-            'location_name',
-          );
-          client.set('subcounty_id', locationIds.ids[subcountyInput]);
-          const locationData = locations.then((data) => data);
-          locationData.then((finalLocationIds) => {
-            client.set('location_id', finalLocationIds.ids[locationInput]);
-
-            message = 'CON Enter your area';
-            message += footer;
-            res.send(message);
-          });
-        });
-      });
-    });
-  } else if (textValue === 9 && isLogin) {
-    message = 'END Thank you for registering with Mamlaka ';
-    client.set('area', text.split('*')[8]);
-    const getLabelValues = () => {
-      const userId = client.getAsync('user_id').then((reply) => reply);
-      const regionId = client.getAsync('region_id').then((reply) => reply);
-      const countyId = client.getAsync('county_id').then((reply) => reply);
-      const subcountyId = client.getAsync('subcounty_id').then((reply) => reply);
-      const locationId = client.getAsync('location_id').then((reply) => reply);
-      const area = client.getAsync('area').then((reply) => reply);
-      return Promise.all([userId, regionId, countyId, subcountyId, locationId, area]);
-    };
-    getLabelValues().then((results) => {
-      const capturedLocation = {};
-
-      capturedLocation.user_id = results[0];
-      capturedLocation.region_id = results[1];
-      capturedLocation.county_id = results[2];
-      capturedLocation.subcounty_id = results[3];
-      capturedLocation.location_id = results[4];
-      capturedLocation.area = results[5];
-
-      const postLocation = {
-        sub_county_id: capturedLocation.subcounty_id,
-        location_id: capturedLocation.location_id,
-        area: capturedLocation.area,
-
-      };
-      const postID = parseInt(capturedLocation.user_id, 10);
-      addLocation(postLocation, postID).then((response) => {
-        console.log(response);
-      });
-    });
-
-    res.send(message);
   } else if ((isRegistration)) {
     let error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue);

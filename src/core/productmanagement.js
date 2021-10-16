@@ -56,7 +56,7 @@ async function fetchProducts(id) {
     const response = await axios.get(`${BASEURL}/api/productsundercategory/${id}`);
     response.data.forEach((product) => {
       optionProducts.push(product);
-      results += `${product.id}. ${product.product_name}`;
+      results += `\n${product.id}. ${product.product_name}`;
     });
     return results;
   } catch (error) {
