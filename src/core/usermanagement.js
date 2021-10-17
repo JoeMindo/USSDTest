@@ -10,10 +10,10 @@ const clearData = (details) => {
 
   return details;
 };
-const registerUser = async (regdata) => {
+const registerUser = async (regdata, phone) => {
   const path = `${BASEURL}/api/register`;
   const postdata = {
-    phone_no: regdata.phone_no,
+    phone_no: phone,
     first_name: regdata.first_name,
     last_name: regdata.last_name,
     id_no: regdata.id_no,
@@ -35,7 +35,7 @@ const registerUser = async (regdata) => {
 
     return registrationresponse.data;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 };
 
@@ -49,7 +49,7 @@ const loginUser = async (loginData) => {
     const loginresponse = await postrequest(postdata, path);
     return loginresponse;
   } catch (error) {
-    console.log(error);
+    return 'Hmm something went wrong';
   }
 };
 

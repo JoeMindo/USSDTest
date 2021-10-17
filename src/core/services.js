@@ -28,7 +28,7 @@ export const postrequest = async (
     const response = await axios.post(endpoint, params, { headers: {} });
     return response;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 };
 

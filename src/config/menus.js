@@ -1,4 +1,12 @@
 /* eslint-disable import/prefer-default-export */
+const grades = {
+  1: 'Grade A',
+  2: 'Grade B',
+  3: 'Grade C',
+  4: 'Grade D',
+  5: 'Grade E',
+};
+
 export const menus = {
 
   registration: 'Welcome to Mamlaka Foods \nSelect Option:\n1. Register',
@@ -45,16 +53,11 @@ export const menus = {
     success: 'Farmer details updated successfully',
 
   },
+
   addProduct: {
-    grades: {
-      1: '1. Grade A',
-      2: '2. Grade B',
-      3: '3. Grade C',
-      4: '4. Grade D',
-      5: '5. Grade E',
-    },
-    quantity: 'Enter the quantity of ',
-    grade: 'How would you grade your produce?\n',
+
+    0: 'Enter the quantity of ',
+    1: `How would you grade your produce?\n1.${grades[1]}\n2.${grades[2]}\n3.${grades[3]}\n4. ${grades[4]}\n5. ${grades[5]}`,
     success: 'Product added successfully',
   },
   updateLocation: {
@@ -67,7 +70,8 @@ export const menus = {
 
   },
   errorMessage: 'Error!',
-  footer: '\n 98. Home 99.Back',
+  footer: '\n 98. Back 99.Home',
+
   submitDetails: 'Submit details?\n 1.Yes',
 
 };

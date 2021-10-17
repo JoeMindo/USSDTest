@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 /* eslint-disable import/no-cycle */
 /* eslint-disable import/prefer-default-export */
 import { getLocations, getRegions } from '../core/listlocations.js';
@@ -5,13 +6,17 @@ import { menus } from './menus.js';
 import { client } from '../server.js';
 import { addLocation } from '../core/usermanagement.js';
 import { retreiveCachedItems } from '../core/services.js';
-import { fetchCategories, fetchProducts } from '../core/productmanagement.js';
-import { addFarm } from '../core/farmmanagement.js';
+import {
+  fetchCategories, fetchProducts, getSpecificProduct, addProduct,
+} from '../core/productmanagement.js';
+import {
+  addFarm, getAnswersPerQuestion, getFarmerMetricSections, getQuestionsPerSection,
+} from '../core/farmmanagement.js';
 
 const con = () => 'CON';
 const end = () => 'END';
 let message = '';
-
+const questionanswers = {};
 // Register Menus
 let completedStatus = false;
 export const renderRegisterMenu = (textValue) => {
@@ -56,11 +61,12 @@ export const renderRegisterMenu = (textValue) => {
 };
 
 // Login Menu
-export const renderLoginMenus = (textValue) => {
+export const renderLoginMenus = (res, textValue) => {
   if (textValue === 1) {
     let menuPrompt = `${con()} ${menus.login.password}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
+    res.send(message);
   } else {
     completedStatus = true;
   }
@@ -86,7 +92,6 @@ export const renderUpdateLocationMenu = (res, textValue, text) => {
     const counties = getLocations('counties', regionId, 'county_name');
     const output = counties.then((data) => data);
     output.then((list) => {
-      console.log('List of counties', list.items);
       menuPrompt += `${list.items}`;
 
       client.set('usercountyIds', list.ids.toString());
@@ -152,7 +157,7 @@ export const renderUpdateLocationMenu = (res, textValue, text) => {
         const userId = parseInt(postLocationDetails[3], 10);
         addLocation(postDetails, userId).then((response) => {
           // TODO: Add a success message and failure message
-          console.log(response);
+
         });
       });
     const menuPrompt = `${end()} ${menus.updateLocation.success}`;
@@ -163,7 +168,6 @@ export const renderUpdateLocationMenu = (res, textValue, text) => {
 export const renderAddFarmDetailsMenu = (res, textValue, text) => {
   // TODO: Add a check for KYC
   if (textValue === 3) {
-    console.log('Hey', textValue);
     let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
@@ -230,58 +234,144 @@ export const renderAddFarmDetailsMenu = (res, textValue, text) => {
   }
 };
 
-export const renderFarmerUpdateDetailsMenu = () => {
-  const counter = 0;
-  if (counter === 0) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 1) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 2) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 3) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 4) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 5) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 6) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 7) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 8) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (counter === 9) {
-    let menuPrompt = `${con()} ${menus.updateFarmerDetails[counter]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  }
+export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
+  if (textValue === 3) {
+    getFarmerMetricSections().then((response) => {
+      if (response.status === 200) {
+        let menuPrompt = '';
+        response.data.forEach((section) => {
+          menuPrompt += `\n${section.id}. ${section.section_name}`;
+        });
+        message = `${con()} Choose a section to fill`;
+        message += menuPrompt;
+        message += menus.footer;
+        res.send(message);
+      } else {
+        message = `${end()} Could not fetch sections at the moment, try later`;
+        res.send(message);
+      }
+    });
+  } else if (textValue === 4) {
+    const sectionId = parseInt(text.split('*')[3], 10);
+    console.log(sectionId);
+    client.set('sectionId', sectionId);
+    getQuestionsPerSection(sectionId).then((response) => {
+      if (response.status === 200) {
+        let menuPrompt = '';
+        response.data.forEach((question) => {
+          menuPrompt += `\n${question.id}. ${question.metric_name}`;
+        });
+        message = `${con()} Choose a question to fill`;
+        message += menuPrompt;
+        message += menus.footer;
+        res.send(message);
+      } else {
+        message = `${end()} Could not fetch questions at the moment, try later`;
+        res.send(message);
+      }
+    });
+  } else if (textValue === 5) {
+    const questionId = parseInt(text.split('*')[4], 10);
+    client.set('questionId', questionId);
+    getAnswersPerQuestion(questionId).then((response) => {
+      if (response.status === 200) {
+        let menuPrompt = '';
 
-  return message;
+        response.data[0].kyc_metrics_possible_answers.forEach((answer) => {
+          menuPrompt += `\n${answer.id}. ${answer.possible_answer}`;
+          questionanswers[answer.id] = answer.possible_answer;
+        });
+        console.log('Question and answers object', questionanswers);
+        message = `${con()} Select any of the following separated by a space`;
+        message += menuPrompt;
+        message += menus.footer;
+        res.send(message);
+      } else {
+        message = `${end()} Could not fetch answers at the moment, try later`;
+        res.send(message);
+      }
+    });
+  } else if (textValue === 6) {
+    const userAnswers = text.split('*')[5];
+    const userAnswersArray = userAnswers.split(' ');
+    console.log('User answers array', userAnswersArray);
+    let answers = '';
+    userAnswersArray.forEach((answer) => {
+      const answerId = parseInt(answer, 10);
+      answers += `${questionanswers[answerId]} `;
+    });
+    client.set('answers', answers);
+    message = `${con()} Submit?\n 1. Yes`;
+    res.send(message);
+  } else if (textValue === 7) {
+    // TODO: Add the logic to update the farmer details
+    message = `${end()} Thank you for your submission`;
+    res.send(message);
+  }
 };
 
-export const renderFarmerAddProductMenu = () => {
-  let menuPrompt = `${con()} ${menus.farmer.addProduct}`;
-  menuPrompt += menus.footer;
-  message = menuPrompt;
-  return message;
+export const renderFarmerAddProductMenu = (res, textValue, text) => {
+  retreiveCachedItems(client, ['productID'])
+    .then((result) => {
+      const productID = result[0];
+      getSpecificProduct(productID)
+        .then((response) => {
+          let menuPrompt = `${con()} ${menus.addProduct[0]} ${response.data[0].product_name}`;
+          menuPrompt += menus.footer;
+          message = menuPrompt;
+          res.send(message);
+        });
+      if (textValue === 4) {
+        console.log('Am I executed?', text.split('*')[3]);
+        client.set('units', parseInt(text.split('*')[3], 10));
+        let menuPrompt = `${con()} ${menus.addProduct[1]}`;
+        menuPrompt += menus.footer;
+        message = menuPrompt;
+        res.send(message);
+      } else if (textValue === 5) {
+        let grade;
+        if (text.split('*')[4] === '1') {
+          grade = 'A';
+          client.set('grade', grade);
+        } else if (text.split('*')[4] === '2') {
+          grade = 'B';
+          client.set('grade', grade);
+        } else if (text.split('*')[4] === '3') {
+          grade = 'C';
+          client.set('grade', grade);
+        } else if (text.split('*')[4] === '4') {
+          grade = 'D';
+          client.set('grade', grade);
+        } else if (text.split('*')[4] === '5') {
+          grade = 'E';
+          client.set('grade', grade);
+        } else {
+          message = 'Invalid grade';
+          message += menus.footer;
+          res.send(message);
+        }
+      }
+    });
+
+  retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade'])
+    .then((result) => {
+      const postDetails = {
+        farm_id: result[0],
+        product_id: result[1],
+        units: result[2],
+        grade: result[3],
+      };
+      addProduct(postDetails).then((response) => {
+        if (response.status === 200) {
+          const menuPrompt = `${end()} ${menus.addProduct.success}`;
+          message = menuPrompt;
+        } else {
+          const menuPrompt = `${end()} ${menus.addProduct.failure}`;
+          message = menuPrompt;
+        }
+        res.send(message);
+      });
+    });
 };
 
 export const renderFarmerMenus = () => {
@@ -302,7 +392,9 @@ export const checkFarmerSelection = (text, res, textValue) => {
     renderAddFarmDetailsMenu(res, textValue, text);
   } else if (selection === '3') {
     renderFarmerAddProductMenu(res, textValue, text);
-  } else {
+  } else if (selection === '4') {
     renderFarmerUpdateDetailsMenu(res, textValue, text);
+  } else {
+    res.send('CON Invalid Choice');
   }
 };
