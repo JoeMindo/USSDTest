@@ -13,6 +13,8 @@ import bluebird from 'bluebird';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
+import { retreiveCachedItems } from './core/services.js';
+import { menus } from './config/menus.js';
 
 const port = process.env.PORT || 3031;
 
@@ -56,11 +58,8 @@ app.post('/ussd', (req, res) => {
   // TODO: Migrate this to usermanagement
   const isRegistration = text.split('*')[0] === '1';
   const isLogin = text.split('*')[0] === '2';
-  const isUpdateLocation = text.split('*')[2] === '1';
-  const isAddFarmDetails = text.split('*')[2] === '2';
-  const isAddProduct = text.split('*')[2] === '3';
-  const isUpdateFarmerDetails = text.split('*')[2] === '4';
-  let userRole = '';
+
+  const userRole = '';
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
   console.log(textValue);
@@ -79,16 +78,17 @@ app.post('/ussd', (req, res) => {
 
       loginUser(userLogin)
         .then((response) => {
+          console.log('Login Response', response);
           if (response.status === 200 && response.data.role === 'farmer') {
-            userRole = 'isFarmer';
+            console.log('Farmer here');
             client.set('role', 'farmer');
-            console.log('Login Response', response.data);
             client.set('user_id', `${response.data.user_id}`, redis.print);
-
             message = menuItems.renderFarmerMenus();
             res.send(message);
           } else if (response.status === 200 && response.data.role === 'buyer') {
-            userRole = 'isBuyer';
+            console.log('Buyer detected', response);
+            client.set('role', 'buyer');
+            client.set('user_id', `${response.data.user_id}`, redis.print);
             message = menuItems.renderBuyerMenus();
             res.send(message);
           } else {
@@ -97,13 +97,12 @@ app.post('/ussd', (req, res) => {
           }
         });
     }
-  } else if (isUpdateLocation && userRole === 'isFarmer') {
-    menuItems.checkFarmerSelection(text, res, textValue);
-  } else if (isAddFarmDetails) {
-    menuItems.checkFarmerSelection(text, res, textValue);
-  } else if (isAddProduct) {
-    menuItems.checkFarmerSelection(text, res, textValue);
-  } else if ((isRegistration)) {
+  }
+  // menuItems.checkFarmerSeleelse if (isAddFarmDetails) {
+  // menuItems.checkFarmerSelection(text, res, textValue);
+  // menuItems.checkFarmerSelection(text, res, textValue);
+  // menuItems.checkFarmerSelection(text, res, textValue);
+  else if ((isRegistration)) {
     let error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue);
     console.log('TextValue at register', textValue);
@@ -142,10 +141,37 @@ app.post('/ussd', (req, res) => {
     } else {
       res.send(message);
     }
-  } else if ((isUpdateFarmerDetails)) {
-    menuItems.checkFarmerSelection(text, res, textValue);
-  } else if (isLogin && userRole === 'isBuyer') {
-    menuItems.checkBuyerSelection(text, res, textValue);
+  } else {
+    console.log('Other executed');
+    retreiveCachedItems(client, ['role'])
+      .then((response) => {
+        console.log('Response of other', response);
+        if (response[0] === 'farmer') {
+          console.log('Farmer menus here');
+          const isUpdateLocation = text.split('*')[2] === '1';
+          const isAddFarmDetails = text.split('*')[2] === '2';
+          const isAddProduct = text.split('*')[2] === '3';
+          const isUpdateFarmerDetails = text.split('*')[2] === '4';
+          if (isUpdateLocation) {
+            menuItems.checkFarmerSelection(text, res, textValue);
+          } else if (isAddFarmDetails) {
+            menuItems.checkFarmerSelection(text, res, textValue);
+          } else if (isAddProduct) {
+            menuItems.checkFarmerSelection(text, res, textValue);
+          } else if (isUpdateFarmerDetails) {
+            menuItems.checkFarmerSelection(text, res, textValue);
+          } else {
+            message = 'CON Invalid choice';
+            message += menus.footer;
+            res.send(message);
+          }
+        } else if (response[0] === 'buyer') {
+          menuItems.checkBuyerSelection(res, textValue, text);
+        } else {
+          message = 'END Something went wrong on our end, try again later';
+          res.send(message);
+        }
+      });
   }
 });
 
