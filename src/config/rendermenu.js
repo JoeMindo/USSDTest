@@ -7,7 +7,7 @@ import { client } from '../server.js';
 import { addLocation, checkFarmerVerification } from '../core/usermanagement.js';
 import { retreiveCachedItems } from '../core/services.js';
 import {
-  fetchCategories, fetchProducts, getSpecificProduct, addProduct,
+  fetchCategories, fetchProducts, getSpecificProduct, addProduct, fetchFarmOfferings,
 } from '../core/productmanagement.js';
 import {
   addFarm, addFarmerKYC, getAnswersPerQuestion, getFarmerMetricSections, getQuestionsPerSection,
@@ -427,32 +427,66 @@ export const renderBuyerMenus = () => {
   message = menuPrompt;
   return message;
 };
-export const renderProductCategories = (res, textValue, text) => {
-  console.log('The text extracted', text.split('*')[2]);
-  if (textValue === 3 && text.split('*')[2] === '1') {
-    fetchCategories().then((response) => {
-      console.log('Response at logging product', response);
-      if (response.status === 200) {
-        let menuPrompt = '';
-        response.data.forEach((category) => {
-          menuPrompt += `${category}`;
-        });
-        message = `${con()} Choose a category`;
-        message += menuPrompt;
-        message += menus.footer;
-        res.send(message);
-      } else {
-        message = `${end()} Could not fetch categories at the moment, try later`;
-        res.send(message);
-      }
-    });
-  }
+export const renderProductCategories = (res) => {
+  console.log('Function is called');
+  fetchCategories().then((response) => {
+    console.log('Response at logging product', response);
+    if (response) {
+      let menuPrompt = '';
+      menuPrompt += response;
+      message = `${con()} Choose a category`;
+      message += menuPrompt;
+      message += menus.footer;
+      res.send(message);
+    } else {
+      message = `${end()} Could not fetch categories at the moment, try later`;
+      res.send(message);
+    }
+  });
+};
+export const renderProducts = (res, id) => {
+  fetchProducts(id).then((response) => {
+    if (response) {
+      console.log('New product', response);
+      let menuPrompt = '';
+      menuPrompt += response;
+      message = `${con()} Choose a product\n`;
+      message += menuPrompt;
+      message += menus.footer;
+      res.send(message);
+    } else {
+      message = `${con()} Could not fetch`;
+      message += menus.footer;
+      res.send(message);
+    }
+  });
+};
+export const renderFarmOfferings = (res, id) => {
+  fetchFarmOfferings(id).then((response) => {
+    if (response) {
+      console.log('New product', response);
+      let menuPrompt = '';
+      menuPrompt += response;
+      message = `${con()} Choose an offer\n`;
+      message += menuPrompt;
+      message += menus.footer;
+      res.send(message);
+    } else {
+      message = `${con()} Could not fetch`;
+      message += menus.footer;
+      res.send(message);
+    }
+  });
 };
 export const checkBuyerSelection = (res, textValue, text) => {
-  const selection = text.split('*')[2];
-  console.log(selection);
-  if (selection === '1') {
-    renderProductCategories(res, textValue, text);
+  if (textValue === 3) {
+    renderProductCategories(res);
+  } else if (textValue === 4) {
+    const selection = parseInt(text.split('*')[3], 10);
+    renderProducts(res, selection);
+  } else if (textValue === 5) {
+    const selection = parseInt(text.split('*')[3], 10);
+    renderFarmOfferings(res, selection);
   }
 };
 export const checkFarmerSelection = (text, res, textValue) => {

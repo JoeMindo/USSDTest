@@ -49,22 +49,42 @@ async function fetchCategories() {
     });
     return results;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 }
 async function fetchProducts(id) {
   let results = '';
+  const farmOfferings = '';
   try {
-    const response = await axios.get(`${BASEURL}/api/productsundercategory/${id}`);
-    response.data.forEach((product) => {
-      optionProducts.push(product);
-      results += `\n${product.id}. ${product.product_name}`;
+    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    response.data.forEach((item) => {
+      item.products.forEach((description) => {
+        if (description.category_id === id) {
+          results += `${description.id}. ${description.product_name} `;
+        }
+      });
     });
     return results;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 }
+const fetchFarmOfferings = async (id) => {
+  let farmOfferings = '';
+  try {
+    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    response.data.forEach((item) => {
+      item.farm_products.forEach((farmItem) => {
+        if (farmItem.product_id === id) {
+          farmOfferings += `farm_id:${farmItem.farm_id}. units: ${farmItem.units} grade: ${farmItem.grade}\n `;
+        }
+      });
+    });
+    return farmOfferings;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 const addProduct = async (productdata) => {
   try {
@@ -85,5 +105,5 @@ const getSpecificProduct = async (id) => {
   }
 };
 export {
-  fetchCategories, fetchProducts, addProduct, getSpecificProduct,
+  fetchCategories, fetchProducts, addProduct, getSpecificProduct, fetchFarmOfferings,
 };

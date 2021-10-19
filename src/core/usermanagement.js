@@ -67,7 +67,16 @@ const addLocation = async (locationData, id) => {
   }
 };
 
-const checkFarmerVerification = () => false;
+const checkFarmerVerification = async (id) => {
+  const path = `${BASEURL}/api/isverified/${id}`;
+  try {
+    const verificationresponse = await postrequest(path);
+    console.log('This is verification response', verificationresponse);
+    return verificationresponse;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
 export {
   clearData, registerUser, loginUser, addLocation, checkFarmerVerification,
 };
