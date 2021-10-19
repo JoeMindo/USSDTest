@@ -1,5 +1,8 @@
-import { postrequest } from './services.js';
+/* eslint-disable consistent-return */
+/* eslint-disable import/extensions */
+import { postrequest, retreiveCachedItems } from './services.js';
 import { BASEURL } from '../config/urls.js';
+import { renderProductCategories } from '../config/rendermenu.js';
 
 const clearData = (details) => {
   details.name = '';
@@ -64,6 +67,18 @@ const addLocation = async (locationData, id) => {
   }
 };
 
+const checkRole = (client) => {
+  retreiveCachedItems(client, ['role']).then((results) => {
+    let flag = '';
+    if (results === 'farmer') {
+      flag = 'isFarmer';
+    } else {
+      flag = 'isBuyer';
+    }
+    return flag;
+  });
+};
+
 export {
-  clearData, registerUser, loginUser, addLocation,
+  clearData, registerUser, loginUser, addLocation, checkRole,
 };

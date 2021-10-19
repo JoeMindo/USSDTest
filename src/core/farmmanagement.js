@@ -14,7 +14,7 @@ export const addFarm = async (farm) => {
 
 export const addFarmerKYC = async (farmerKYC, id) => {
   try {
-    const response = await axios.post(`${BASEURL}/api/farmerkyc/update/${id}`, farmerKYC);
+    const response = await axios.post(`${BASEURL}/api/kycsanswers/save/${id}`, farmerKYC);
     console.log(response);
     return response;
   } catch (err) {

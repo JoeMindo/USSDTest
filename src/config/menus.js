@@ -74,4 +74,8 @@ export const menus = {
 
   submitDetails: 'Submit details?\n 1.Yes',
 
+  buyermenu: {
+    viewProducts: '1. View available products',
+  },
+
 };

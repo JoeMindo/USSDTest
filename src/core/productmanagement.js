@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable import/extensions */
 import axios from 'axios';
 import { BASEURL } from '../config/urls.js';
 
@@ -81,7 +83,7 @@ const getSpecificProduct = async (id) => {
   } catch (err) {
     throw new Error(err);
   }
-}
+};
 export {
-  fetchCategories, fetchProducts,addProduct, getSpecificProduct,
+  fetchCategories, fetchProducts, addProduct, getSpecificProduct,
 };

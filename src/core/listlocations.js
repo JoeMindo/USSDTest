@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 import axios from 'axios';
 import { BASEURL } from '../config/urls.js';
 
@@ -48,9 +49,4 @@ export const getLocations = async (type, id, identifier) => {
   }
 };
 
-export const userSpecificSelection = (index, text) => {
-  if (text.split('.')[0] === index) {
-    return text.split('. ')[1];
-  }
-};
 export const splitText = (text, index) => text.split('*')[index];

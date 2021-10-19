@@ -60,6 +60,7 @@ app.post('/ussd', (req, res) => {
   const isAddFarmDetails = text.split('*')[2] === '2';
   const isAddProduct = text.split('*')[2] === '3';
   const isUpdateFarmerDetails = text.split('*')[2] === '4';
+  let userRole = '';
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
   console.log(textValue);
@@ -70,6 +71,7 @@ app.post('/ussd', (req, res) => {
   } else if (isLogin && textValue <= 2) {
     const menus = menuItems.renderLoginMenus(res, textValue);
     let message = menus.message;
+
     if (menus.completedStatus === true) {
       req.session.login = text.split('*');
       userLogin.phone_no = req.body.phoneNumber;
@@ -77,11 +79,17 @@ app.post('/ussd', (req, res) => {
 
       loginUser(userLogin)
         .then((response) => {
-          console.log('Response at login', response.status);
-          if (response.status === 200) {
+          if (response.status === 200 && response.data.role === 'farmer') {
+            userRole = 'isFarmer';
+            client.set('role', 'farmer');
+            console.log('Login Response', response.data);
             client.set('user_id', `${response.data.user_id}`, redis.print);
-            client.set('userLoggedIn', true);
+
             message = menuItems.renderFarmerMenus();
+            res.send(message);
+          } else if (response.status === 200 && response.data.role === 'buyer') {
+            userRole = 'isBuyer';
+            message = menuItems.renderBuyerMenus();
             res.send(message);
           } else {
             message = 'END Invalid credentials';
@@ -89,7 +97,7 @@ app.post('/ussd', (req, res) => {
           }
         });
     }
-  } else if (isUpdateLocation) {
+  } else if (isUpdateLocation && userRole === 'isFarmer') {
     menuItems.checkFarmerSelection(text, res, textValue);
   } else if (isAddFarmDetails) {
     menuItems.checkFarmerSelection(text, res, textValue);
@@ -136,6 +144,8 @@ app.post('/ussd', (req, res) => {
     }
   } else if ((isUpdateFarmerDetails)) {
     menuItems.checkFarmerSelection(text, res, textValue);
+  } else if (isLogin && userRole === 'isBuyer') {
+    menuItems.checkBuyerSelection(text, res, textValue);
   }
 });
 
