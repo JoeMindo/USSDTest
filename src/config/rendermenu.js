@@ -4,7 +4,7 @@
 import { getLocations, getRegions } from '../core/listlocations.js';
 import { menus } from './menus.js';
 import { client } from '../server.js';
-import { addLocation } from '../core/usermanagement.js';
+import { addLocation, checkFarmerVerification } from '../core/usermanagement.js';
 import { retreiveCachedItems } from '../core/services.js';
 import {
   fetchCategories, fetchProducts, getSpecificProduct, addProduct,
@@ -343,67 +343,73 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
 };
 
 export const renderFarmerAddProductMenu = (res, textValue, text) => {
-  retreiveCachedItems(client, ['productID'])
-    .then((result) => {
-      const productID = result[0];
-      getSpecificProduct(productID)
-        .then((response) => {
-          let menuPrompt = `${con()} ${menus.addProduct[0]} ${response.data[0].product_name}`;
+  if (checkFarmerVerification === true) {
+    retreiveCachedItems(client, ['productID'])
+      .then((result) => {
+        const productID = result[0];
+        getSpecificProduct(productID)
+          .then((response) => {
+            let menuPrompt = `${con()} ${menus.addProduct[0]} ${response.data[0].product_name}`;
+            menuPrompt += menus.footer;
+            message = menuPrompt;
+            res.send(message);
+          });
+        if (textValue === 4) {
+          console.log('Am I executed?', text.split('*')[3]);
+          client.set('units', parseInt(text.split('*')[3], 10));
+          let menuPrompt = `${con()} ${menus.addProduct[1]}`;
           menuPrompt += menus.footer;
           message = menuPrompt;
           res.send(message);
-        });
-      if (textValue === 4) {
-        console.log('Am I executed?', text.split('*')[3]);
-        client.set('units', parseInt(text.split('*')[3], 10));
-        let menuPrompt = `${con()} ${menus.addProduct[1]}`;
-        menuPrompt += menus.footer;
-        message = menuPrompt;
-        res.send(message);
-      } else if (textValue === 5) {
-        let grade;
-        if (text.split('*')[4] === '1') {
-          grade = 'A';
-          client.set('grade', grade);
-        } else if (text.split('*')[4] === '2') {
-          grade = 'B';
-          client.set('grade', grade);
-        } else if (text.split('*')[4] === '3') {
-          grade = 'C';
-          client.set('grade', grade);
-        } else if (text.split('*')[4] === '4') {
-          grade = 'D';
-          client.set('grade', grade);
-        } else if (text.split('*')[4] === '5') {
-          grade = 'E';
-          client.set('grade', grade);
-        } else {
-          message = 'Invalid grade';
-          message += menus.footer;
-          res.send(message);
+        } else if (textValue === 5) {
+          let grade;
+          if (text.split('*')[4] === '1') {
+            grade = 'A';
+            client.set('grade', grade);
+          } else if (text.split('*')[4] === '2') {
+            grade = 'B';
+            client.set('grade', grade);
+          } else if (text.split('*')[4] === '3') {
+            grade = 'C';
+            client.set('grade', grade);
+          } else if (text.split('*')[4] === '4') {
+            grade = 'D';
+            client.set('grade', grade);
+          } else if (text.split('*')[4] === '5') {
+            grade = 'E';
+            client.set('grade', grade);
+          } else {
+            message = 'Invalid grade';
+            message += menus.footer;
+            res.send(message);
+          }
         }
-      }
-    });
-
-  retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade'])
-    .then((result) => {
-      const postDetails = {
-        farm_id: result[0],
-        product_id: result[1],
-        units: result[2],
-        grade: result[3],
-      };
-      addProduct(postDetails).then((response) => {
-        if (response.status === 200) {
-          const menuPrompt = `${end()} ${menus.addProduct.success}`;
-          message = menuPrompt;
-        } else {
-          const menuPrompt = `${end()} ${menus.addProduct.failure}`;
-          message = menuPrompt;
-        }
-        res.send(message);
       });
-    });
+
+    retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade'])
+      .then((result) => {
+        const postDetails = {
+          farm_id: result[0],
+          product_id: result[1],
+          units: result[2],
+          grade: result[3],
+        };
+        addProduct(postDetails).then((response) => {
+          if (response.status === 200) {
+            const menuPrompt = `${end()} ${menus.addProduct.success}`;
+            message = menuPrompt;
+          } else {
+            const menuPrompt = `${end()} ${menus.addProduct.failure}`;
+            message = menuPrompt;
+          }
+          res.send(message);
+        });
+      });
+  } else {
+    message = 'CON Cannot add product please update your farmer details';
+    message += menus.footer;
+    res.send(message);
+  }
 };
 
 export const renderFarmerMenus = () => {

@@ -67,18 +67,7 @@ const addLocation = async (locationData, id) => {
   }
 };
 
-const checkRole = (client) => {
-  retreiveCachedItems(client, ['role']).then((results) => {
-    let flag = '';
-    if (results === 'farmer') {
-      flag = 'isFarmer';
-    } else {
-      flag = 'isBuyer';
-    }
-    return flag;
-  });
-};
-
+const checkFarmerVerification = () => false;
 export {
-  clearData, registerUser, loginUser, addLocation, checkRole,
+  clearData, registerUser, loginUser, addLocation, checkFarmerVerification,
 };
