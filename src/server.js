@@ -97,12 +97,7 @@ app.post('/ussd', (req, res) => {
           }
         });
     }
-  }
-  // menuItems.checkFarmerSeleelse if (isAddFarmDetails) {
-  // menuItems.checkFarmerSelection(text, res, textValue);
-  // menuItems.checkFarmerSelection(text, res, textValue);
-  // menuItems.checkFarmerSelection(text, res, textValue);
-  else if ((isRegistration)) {
+  } else if ((isRegistration)) {
     let error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue);
     console.log('TextValue at register', textValue);
@@ -142,7 +137,6 @@ app.post('/ussd', (req, res) => {
       res.send(message);
     }
   } else {
-    console.log('Other executed');
     retreiveCachedItems(client, ['role'])
       .then((response) => {
         console.log('Response of other', response);
