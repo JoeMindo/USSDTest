@@ -353,7 +353,7 @@ export const renderFarmerAddProductMenu = (res, textValue, text) => {
             let menuPrompt = `${con()} ${menus.addProduct[0]} ${response.data[0].product_name}`;
             menuPrompt += menus.footer;
             message = menuPrompt;
-            // res.send(message);
+            res.send(message);
           });
         if (textValue === 4) {
           console.log('Am I executed?', text.split('*')[3]);
@@ -384,27 +384,30 @@ export const renderFarmerAddProductMenu = (res, textValue, text) => {
             message += menus.footer;
             res.send(message);
           }
+        } else if (textValue === 6) {
+          console.log('I am done');
+          retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade'])
+            .then((result) => {
+              const postDetails = {
+                farm_id: result[0],
+                product_id: result[1],
+                units: result[2],
+                grade: result[3],
+              };
+              addProduct(postDetails).then((response) => {
+                if (response.status === 200) {
+                  const menuPrompt = `${end()} ${menus.addProduct.success}`;
+                  message = menuPrompt;
+                  res.send(message);
+                } else {
+                  const menuPrompt = `${end()} ${menus.addProduct.failure}`;
+                  message = menuPrompt;
+                  res.send(message);
+                }
+                // res.send(message);
+              });
+            });
         }
-      });
-
-    retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade'])
-      .then((result) => {
-        const postDetails = {
-          farm_id: result[0],
-          product_id: result[1],
-          units: result[2],
-          grade: result[3],
-        };
-        addProduct(postDetails).then((response) => {
-          if (response.status === 200) {
-            const menuPrompt = `${end()} ${menus.addProduct.success}`;
-            message = menuPrompt;
-          } else {
-            const menuPrompt = `${end()} ${menus.addProduct.failure}`;
-            message = menuPrompt;
-          }
-          res.send(message);
-        });
       });
   } else {
     message = 'CON Cannot add product please update your farmer details';
