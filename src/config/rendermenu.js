@@ -196,7 +196,7 @@ export const renderAddFarmDetailsMenu = (res, textValue, text) => {
       res.send(message);
     });
   } else if (textValue === 6) {
-    const category = text.split('*')[5];
+    const category = parseInt(text.split('*')[5], 10);
     const product = fetchProducts(category);
     product.then((data) => {
       let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
@@ -343,7 +343,7 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
 };
 
 export const renderFarmerAddProductMenu = (res, textValue, text) => {
-  if (checkFarmerVerification === true) {
+  if (checkFarmerVerification() === true) {
     retreiveCachedItems(client, ['productID'])
       .then((result) => {
         const productID = result[0];
@@ -395,12 +395,14 @@ export const renderFarmerAddProductMenu = (res, textValue, text) => {
           grade: result[3],
         };
         addProduct(postDetails).then((response) => {
+          let message = '';
+          console.log('Add product response', response);
           if (response.status === 200) {
             const menuPrompt = `${end()} ${menus.addProduct.success}`;
-            message = menuPrompt;
+            message += menuPrompt;
           } else {
             const menuPrompt = `${end()} ${menus.addProduct.failure}`;
-            message = menuPrompt;
+            message += menuPrompt;
           }
           res.send(message);
         });
