@@ -1,8 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/extensions */
-import { postrequest, retreiveCachedItems } from './services.js';
+import { postrequest } from './services.js';
 import { BASEURL } from '../config/urls.js';
-import { renderProductCategories } from '../config/rendermenu.js';
 
 const clearData = (details) => {
   details.name = '';
@@ -10,7 +9,6 @@ const clearData = (details) => {
   details.phone = '';
   details.password = '';
   details.role = '';
-
   return details;
 };
 const registerUser = async (regdata, phone) => {
@@ -29,13 +27,6 @@ const registerUser = async (regdata, phone) => {
   };
   try {
     const registrationresponse = await postrequest(postdata, path);
-
-    // if (registrationresponse.status === 'success') {
-    //   return registrationresponse.status;
-    // } else {
-    //   return registrationresponse.data.message;
-    // }
-
     return registrationresponse.data;
   } catch (error) {
     return error;
@@ -63,7 +54,7 @@ const addLocation = async (locationData, id) => {
     const locationResponse = await postrequest(locationData, path);
     return locationResponse;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 };
 
@@ -71,7 +62,6 @@ const checkFarmerVerification = async (id) => {
   const path = `${BASEURL}/api/isverified/${id}`;
   try {
     const verificationresponse = await postrequest(path);
-    console.log('This is verification response', verificationresponse);
     return verificationresponse;
   } catch (err) {
     throw new Error(err);

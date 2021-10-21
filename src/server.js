@@ -14,7 +14,7 @@ import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
 import { retreiveCachedItems } from './core/services.js';
-import { menus } from './config/menus.js';
+import { menus } from './config/menuoptions.js';
 
 const port = process.env.PORT || 3031;
 

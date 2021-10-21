@@ -7,7 +7,7 @@ const createToken = async (payload) => {
     const token = await jwt.sign(payload, 'this is secret');
     return token;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 };
 export const postrequest = async (
