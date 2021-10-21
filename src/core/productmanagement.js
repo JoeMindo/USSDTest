@@ -24,7 +24,7 @@ async function fetchProducts(id) {
     response.data.forEach((item) => {
       item.products.forEach((description) => {
         if (description.category_id === id) {
-          results += `${description.id}. ${description.product_name} `;
+          results += `${description.id}. ${description.product_name}\n `;
         }
       });
     });
@@ -40,7 +40,7 @@ const fetchFarmOfferings = async (id) => {
     response.data.forEach((item) => {
       item.farm_products.forEach((farmItem) => {
         if (farmItem.product_id === id) {
-          farmOfferings += `farm_id:${farmItem.farm_id}. units: ${farmItem.units} grade: ${farmItem.grade}\n `;
+          farmOfferings += `${farmItem.farm_id}. Available units: ${farmItem.units} grade of items: ${farmItem.grade}\n `;
         }
       });
     });

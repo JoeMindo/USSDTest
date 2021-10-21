@@ -41,3 +41,8 @@ export const retreiveCachedItems = (client, fields = []) => {
   });
   return Promise.all(resultFields);
 };
+
+export const setToCache = (text, index, client, key) => {
+  const customAnswer = text.split('*')[index];
+  client.set(key, customAnswer);
+};

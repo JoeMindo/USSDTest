@@ -5,19 +5,21 @@ import { getLocations, getRegions } from '../core/listlocations.js';
 import { menus } from './menuoptions.js';
 import { client } from '../server.js';
 import { addLocation, checkFarmerVerification } from '../core/usermanagement.js';
-import { retreiveCachedItems } from '../core/services.js';
+import { retreiveCachedItems, setToCache } from '../core/services.js';
 import {
   fetchCategories, fetchProducts, getSpecificProduct, addProduct,
 } from '../core/productmanagement.js';
 import {
   addFarm, addFarmerKYC, getAnswersPerQuestion, getFarmerMetricSections, getQuestionsPerSection,
 } from '../core/farmmanagement.js';
+import { responsePrompt } from './prompts.js';
 
 const con = () => 'CON';
 const end = () => 'END';
 let message = '';
 const questionanswers = {};
 export const renderUpdateLocationMenu = (res, textValue, text) => {
+  console.log('Update location');
   if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.updateLocation[0]}`;
     const regions = getRegions();
@@ -185,38 +187,16 @@ export const renderAddFarmDetailsMenu = (res, textValue, text) => {
 export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
   if (textValue === 3) {
     getFarmerMetricSections().then((response) => {
-      if (response.status === 200) {
-        let menuPrompt = '';
-        response.data.forEach((section) => {
-          menuPrompt += `\n${section.id}. ${section.section_name}`;
-        });
-        message = `${con()} Choose a section to fill`;
-        message += menuPrompt;
-        message += menus.footer;
-        res.send(message);
-      } else {
-        message = `${end()} Could not fetch sections at the moment, try later`;
-        res.send(message);
-      }
+      message = responsePrompt(response, 'sections');
+      res.send(message);
     });
   } else if (textValue === 4) {
     const sectionId = parseInt(text.split('*')[3], 10);
     console.log(sectionId);
     client.set('sectionId', sectionId);
     getQuestionsPerSection(sectionId).then((response) => {
-      if (response.status === 200) {
-        let menuPrompt = '';
-        response.data.forEach((question) => {
-          menuPrompt += `\n${question.id}. ${question.metric_name}`;
-        });
-        message = `${con()} Choose a question to fill`;
-        message += menuPrompt;
-        message += menus.footer;
-        res.send(message);
-      } else {
-        message = `${end()} Could not fetch questions at the moment, try later`;
-        res.send(message);
-      }
+      message = responsePrompt(response, 'questions');
+      res.send(message);
     });
   } else if (textValue === 5) {
     const questionId = parseInt(text.split('*')[4], 10);
@@ -262,8 +242,7 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
     }
   } else if (textValue === 7) {
     if (text.split('*')[5] === '0') {
-      const customAnswer = text.split('*')[6];
-      client.set('answers', customAnswer);
+      setToCache(text, 5, client, 'answers');
     }
     retreiveCachedItems(client, ['user_id', 'answers', 'questionId'])
       .then((results) => {
