@@ -395,16 +395,18 @@ export const renderFarmerAddProductMenu = (res, textValue, text) => {
           grade: result[3],
         };
         addProduct(postDetails).then((response) => {
-          let message = '';
+          let prompt = '';
           console.log('Add product response', response);
           if (response.status === 200) {
             const menuPrompt = `${end()} ${menus.addProduct.success}`;
-            message += menuPrompt;
+            prompt += menuPrompt;
+            // res.send(message);
           } else {
             const menuPrompt = `${end()} ${menus.addProduct.failure}`;
-            message += menuPrompt;
+            prompt += menuPrompt;
+            // res.send(message);
           }
-          res.send(message);
+          res.send(prompt);
         });
       });
   } else {
