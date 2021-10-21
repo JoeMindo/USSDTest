@@ -58,8 +58,6 @@ app.post('/ussd', (req, res) => {
   // TODO: Migrate this to usermanagement
   const isRegistration = text.split('*')[0] === '1';
   const isLogin = text.split('*')[0] === '2';
-
-  const userRole = '';
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
   console.log(textValue);

@@ -99,7 +99,6 @@ export const renderUpdateLocationMenu = (res, textValue, text) => {
         };
         const userId = parseInt(postLocationDetails[3], 10);
         addLocation(postDetails, userId).then((response) => {
-          // TODO: Add a success message and failure message
           console.log('Add location response', response);
           if (response.status === 201) {
             const menuPrompt = `${end()} ${menus.updateLocation.success}`;
