@@ -89,6 +89,9 @@ app.post('/ussd', (req, res) => {
             client.set('user_id', `${response.data.user_id}`, redis.print);
             message = menuItems.renderBuyerMenus();
             res.send(message);
+          } else if (response.status === 404) {
+            message = 'CON User not found';
+            res.send(message);
           } else {
             message = 'END Invalid credentials';
             res.send(message);
