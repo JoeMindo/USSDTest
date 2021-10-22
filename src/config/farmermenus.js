@@ -263,8 +263,53 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
 };
 
 export const renderFarmerAddProductMenu = async (res, textValue, text) => {
+  let message = '';
   const items = await retreiveCachedItems(client, ['farm_id', 'productID', 'user_id']);
-  const specificProduct = await getSpecificProduct(parseInt(items[1], 10));
-  // res.send(specificProduct);
-  console.log('Spec',specificProduct);
+  const productID = parseInt(items[1], 10);
+  const specificProduct = await getSpecificProduct(productID);
+  message += `CON What quantity of \n ${specificProduct}`;
+  if (textValue === 4) {
+    const units = parseInt(text.split('*')[3], 10);
+    client.set('units', units);
+    const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
+    message = menuPrompt;
+  } else if (textValue === 5) {
+    console.log('Text value', textValue);
+    let grade;
+    if (text.split('*')[4] === '1') {
+      grade = 'A';
+      client.set('grade', grade);
+    } else if (text.split('*')[4] === '2') {
+      grade = 'B';
+      client.set('grade', grade);
+    } else if (text.split('*')[4] === '3') {
+      grade = 'C';
+      client.set('grade', grade);
+    } else if (text.split('*')[4] === '4') {
+      grade = 'D';
+      client.set('grade', grade);
+    } else if (text.split('*')[4] === '5') {
+      grade = 'E';
+      client.set('grade', grade);
+    } else {
+      message = 'Invalid grade';
+      message += menus.footer;
+    }
+    const addProductDetails = await retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade']);
+
+    const addProductResponse = await addProductDetails;
+    const postDetails = {
+      farm_id: addProductResponse[0],
+      product_id: addProductResponse[1],
+      units: addProductResponse[2],
+      grade: addProductResponse[3],
+    };
+    const addProductToDB = await addProduct(postDetails);
+    if (addProductToDB.status === 200) {
+      message = 'END Added successfully';
+    } else {
+      message = 'END Added failed';
+    }
+  }
+  return res.send(message);
 };

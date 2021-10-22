@@ -63,8 +63,12 @@ const addProduct = async (productdata) => {
 const getSpecificProduct = async (id) => {
   try {
     const specificProduct = await axios.get(`${BASEURL}/api/products/all`);
-    const products = specificProduct.data.filter((item) => item.id === id);
-    products.forEach((item) => `${item.id}. ${item.product_name}`);
+    const filteredItems = specificProduct.data.filter((item) => item.id === id);
+    let respose = '';
+    filteredItems.forEach((filteredItem) => {
+      respose += `${filteredItem.id}. ${filteredItem.product_name}`;
+    });
+    return respose;
   } catch (err) {
     throw new Error(err);
   }
