@@ -50,7 +50,7 @@ app.use(
 );
 
 app.post("/ussd", (req, res) => {
-  console.log("request payload" + JSON.stringify(req));
+  console.log("request payload" + JSON.stringify(req.body));
   let message = "";
 
   const userLogin = {
