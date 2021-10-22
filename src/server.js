@@ -61,10 +61,12 @@ app.post('/ussd', (req, res) => {
   const rawtext = req.body.text;
   const text = ussdRouter(rawtext, '99', '98');
   // TODO: Migrate this to usermanagement
-  const isRegistration = text.split('*')[0] === '1';
-  const isLogin = text.split('*')[0] === '2';
-  console.log(`incoming text ${text}`);
-  const textValue = text.split('*').length;
+  if (text) {
+    const isRegistration = text.split('*')[0] === '1';
+    const isLogin = text.split('*')[0] === '2';
+    console.log(`incoming text ${text}`);
+    const textValue = text.split('*').length;
+  }
   console.log(textValue);
 
   if (text === '') {
