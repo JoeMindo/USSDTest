@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
-import cors from cors;
+import cors from 'cors';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
@@ -49,9 +49,18 @@ app.use(
     saveUninitialized: true,
   }),
 );
-app.use(cors({
-  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
-}));
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, POST, GET, PATCH, DELETE',
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+});
+
 app.post('/ussd', (req, res) => {
   console.log(`request payload${JSON.stringify(req.body)}`);
   let message = '';
@@ -106,7 +115,7 @@ app.post('/ussd', (req, res) => {
       });
     }
   } else if (isRegistration) {
-    console.log('Registration done here')
+    console.log('Registration done here');
     let error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue);
     console.log('TextValue at register', textValue);
