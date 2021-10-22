@@ -52,6 +52,7 @@ app.use(cors({
 
 app.post('/ussd', (req, res) => {
   let message = '';
+  let textValue;
 
   const userLogin = {
     phone_no: '',
@@ -65,7 +66,7 @@ app.post('/ussd', (req, res) => {
     const isRegistration = text.split('*')[0] === '1';
     const isLogin = text.split('*')[0] === '2';
     console.log(`incoming text ${text}`);
-    const textValue = text.split('*').length;
+    textValue = text.split('*').length;
   }
   console.log(textValue);
 
