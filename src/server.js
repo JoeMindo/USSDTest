@@ -10,13 +10,14 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
+import cors from cors;
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
 import { retreiveCachedItems } from './core/services.js';
 import { menus } from './config/menuoptions.js';
 
-const port = process.env.PORT || 3031;
+const port = process.env.PORT || 3032;
 
 const app = express();
 
@@ -48,7 +49,9 @@ app.use(
     saveUninitialized: true,
   }),
 );
-
+app.use(cors({
+  methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+}));
 app.post('/ussd', (req, res) => {
   console.log(`request payload${JSON.stringify(req.body)}`);
   let message = '';
@@ -103,6 +106,7 @@ app.post('/ussd', (req, res) => {
       });
     }
   } else if (isRegistration) {
+    console.log('Registration done here')
     let error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue);
     console.log('TextValue at register', textValue);
