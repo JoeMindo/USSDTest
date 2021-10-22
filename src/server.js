@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
+import cors from 'cors';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
@@ -44,6 +45,10 @@ app.use(
     saveUninitialized: true,
   }),
 );
+
+app.use(cors({
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
+}));
 
 app.post('/ussd', (req, res) => {
   let message = '';
