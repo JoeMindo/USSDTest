@@ -7,7 +7,7 @@ const createToken = async (payload) => {
     const token = await jwt.sign(payload, 'this is secret');
     return token;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 };
 export const postrequest = async (
@@ -40,4 +40,9 @@ export const retreiveCachedItems = (client, fields = []) => {
     resultFields.push(field);
   });
   return Promise.all(resultFields);
+};
+
+export const setToCache = (text, index, client, key) => {
+  const customAnswer = text.split('*')[index];
+  client.set(key, customAnswer);
 };

@@ -10,11 +10,12 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
+import cors from 'cors';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
 import { retreiveCachedItems } from './core/services.js';
-import { menus } from './config/menus.js';
+import { menus } from './config/menuoptions.js';
 
 const port = process.env.PORT || 3031;
 
@@ -45,6 +46,10 @@ app.use(
   }),
 );
 
+app.use(cors({
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
+}));
+
 app.post('/ussd', (req, res) => {
   let message = '';
 
@@ -56,12 +61,12 @@ app.post('/ussd', (req, res) => {
   const rawtext = req.body.text;
   const text = ussdRouter(rawtext, '99', '98');
   // TODO: Migrate this to usermanagement
-  const isRegistration = text.split('*')[0] === '1';
-  const isLogin = text.split('*')[0] === '2';
-
-  const userRole = '';
-  console.log(`incoming text ${text}`);
-  const textValue = text.split('*').length;
+  if (text) {
+    const isRegistration = text.split('*')[0] === '1';
+    const isLogin = text.split('*')[0] === '2';
+    console.log(`incoming text ${text}`);
+    const textValue = text.split('*').length;
+  }
   console.log(textValue);
 
   if (text === '') {
@@ -90,6 +95,9 @@ app.post('/ussd', (req, res) => {
             client.set('role', 'buyer');
             client.set('user_id', `${response.data.user_id}`, redis.print);
             message = menuItems.renderBuyerMenus();
+            res.send(message);
+          } else if (response.status === 404) {
+            message = 'CON User not found';
             res.send(message);
           } else {
             message = 'END Invalid credentials';

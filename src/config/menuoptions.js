@@ -59,6 +59,7 @@ export const menus = {
     0: 'Enter the quantity of ',
     1: `How would you grade your produce?\n1.${grades[1]}\n2.${grades[2]}\n3.${grades[3]}\n4. ${grades[4]}\n5. ${grades[5]}`,
     success: 'Product added successfully',
+    failure: 'Could not add product',
   },
   updateLocation: {
     0: 'Select region\n',
