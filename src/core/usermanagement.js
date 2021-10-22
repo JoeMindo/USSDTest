@@ -62,11 +62,12 @@ const checkFarmerVerification = async (id) => {
   const path = `${BASEURL}/api/isverified/${id}`;
   try {
     const verificationresponse = await postrequest(path);
-    return verificationresponse;
+    return verificationresponse.status;
   } catch (err) {
     throw new Error(err);
   }
 };
+const checkVerification = () => true;
 export {
-  clearData, registerUser, loginUser, addLocation, checkFarmerVerification,
+  clearData, registerUser, loginUser, addLocation, checkFarmerVerification, checkVerification,
 };

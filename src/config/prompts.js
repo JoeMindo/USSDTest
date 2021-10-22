@@ -4,8 +4,7 @@ import { menus } from './menuoptions.js';
 
 const con = () => 'CON';
 const end = () => 'END';
-let menuPrompt = '';
-const message = '';
+
 export const promptToShow = (response, textToShow) => {
   let message = '';
   let menuPrompt = '';
@@ -36,6 +35,7 @@ export const promptToShow = (response, textToShow) => {
 
 export const responsePrompt = (response, section) => {
   let message = '';
+  let menuPrompt = 'CON ';
   console.log('Sections written here', response);
   if (response.status === 200 && section === 'sections') {
     response.data.forEach((item) => {

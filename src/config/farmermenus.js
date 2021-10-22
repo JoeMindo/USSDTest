@@ -4,7 +4,7 @@
 import { getLocations, getRegions } from '../core/listlocations.js';
 import { menus } from './menuoptions.js';
 import { client } from '../server.js';
-import { addLocation, checkFarmerVerification } from '../core/usermanagement.js';
+import { addLocation, checkFarmerVerification, checkVerification } from '../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../core/services.js';
 import {
   fetchCategories, fetchProducts, getSpecificProduct, addProduct,
@@ -115,7 +115,7 @@ export const renderUpdateLocationMenu = (res, textValue, text) => {
       });
   }
 };
-export const renderAddFarmDetailsMenu = (res, textValue, text) => {
+export const renderAddFarmDetailsMenu = async (res, textValue, text) => {
   // TODO: Add a check for KYC
   if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
@@ -130,25 +130,21 @@ export const renderAddFarmDetailsMenu = (res, textValue, text) => {
     res.send(message);
   } else if (textValue === 5) {
     client.set('farm_location', text.split('*')[4]);
-
-    const categories = fetchCategories();
-    categories.then((data) => {
-      let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
-      menuPrompt += `${data}`;
-      menuPrompt += menus.footer;
-      message = menuPrompt;
-      res.send(message);
-    });
+    const categories = await fetchCategories();
+    console.log(categories);
+    let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
+    menuPrompt += categories;
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    res.send(message);
   } else if (textValue === 6) {
-    const category = text.split('*')[5];
-    const product = fetchProducts(category);
-    product.then((data) => {
-      let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
-      menuPrompt += `${data}`;
-      menuPrompt += menus.footer;
-      message = menuPrompt;
-      res.send(message);
-    });
+    const category = parseInt(text.split('*')[5], 10);
+    const product = await fetchProducts(category);
+    let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
+    menuPrompt += `${product}`;
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    res.send(message);
   } else if (textValue === 7) {
     const productId = parseInt(text.split('*')[6], 10);
     client.set('productID', productId);
@@ -185,11 +181,13 @@ export const renderAddFarmDetailsMenu = (res, textValue, text) => {
 };
 
 export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
+  let message = '';
   if (textValue === 3) {
     getFarmerMetricSections().then((response) => {
       message = responsePrompt(response, 'sections');
       res.send(message);
     });
+    message = '';
   } else if (textValue === 4) {
     const sectionId = parseInt(text.split('*')[3], 10);
     console.log(sectionId);
@@ -198,6 +196,7 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
       message = responsePrompt(response, 'questions');
       res.send(message);
     });
+    message = '';
   } else if (textValue === 5) {
     const questionId = parseInt(text.split('*')[4], 10);
     client.set('questionId', questionId);
@@ -263,72 +262,9 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
   }
 };
 
-export const renderFarmerAddProductMenu = (res, textValue, text) => {
-  if (checkFarmerVerification === true) {
-    retreiveCachedItems(client, ['productID'])
-      .then((result) => {
-        const productID = result[0];
-        getSpecificProduct(productID)
-          .then((response) => {
-            let menuPrompt = `${con()} ${menus.addProduct[0]} ${response.data[0].product_name}`;
-            menuPrompt += menus.footer;
-            message = menuPrompt;
-            res.send(message);
-          });
-        if (textValue === 4) {
-          console.log('Am I executed?', text.split('*')[3]);
-          client.set('units', parseInt(text.split('*')[3], 10));
-          let menuPrompt = `${con()} ${menus.addProduct[1]}`;
-          menuPrompt += menus.footer;
-          message = menuPrompt;
-          res.send(message);
-        } else if (textValue === 5) {
-          let grade;
-          if (text.split('*')[4] === '1') {
-            grade = 'A';
-            client.set('grade', grade);
-          } else if (text.split('*')[4] === '2') {
-            grade = 'B';
-            client.set('grade', grade);
-          } else if (text.split('*')[4] === '3') {
-            grade = 'C';
-            client.set('grade', grade);
-          } else if (text.split('*')[4] === '4') {
-            grade = 'D';
-            client.set('grade', grade);
-          } else if (text.split('*')[4] === '5') {
-            grade = 'E';
-            client.set('grade', grade);
-          } else {
-            message = 'Invalid grade';
-            message += menus.footer;
-            res.send(message);
-          }
-        }
-      });
-
-    retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade'])
-      .then((result) => {
-        const postDetails = {
-          farm_id: result[0],
-          product_id: result[1],
-          units: result[2],
-          grade: result[3],
-        };
-        addProduct(postDetails).then((response) => {
-          if (response.status === 200) {
-            const menuPrompt = `${end()} ${menus.addProduct.success}`;
-            message = menuPrompt;
-          } else {
-            const menuPrompt = `${end()} ${menus.addProduct.failure}`;
-            message = menuPrompt;
-          }
-          res.send(message);
-        });
-      });
-  } else {
-    message = 'CON Cannot add product please update your farmer details';
-    message += menus.footer;
-    res.send(message);
-  }
+export const renderFarmerAddProductMenu = async (res, textValue, text) => {
+  const items = await retreiveCachedItems(client, ['farm_id', 'productID', 'user_id']);
+  const specificProduct = await getSpecificProduct(parseInt(items[1], 10));
+  // res.send(specificProduct);
+  console.log('Spec',specificProduct);
 };
