@@ -10,12 +10,15 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
+
+import cors from 'cors';
+
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser } from './core/usermanagement.js';
 import { retreiveCachedItems } from './core/services.js';
 import { menus } from './config/menus.js';
-import cors from 'cors';
+
 const port = process.env.PORT || 3031;
 
 const app = express();
@@ -34,7 +37,7 @@ app.use(logger('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(cors({
-    methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('trust proxy', 1);
