@@ -8,8 +8,9 @@ const con = () => 'CON';
 const end = () => 'END';
 
 export const renderProductCategories = (res) => {
+  console.log('Here');
   fetchCategories().then((response) => {
-    console.log('Response at logging product', response);
+    console.log('Response at logging categories', response);
     if (response) {
       message = promptToShow(response, 'productcategories');
       res.send(message);

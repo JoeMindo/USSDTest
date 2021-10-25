@@ -10,10 +10,10 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
-import cors from 'cors';
+// import cors from 'cors';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './config/rendermenu.js';
-import { registerUser, loginUser } from './core/usermanagement.js';
+import { registerUser, loginUser, checkIfUserExists } from './core/usermanagement.js';
 import { retreiveCachedItems } from './core/services.js';
 import { menus } from './config/menuoptions.js';
 
@@ -61,7 +61,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/ussd', (req, res) => {
+app.post('/ussd', async (req, res) => {
   console.log(`request payload${JSON.stringify(req.body)}`);
   let message = '';
 
@@ -69,69 +69,40 @@ app.post('/ussd', (req, res) => {
     phone_no: '',
     password: '',
   };
+  const userGender = {
+    1: 'Male',
+    2: 'Female',
+  };
 
   const rawtext = req.body.text;
   const text = ussdRouter(rawtext, '99', '98');
   // TODO: Migrate this to usermanagement
-  const isRegistration = text.split('*')[0] === '1';
-  const isLogin = text.split('*')[0] === '2';
+
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
   console.log(textValue);
+  console.log('Length of text', text.length);
+  const userStatus = await checkIfUserExists(req.body.phoneNumber);
+  console.log('User Status', userStatus);
 
-  if (text === '') {
-    message = 'CON Welcome to Mamlaka Foods\n 1. Register \n 2. Login';
-    res.send(message);
-  } else if (isLogin && textValue <= 2) {
-    const menus = menuItems.renderLoginMenus(res, textValue);
-    let message = menus.message;
-
-    if (menus.completedStatus === true) {
-      req.session.login = text.split('*');
-      userLogin.phone_no = req.body.phoneNumber;
-      userLogin.password = req.session.login[1];
-
-      loginUser(userLogin).then((response) => {
-        console.log('Login Response', response);
-        if (response.status === 200 && response.data.role === 'farmer') {
-          console.log('Farmer here');
-          client.set('role', 'farmer');
-          client.set('user_id', `${response.data.user_id}`, redis.print);
-          message = menuItems.renderFarmerMenus();
-          res.send(message);
-        } else if (response.status === 200 && response.data.role === 'buyer') {
-          console.log('Buyer detected', response);
-          client.set('role', 'buyer');
-          client.set('user_id', `${response.data.user_id}`, redis.print);
-          message = menuItems.renderBuyerMenus();
-          res.send(message);
-        } else if (response.status === 404) {
-          message = 'CON User not found';
-          res.send(message);
-        } else {
-          message = 'END Invalid credentials';
-          res.send(message);
-        }
-      });
-    }
-  } else if (isRegistration) {
-    console.log('Registration done here');
+  if (userStatus === false) {
+    console.log('Here is registering', textValue);
     let error = 'END ';
-    const menus = menuItems.renderRegisterMenu(textValue);
-    console.log('TextValue at register', textValue);
+    const menus = menuItems.renderRegisterMenu(textValue, text);
     let message = menus.message;
     if (menus.completedStatus === true) {
       message = 'END Success';
       req.session.registration = text.split('*');
+
       const userDetails = {
-        first_name: req.session.registration[1],
-        last_name: req.session.registration[2],
-        id_no: req.session.registration[3],
-        gender: 'Male',
-        password: req.session.registration[5],
-        password_confirmation: req.session.registration[6],
-        role_id: req.session.registration[7],
-        // email: req.session.registration[9],
+        first_name: req.session.registration[0],
+        last_name: req.session.registration[1],
+        id_no: req.session.registration[2],
+        gender: userGender[parseInt(req.session.registration[3], 10)],
+        password: req.session.registration[4],
+        password_confirmation: req.session.registration[5],
+        role_id: req.session.registration[6],
+
       };
       console.log('DetailsHere', userDetails);
       const out = registerUser(userDetails, req.body.phoneNumber);
@@ -152,6 +123,33 @@ app.post('/ussd', (req, res) => {
         res.send(response);
       });
     } else {
+      res.send(message);
+    }
+  } else if (userStatus === true) {
+    const menus = menuItems.renderLoginMenus(res, textValue, text);
+    let message = menus.message;
+    if (menus.completedStatus === true) {
+      req.session.login = text.split('*');
+      userLogin.phone_no = req.body.phoneNumber;
+      userLogin.password = req.session.login[0];
+      console.log('Login', userLogin);
+      const response = await loginUser(userLogin);
+      console.log('Login Response', response);
+      if (response.status === 200 && response.data.role === 'farmer') {
+        console.log('Farmer here');
+        client.set('role', 'farmer');
+        client.set('user_id', `${response.data.user_id}`, redis.print);
+        message = menuItems.renderFarmerMenus();
+      } else if (response.status === 200 && response.data.role === 'buyer') {
+        console.log('Buyer detected', response);
+        client.set('role', 'buyer');
+        client.set('user_id', `${response.data.user_id}`, redis.print);
+        message = menuItems.renderBuyerMenus();
+      } else if (response.status === 404) {
+        message = 'CON User not found';
+      } else {
+        message = 'END Invalid credentials';
+      }
       res.send(message);
     }
   } else {

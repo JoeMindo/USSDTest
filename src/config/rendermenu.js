@@ -12,32 +12,32 @@ let message = '';
 
 // Register Menus
 let completedStatus = false;
-export const renderRegisterMenu = (textValue) => {
-  if (textValue === 1) {
+export const renderRegisterMenu = (textValue, text) => {
+  if (textValue === 1 && text.length === 0) {
     let menuPrompt = `${con()} ${menus.register.firstname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 2) {
+  } else if (textValue === 1) {
     let menuPrompt = `${con()} ${menus.register.lastname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 3) {
+  } else if (textValue === 2) {
     let menuPrompt = `${con()} ${menus.register.idNumber}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 4) {
+  } else if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.register.gender}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 5) {
+  } else if (textValue === 4) {
     let menuPrompt = `${con()} ${menus.register.password}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 6) {
+  } else if (textValue === 5) {
     let menuPrompt = `${con()} ${menus.register.confirmPassword}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 7) {
+  } else if (textValue === 6) {
     let menuPrompt = `${con()} ${menus.register.role}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
@@ -54,15 +54,15 @@ export const renderRegisterMenu = (textValue) => {
 };
 
 // Login Menu
-export const renderLoginMenus = (res, textValue) => {
-  if (textValue === 1) {
+export const renderLoginMenus = (textValue, text) => {
+  if (textValue === 1 && text.length === 0) {
     let menuPrompt = `${con()} ${menus.login.password}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-    res.send(message);
   } else {
     completedStatus = true;
   }
+
   return { message, completedStatus };
 };
 
@@ -83,13 +83,13 @@ export const renderBuyerMenus = () => {
 };
 
 export const checkBuyerSelection = (res, textValue, text) => {
-  if (textValue === 3) {
+  if (textValue === 1) {
     buyermenus.renderProductCategories(res);
-  } else if (textValue === 4) {
-    const selection = parseInt(text.split('*')[3], 10);
+  } else if (textValue === 2) {
+    const selection = parseInt(text.split('*')[1], 10);
     buyermenus.renderProducts(res, selection);
-  } else if (textValue === 5) {
-    const selection = parseInt(text.split('*')[3], 10);
+  } else if (textValue === 3) {
+    const selection = parseInt(text.split('*')[2], 10);
     buyermenus.renderFarmOfferings(res, selection);
   }
 };
