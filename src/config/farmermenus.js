@@ -171,14 +171,14 @@ export const renderAddFarmDetailsMenu = async (res, textValue, text) => {
 
 export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
   let message = '';
-  if (textValue === 3) {
+  if (textValue === 2) {
     getFarmerMetricSections().then((response) => {
       message = responsePrompt(response, 'sections');
       res.send(message);
     });
     message = '';
-  } else if (textValue === 4) {
-    const sectionId = parseInt(text.split('*')[3], 10);
+  } else if (textValue === 3) {
+    const sectionId = parseInt(text.split('*')[2], 10);
     console.log(sectionId);
     client.set('sectionId', sectionId);
     getQuestionsPerSection(sectionId).then((response) => {
@@ -186,8 +186,8 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
       res.send(message);
     });
     message = '';
-  } else if (textValue === 5) {
-    const questionId = parseInt(text.split('*')[4], 10);
+  } else if (textValue === 4) {
+    const questionId = parseInt(text.split('*')[3], 10);
     client.set('questionId', questionId);
     getAnswersPerQuestion(questionId).then((response) => {
       if (response.status === 200) {
@@ -209,8 +209,8 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
         res.send(message);
       }
     });
-  } else if (textValue === 6) {
-    const userAnswers = text.split('*')[5];
+  } else if (textValue === 5) {
+    const userAnswers = text.split('*')[4];
     if (userAnswers === '0') {
       message = `${con()} Type in your answer`;
       res.send(message);
@@ -228,9 +228,9 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
       message = `${con()} Proceed?\n 1. Yes`;
       res.send(message);
     }
-  } else if (textValue === 7) {
-    if (text.split('*')[5] === '0') {
-      setToCache(text, 5, client, 'answers');
+  } else if (textValue === 6) {
+    if (text.split('*')[4] === '0') {
+      setToCache(text, 4, client, 'answers');
     }
     retreiveCachedItems(client, ['user_id', 'answers', 'questionId'])
       .then((results) => {
@@ -257,27 +257,28 @@ export const renderFarmerAddProductMenu = async (res, textValue, text) => {
   const productID = parseInt(items[1], 10);
   const specificProduct = await getSpecificProduct(productID);
   message += `CON What quantity of \n ${specificProduct}`;
-  if (textValue === 4) {
-    const units = parseInt(text.split('*')[3], 10);
+  if (textValue === 3) {
+    const units = parseInt(text.split('*')[2], 10);
     client.set('units', units);
     const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
     message = menuPrompt;
-  } else if (textValue === 5) {
+  } else if (textValue === 4) {
     console.log('Text value', textValue);
     let grade;
-    if (text.split('*')[4] === '1') {
+    const selection = text.split('*')[3];
+    if (selection === '1') {
       grade = 'A';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '2') {
+    } else if (selection === '2') {
       grade = 'B';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '3') {
+    } else if (selection === '3') {
       grade = 'C';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '4') {
+    } else if (selection === '4') {
       grade = 'D';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '5') {
+    } else if (selection === '5') {
       grade = 'E';
       client.set('grade', grade);
     } else {
