@@ -140,7 +140,7 @@ app.post('/ussd', async (req, res) => {
         client.set('user_id', `${response.data.user_id}`, redis.print);
         message = menuItems.renderFarmerMenus();
 
-        const userRole = await retreiveCachedItems(client, ['role']);
+        // const userRole = await retreiveCachedItems(client, ['role']);
         const isUpdateLocation = text.split('*')[1] === '1';
         const isAddFarmDetails = text.split('*')[1] === '2';
         const isAddProduct = text.split('*')[1] === '3';
@@ -158,10 +158,10 @@ app.post('/ussd', async (req, res) => {
           message += menus.footer;
         }
       } else if (response.status === 200 && response.data.role === 'buyer') {
-        console.log('Buyer detected', response);
         client.set('role', 'buyer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = menuItems.renderBuyerMenus();
+        message = await menuItems.checkBuyerSelection(textValue, text);
+        res.send(message);
       } else if (response.status === 404) {
         message = 'CON User not found';
       } else {

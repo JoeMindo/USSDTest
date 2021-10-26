@@ -82,16 +82,20 @@ export const renderBuyerMenus = () => {
   return message;
 };
 
-export const checkBuyerSelection = (res, textValue, text) => {
+export const checkBuyerSelection = async (textValue, text) => {
   if (textValue === 1) {
-    buyermenus.renderProductCategories(res);
+    message = renderBuyerMenus();
   } else if (textValue === 2) {
-    const selection = parseInt(text.split('*')[1], 10);
-    buyermenus.renderProducts(res, selection);
+    message = await buyermenus.renderProductCategories();
   } else if (textValue === 3) {
     const selection = parseInt(text.split('*')[2], 10);
-    buyermenus.renderFarmOfferings(res, selection);
+    console.log('Selection is', selection);
+    message = await buyermenus.renderProducts(selection);
+  } else if (textValue === 4) {
+    // const selection = parseInt(text.split('*')[3], 10);
+    message = await buyermenus.renderOfferings();
   }
+  return message;
 };
 export const checkFarmerSelection = (text, res, textValue) => {
   const selection = text.split('*')[1];
