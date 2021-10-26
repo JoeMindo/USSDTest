@@ -74,7 +74,7 @@ const checkIfUserExists = async (phone) => {
   const path = `${BASEURL}/api/user/details/`;
   try {
     const userresponse = await axios.get(path);
-    const found = userresponse.data.some((profile) => profile.phone_no === phone);
+    const found = userresponse.data.data.some((profile) => profile.phone_no === phone);
     if (!found) {
       return false;
     }

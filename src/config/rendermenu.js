@@ -94,7 +94,7 @@ export const checkBuyerSelection = (res, textValue, text) => {
   }
 };
 export const checkFarmerSelection = (text, res, textValue) => {
-  const selection = text.split('*')[2];
+  const selection = text.split('*')[1];
   if (selection === '1') {
     farmerMenus.renderUpdateLocationMenu(res, textValue, text);
   } else if (selection === '2') {

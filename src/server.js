@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 
 app.post('/ussd', async (req, res) => {
   console.log(`request payload${JSON.stringify(req.body)}`);
-  let message = '';
+  const message = '';
 
   const userLogin = {
     phone_no: '',
@@ -80,7 +80,7 @@ app.post('/ussd', async (req, res) => {
 
   console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
-  console.log(textValue);
+  console.log('Textvalue', textValue);
   console.log('Length of text', text.length);
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   console.log('User Status', userStatus);
@@ -134,33 +134,17 @@ app.post('/ussd', async (req, res) => {
       userLogin.password = req.session.login[0];
       console.log('Login', userLogin);
       const response = await loginUser(userLogin);
-      console.log('Login Response', response);
       if (response.status === 200 && response.data.role === 'farmer') {
         console.log('Farmer here');
         client.set('role', 'farmer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
         message = menuItems.renderFarmerMenus();
-      } else if (response.status === 200 && response.data.role === 'buyer') {
-        console.log('Buyer detected', response);
-        client.set('role', 'buyer');
-        client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = menuItems.renderBuyerMenus();
-      } else if (response.status === 404) {
-        message = 'CON User not found';
-      } else {
-        message = 'END Invalid credentials';
-      }
-      res.send(message);
-    }
-  } else {
-    retreiveCachedItems(client, ['role']).then((response) => {
-      console.log('Response of other', response);
-      if (response[0] === 'farmer') {
-        console.log('Farmer menus here');
-        const isUpdateLocation = text.split('*')[2] === '1';
-        const isAddFarmDetails = text.split('*')[2] === '2';
-        const isAddProduct = text.split('*')[2] === '3';
-        const isUpdateFarmerDetails = text.split('*')[2] === '4';
+
+        const userRole = await retreiveCachedItems(client, ['role']);
+        const isUpdateLocation = text.split('*')[1] === '1';
+        const isAddFarmDetails = text.split('*')[1] === '2';
+        const isAddProduct = text.split('*')[1] === '3';
+        const isUpdateFarmerDetails = text.split('*')[1] === '4';
         if (isUpdateLocation) {
           menuItems.checkFarmerSelection(text, res, textValue);
         } else if (isAddFarmDetails) {
@@ -172,15 +156,21 @@ app.post('/ussd', async (req, res) => {
         } else {
           message = 'CON Invalid choice';
           message += menus.footer;
-          res.send(message);
         }
-      } else if (response[0] === 'buyer') {
-        menuItems.checkBuyerSelection(res, textValue, text);
+      } else if (response.status === 200 && response.data.role === 'buyer') {
+        console.log('Buyer detected', response);
+        client.set('role', 'buyer');
+        client.set('user_id', `${response.data.user_id}`, redis.print);
+        message = menuItems.renderBuyerMenus();
+      } else if (response.status === 404) {
+        message = 'CON User not found';
       } else {
-        message = 'END Something went wrong on our end, try again later';
-        res.send(message);
+        message = 'END Invalid credentials';
       }
-    });
+    } else {
+      message = 'END Something went wrong on our end, try again later';
+      res.send(message);
+    }
   }
 });
 
