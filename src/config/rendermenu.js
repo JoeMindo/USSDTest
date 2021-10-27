@@ -14,7 +14,7 @@ let message = '';
 let completedStatus = false;
 export const renderRegisterMenu = (textValue, text) => {
   if (textValue === 1 && text.length === 0) {
-    let menuPrompt = `${con()} ${menus.register.firstname}`;
+    let menuPrompt = `${con()} Welcome to Mamlaka\n${menus.register.firstname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
   } else if (textValue === 1) {
@@ -54,16 +54,11 @@ export const renderRegisterMenu = (textValue, text) => {
 };
 
 // Login Menu
-export const renderLoginMenus = (textValue, text) => {
-  if (textValue === 1 && text.length === 0) {
-    let menuPrompt = `${con()} ${menus.login.password}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else {
-    completedStatus = true;
-  }
-
-  return { message, completedStatus };
+export const renderLoginMenus = () => {
+  let menuPrompt = `${con()} ${menus.login.password}`;
+  menuPrompt += menus.footer;
+  message = menuPrompt;
+  return message;
 };
 
 export const renderFarmerMenus = () => {

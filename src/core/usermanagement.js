@@ -30,7 +30,7 @@ const registerUser = async (regdata, phone) => {
     const registrationresponse = await postrequest(postdata, path);
     return registrationresponse.data;
   } catch (error) {
-    return error;
+    throw new Error(error);
   }
 };
 
@@ -44,7 +44,7 @@ const loginUser = async (loginData) => {
     const loginresponse = await postrequest(postdata, path);
     return loginresponse;
   } catch (error) {
-    return 'Hmm something went wrong';
+    throw new Error(error);
   }
 };
 
@@ -80,7 +80,7 @@ const checkIfUserExists = async (phone) => {
     }
     return true;
   } catch (error) {
-    return error;
+    throw new Error(error);
   }
 };
 export {

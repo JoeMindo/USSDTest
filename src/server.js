@@ -126,9 +126,12 @@ app.post('/ussd', async (req, res) => {
       res.send(message);
     }
   } else if (userStatus === true) {
-    const menus = menuItems.renderLoginMenus(res, textValue, text);
-    let message = menus.message;
-    if (menus.completedStatus === true) {
+    let message;
+    // message = menuItems.renderLoginMenus();
+    // res.send(message);
+    if (text.length === 0) {
+      message = menuItems.renderLoginMenus();
+    } else if (text.length > 0) {
       req.session.login = text.split('*');
       userLogin.phone_no = req.body.phoneNumber;
       userLogin.password = req.session.login[0];
@@ -140,7 +143,6 @@ app.post('/ussd', async (req, res) => {
         client.set('user_id', `${response.data.user_id}`, redis.print);
         message = menuItems.renderFarmerMenus();
 
-        // const userRole = await retreiveCachedItems(client, ['role']);
         const isUpdateLocation = text.split('*')[1] === '1';
         const isAddFarmDetails = text.split('*')[1] === '2';
         const isAddProduct = text.split('*')[1] === '3';
@@ -161,7 +163,7 @@ app.post('/ussd', async (req, res) => {
         client.set('role', 'buyer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
         message = await menuItems.checkBuyerSelection(textValue, text);
-        res.send(message);
+        // res.send(message);
       } else if (response.status === 404) {
         message = 'CON User not found';
       } else {
@@ -169,8 +171,9 @@ app.post('/ussd', async (req, res) => {
       }
     } else {
       message = 'END Something went wrong on our end, try again later';
-      res.send(message);
+      // res.send(message);
     }
+    res.send(message);
   }
 });
 
