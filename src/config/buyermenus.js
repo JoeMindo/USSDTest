@@ -1,6 +1,7 @@
 /* eslint-disable import/extensions */
 import axios from 'axios';
 import { fetchCategories, fetchProducts } from '../core/productmanagement.js';
+import { BASEURL } from './urls.js';
 
 let message = '';
 const con = () => 'CON';
@@ -35,17 +36,23 @@ export const renderProducts = async (id) => {
 };
 export const renderOfferings = async () => {
   try {
-    const productOffering = await axios.get('https://032f-197-232-124-171.ngrok.io/singleproductwithprice/1');
-    // let offeringText = 'this';
-    // if (farmOffering) {
-    //   console.log('Farm offering', farmOffering);
-    //   // farmOffering.data.forEach((index, offering) => {
-    //   //   offeringText = `${index}. ${offering.message.product_name} from ${offering.message.farm_name}. Grade: ${offering.message.grade}\n GroupPrice: ${offering.message.group_price} Individual Price: ${offering.message.unit_price}`;
-    //   // });
-    //   message = `${con()} Choose a product to buy\n ${offeringText}`;
-    // } else {
-    //   message = `${con()} Could not fetch the produce`;
-    // }
+    const productOffering = await axios.get(`${BASEURL}/api/singleproductwithprice/1`);
+    let offeringText;
+    if (productOffering.data.message.status !== '3') {
+      const offer = productOffering.data.message;
+      console.log('Farm offering', productOffering);
+      offeringText = `${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
+      if (offer.status === '0') {
+        offeringText += `KES ${offer.unit_price}`;
+      } else if (offer.status === '1') {
+        offeringText += `KES ${offer.group_price}`;
+      } else {
+        offeringText += `Group price: ${offer.group_price}, Unit Price: ${offer.unit_price}`;
+      }
+      message = `${con()} Choose a product to buy\n ${offeringText}`;
+    } else {
+      message = `${con()} Product not available`;
+    }
     console.log('Farm offering', productOffering);
     return message;
   } catch (err) {
