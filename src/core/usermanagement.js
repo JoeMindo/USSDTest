@@ -1,8 +1,8 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/extensions */
-import { postrequest, retreiveCachedItems } from './services.js';
+import axios from 'axios';
+import { postrequest } from './services.js';
 import { BASEURL } from '../config/urls.js';
-import { renderProductCategories } from '../config/rendermenu.js';
 
 const clearData = (details) => {
   details.name = '';
@@ -10,7 +10,6 @@ const clearData = (details) => {
   details.phone = '';
   details.password = '';
   details.role = '';
-
   return details;
 };
 const registerUser = async (regdata, phone) => {
@@ -29,16 +28,9 @@ const registerUser = async (regdata, phone) => {
   };
   try {
     const registrationresponse = await postrequest(postdata, path);
-
-    // if (registrationresponse.status === 'success') {
-    //   return registrationresponse.status;
-    // } else {
-    //   return registrationresponse.data.message;
-    // }
-
     return registrationresponse.data;
   } catch (error) {
-    return error;
+    throw new Error(error);
   }
 };
 
@@ -52,7 +44,7 @@ const loginUser = async (loginData) => {
     const loginresponse = await postrequest(postdata, path);
     return loginresponse;
   } catch (error) {
-    return 'Hmm something went wrong';
+    throw new Error(error);
   }
 };
 
@@ -63,11 +55,35 @@ const addLocation = async (locationData, id) => {
     const locationResponse = await postrequest(locationData, path);
     return locationResponse;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 };
 
-const checkFarmerVerification = () => true;
+const checkFarmerVerification = async (id) => {
+  const path = `${BASEURL}/api/isverified/${id}`;
+  try {
+    const verificationresponse = await postrequest(path);
+    return verificationresponse.status;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+const checkVerification = () => true;
+
+const checkIfUserExists = async (phone) => {
+  const path = `${BASEURL}/api/user/details/`;
+  try {
+    const userresponse = await axios.get(path);
+    const found = userresponse.data.data.some((profile) => profile.phone_no === phone);
+    if (!found) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export {
-  clearData, registerUser, loginUser, addLocation, checkFarmerVerification,
+  clearData, registerUser, loginUser, addLocation, checkFarmerVerification, checkVerification,
+  checkIfUserExists,
 };
