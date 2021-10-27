@@ -9,7 +9,7 @@ export const getRegions = async () => {
   try {
     const regionsResult = await axios.get(`${BASEURL}/api/regions/`);
 
-    regionsResult.data.forEach((location) => {
+    regionsResult.data.data.forEach((location) => {
       regions.push(location);
     });
     regions.forEach((value, index) => {
@@ -32,7 +32,7 @@ export const getLocations = async (type, id, identifier) => {
   try {
     const locationResult = await axios.get(`${BASEURL}/api/${type}/${id}`);
 
-    locationResult.data.forEach((location) => {
+    locationResult.data.data.forEach((location) => {
       locationType.push(location);
     });
     locationType.forEach((value, index) => {
@@ -40,6 +40,7 @@ export const getLocations = async (type, id, identifier) => {
       menuItems += `${index}. ${name}\n`;
       menuIDs.push(value.id);
     });
+    console.log('Locations result is', menuItems);
     return {
       items: menuItems,
       ids: menuIDs,

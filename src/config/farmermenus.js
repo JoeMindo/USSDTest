@@ -16,120 +16,109 @@ import { responsePrompt } from './prompts.js';
 
 const con = () => 'CON';
 const end = () => 'END';
-let message = '';
+
 const questionanswers = {};
-export const renderUpdateLocationMenu = (res, textValue, text) => {
-  console.log('Update location');
-  if (textValue === 3) {
+
+export const renderUpdateLocationMenu = async (res, textValue, text) => {
+  let message;
+  console.log('Update location here');
+  if (textValue === 2) {
     let menuPrompt = `${con()} ${menus.updateLocation[0]}`;
-    const regions = getRegions();
-    const output = regions.then((data) => data);
-    output.then((list) => {
-      menuPrompt += `${list.items}`;
-      menuPrompt += menus.footer;
-      message = menuPrompt;
-      res.send(message);
-    });
-  } else if (textValue === 4) {
-    let regionId = parseInt(text.split('*')[3], 10);
+    const regions = await getRegions();
+    const list = await regions;
+    menuPrompt += `${list.items}`;
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    // res.send(message);
+  } else if (textValue === 3) {
+    let regionId = parseInt(text.split('*')[2], 10);
     regionId += 1;
     let menuPrompt = `${con()} ${menus.updateLocation[1]}`;
-    const counties = getLocations('counties', regionId, 'county_name');
-    const output = counties.then((data) => data);
-    output.then((list) => {
-      menuPrompt += `${list.items}`;
-
-      client.set('usercountyIds', list.ids.toString());
-      menuPrompt += menus.footer;
-      message = menuPrompt;
-      res.send(message);
-    });
+    const counties = await getLocations('counties', regionId, 'county_name');
+    const list = await counties;
+    menuPrompt += `${list.items}`;
+    client.set('usercountyIds', list.ids.toString());
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    // res.send(message);
+  } else if (textValue === 4) {
+    const countyId = parseInt(text.split('*')[3], 10);
+    const countyIds = await retreiveCachedItems(client, ['usercountyIds']);
+    let userCountySelection = countyIds[0].split(',')[countyId];
+    userCountySelection = parseInt(userCountySelection, 10);
+    const subcounties = await getLocations('subcounties', userCountySelection, 'sub_county_name');
+    console.log('Subcounties are here', subcounties);
+    let menuPrompt = `${con()} ${menus.updateLocation[2]}`;
+    menuPrompt += `${subcounties.items}`;
+    client.set('userSubcountyIds', subcounties.ids.toString());
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    // res.send(message);
   } else if (textValue === 5) {
-    const countyId = parseInt(text.split('*')[4], 10);
-
-    retreiveCachedItems(client, ['usercountyIds'])
-      .then((countyIds) => {
-        let userCountySelection = countyIds[0].split(',')[countyId];
-        userCountySelection = parseInt(userCountySelection, 10);
-        const subcounties = getLocations('subcounties', userCountySelection, 'sub_county_name');
-        subcounties.then((list) => {
-          let menuPrompt = `${con()} ${menus.updateLocation[2]}`;
-          menuPrompt += `${list.items}`;
-          client.set('userSubcountyIds', list.ids.toString());
-          menuPrompt += menus.footer;
-          message = menuPrompt;
-          res.send(message);
-        });
-      });
+    const subcountyId = parseInt(text.split('*')[4], 10);
+    const subcountyIds = await retreiveCachedItems(client, ['userSubcountyIds']);
+    let userSubcountySelection = subcountyIds[0].split(',')[subcountyId];
+    userSubcountySelection = parseInt(userSubcountySelection, 10);
+    client.set('userSubCountySelection', userSubcountySelection);
+    const locations = await getLocations('locations', userSubcountySelection, 'location_name');
+    console.log('Locations are here', locations);
+    let menuPrompt = `${con()} ${menus.updateLocation[3]}`;
+    menuPrompt += `${locations.items}`;
+    console.log('Here are the location items', locations.ids.toString());
+    client.set('userLocationIds', locations.ids.toString());
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    console.log('Here is the text value', textValue);
   } else if (textValue === 6) {
-    const subcountyId = parseInt(text.split('*')[5], 10);
-    retreiveCachedItems(client, ['userSubcountyIds'])
-      .then((subcountyIds) => {
-        let userSubcountySelection = subcountyIds[0].split(',')[subcountyId];
-        userSubcountySelection = parseInt(userSubcountySelection, 10);
-        client.set('userSubCountySelection', userSubcountySelection);
-        const locations = getLocations('locations', userSubcountySelection, 'location_name');
-        locations.then((list) => {
-          let menuPrompt = `${con()} ${menus.updateLocation[3]}`;
-          menuPrompt += `${list.items}`;
-          client.set('userLocationIds', list.ids.toString());
-          menuPrompt += menus.footer;
-          message = menuPrompt;
-          res.send(message);
-        });
-      });
-  } else if (textValue === 7) {
-    const locationId = parseInt(text.split('*')[6], 10);
-    retreiveCachedItems(client, ['userLocationIds'])
-      .then((locationIds) => {
-        let userLocationSelection = locationIds[0].split(',')[locationId];
-        userLocationSelection = parseInt(userLocationSelection, 10);
-        client.set('userLocationSelection', userLocationSelection);
-        let menuPrompt = `${con()} ${menus.updateLocation[4]}`;
-        menuPrompt += menus.footer;
-        message = menuPrompt;
-        res.send(message);
-      });
+    const locationId = parseInt(text.split('*')[5], 10);
+    const locationIds = await retreiveCachedItems(client, ['userLocationIds']);
+    let userLocationSelection = locationIds[0].split(',')[locationId];
+    console.log('UserLocationSelection', userLocationSelection);
+    userLocationSelection = parseInt(userLocationSelection, 10);
+    client.set('userLocationSelection', userLocationSelection);
+    let menuPrompt = `${con()} ${menus.updateLocation[4]}`;
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+    // res.send(menuPrompt);
   } else {
-    client.set('userArea', text.split('*')[7]);
-    retreiveCachedItems(client, ['userSubCountySelection', 'userLocationSelection', 'userArea', 'user_id'])
-      .then((postLocationDetails) => {
-        const postDetails = {
-          sub_county_id: postLocationDetails[0],
-          location_id: postLocationDetails[1],
-          area: postLocationDetails[2],
-        };
-        const userId = parseInt(postLocationDetails[3], 10);
-        addLocation(postDetails, userId).then((response) => {
-          console.log('Add location response', response);
-          if (response.status === 201) {
-            const menuPrompt = `${end()} ${menus.updateLocation.success}`;
-            message = menuPrompt;
-            res.send(message);
-          } else {
-            message = 'CON Could not update location, try again later';
-            message += menus.footer;
-            res.send(message);
-          }
-        });
-      });
+    client.set('userArea', text.split('*')[6]);
+    console.log('THe user area is', text.split('*')[6]);
+    const postLocationDetails = await retreiveCachedItems(client, ['userSubCountySelection', 'userLocationSelection', 'userArea', 'user_id']);
+    const postDetails = {
+      sub_county_id: postLocationDetails[0],
+      location_id: postLocationDetails[1],
+      area: postLocationDetails[2],
+    };
+    console.log('The post details are', postDetails);
+    const userId = parseInt(postLocationDetails[3], 10);
+    const response = await addLocation(postDetails, userId);
+    console.log('The end response', response);
+    if (response.status === 201) {
+      const menuPrompt = `${end()} ${menus.updateLocation.success}`;
+      message = menuPrompt;
+    } else {
+      message = 'CON Could not update location, try again later';
+      message += menus.footer;
+    }
   }
+  res.send(message);
 };
 export const renderAddFarmDetailsMenu = async (res, textValue, text) => {
+  let message;
   // TODO: Add a check for KYC
-  if (textValue === 3) {
+  if (textValue === 2) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     res.send(message);
-  } else if (textValue === 4) {
+  } else if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-    client.set('farm_name', text.split('*')[3]);
+    client.set('farm_name', text.split('*')[2]);
     res.send(message);
-  } else if (textValue === 5) {
-    client.set('farm_location', text.split('*')[4]);
+  } else if (textValue === 4) {
+    client.set('farm_location', text.split('*')[3]);
     const categories = await fetchCategories();
     console.log(categories);
     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
@@ -137,23 +126,23 @@ export const renderAddFarmDetailsMenu = async (res, textValue, text) => {
     menuPrompt += menus.footer;
     message = menuPrompt;
     res.send(message);
-  } else if (textValue === 6) {
-    const category = parseInt(text.split('*')[5], 10);
+  } else if (textValue === 5) {
+    const category = parseInt(text.split('*')[4], 10);
     const product = await fetchProducts(category);
     let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
     menuPrompt += `${product}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     res.send(message);
-  } else if (textValue === 7) {
-    const productId = parseInt(text.split('*')[6], 10);
+  } else if (textValue === 6) {
+    const productId = parseInt(text.split('*')[5], 10);
     client.set('productID', productId);
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     res.send(message);
   } else {
-    client.set('capacity', parseInt(text.split('*')[7], 10));
+    client.set('capacity', parseInt(text.split('*')[6], 10));
     retreiveCachedItems(client, ['farm_name', 'farm_location', 'productID', 'capacity', 'user_id'])
       .then((farmDetails) => {
         const postDetails = {
@@ -182,14 +171,14 @@ export const renderAddFarmDetailsMenu = async (res, textValue, text) => {
 
 export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
   let message = '';
-  if (textValue === 3) {
+  if (textValue === 2) {
     getFarmerMetricSections().then((response) => {
       message = responsePrompt(response, 'sections');
       res.send(message);
     });
     message = '';
-  } else if (textValue === 4) {
-    const sectionId = parseInt(text.split('*')[3], 10);
+  } else if (textValue === 3) {
+    const sectionId = parseInt(text.split('*')[2], 10);
     console.log(sectionId);
     client.set('sectionId', sectionId);
     getQuestionsPerSection(sectionId).then((response) => {
@@ -197,8 +186,8 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
       res.send(message);
     });
     message = '';
-  } else if (textValue === 5) {
-    const questionId = parseInt(text.split('*')[4], 10);
+  } else if (textValue === 4) {
+    const questionId = parseInt(text.split('*')[3], 10);
     client.set('questionId', questionId);
     getAnswersPerQuestion(questionId).then((response) => {
       if (response.status === 200) {
@@ -220,8 +209,8 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
         res.send(message);
       }
     });
-  } else if (textValue === 6) {
-    const userAnswers = text.split('*')[5];
+  } else if (textValue === 5) {
+    const userAnswers = text.split('*')[4];
     if (userAnswers === '0') {
       message = `${con()} Type in your answer`;
       res.send(message);
@@ -239,9 +228,9 @@ export const renderFarmerUpdateDetailsMenu = (res, textValue, text) => {
       message = `${con()} Proceed?\n 1. Yes`;
       res.send(message);
     }
-  } else if (textValue === 7) {
-    if (text.split('*')[5] === '0') {
-      setToCache(text, 5, client, 'answers');
+  } else if (textValue === 6) {
+    if (text.split('*')[4] === '0') {
+      setToCache(text, 4, client, 'answers');
     }
     retreiveCachedItems(client, ['user_id', 'answers', 'questionId'])
       .then((results) => {
@@ -268,27 +257,28 @@ export const renderFarmerAddProductMenu = async (res, textValue, text) => {
   const productID = parseInt(items[1], 10);
   const specificProduct = await getSpecificProduct(productID);
   message += `CON What quantity of \n ${specificProduct}`;
-  if (textValue === 4) {
-    const units = parseInt(text.split('*')[3], 10);
+  if (textValue === 3) {
+    const units = parseInt(text.split('*')[2], 10);
     client.set('units', units);
     const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
     message = menuPrompt;
-  } else if (textValue === 5) {
+  } else if (textValue === 4) {
     console.log('Text value', textValue);
     let grade;
-    if (text.split('*')[4] === '1') {
+    const selection = text.split('*')[3];
+    if (selection === '1') {
       grade = 'A';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '2') {
+    } else if (selection === '2') {
       grade = 'B';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '3') {
+    } else if (selection === '3') {
       grade = 'C';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '4') {
+    } else if (selection === '4') {
       grade = 'D';
       client.set('grade', grade);
-    } else if (text.split('*')[4] === '5') {
+    } else if (selection === '5') {
       grade = 'E';
       client.set('grade', grade);
     } else {

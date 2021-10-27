@@ -12,32 +12,32 @@ let message = '';
 
 // Register Menus
 let completedStatus = false;
-export const renderRegisterMenu = (textValue) => {
-  if (textValue === 1) {
-    let menuPrompt = `${con()} ${menus.register.firstname}`;
+export const renderRegisterMenu = (textValue, text) => {
+  if (textValue === 1 && text.length === 0) {
+    let menuPrompt = `${con()} Welcome to Mamlaka\n${menus.register.firstname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 2) {
+  } else if (textValue === 1) {
     let menuPrompt = `${con()} ${menus.register.lastname}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 3) {
+  } else if (textValue === 2) {
     let menuPrompt = `${con()} ${menus.register.idNumber}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 4) {
+  } else if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.register.gender}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 5) {
+  } else if (textValue === 4) {
     let menuPrompt = `${con()} ${menus.register.password}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 6) {
+  } else if (textValue === 5) {
     let menuPrompt = `${con()} ${menus.register.confirmPassword}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 7) {
+  } else if (textValue === 6) {
     let menuPrompt = `${con()} ${menus.register.role}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
@@ -54,16 +54,11 @@ export const renderRegisterMenu = (textValue) => {
 };
 
 // Login Menu
-export const renderLoginMenus = (res, textValue) => {
-  if (textValue === 1) {
-    let menuPrompt = `${con()} ${menus.login.password}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-    res.send(message);
-  } else {
-    completedStatus = true;
-  }
-  return { message, completedStatus };
+export const renderLoginMenus = () => {
+  let menuPrompt = `${con()} ${menus.login.password}`;
+  menuPrompt += menus.footer;
+  message = menuPrompt;
+  return message;
 };
 
 export const renderFarmerMenus = () => {
@@ -82,19 +77,23 @@ export const renderBuyerMenus = () => {
   return message;
 };
 
-export const checkBuyerSelection = (res, textValue, text) => {
-  if (textValue === 3) {
-    buyermenus.renderProductCategories(res);
+export const checkBuyerSelection = async (textValue, text) => {
+  if (textValue === 1) {
+    message = renderBuyerMenus();
+  } else if (textValue === 2) {
+    message = await buyermenus.renderProductCategories();
+  } else if (textValue === 3) {
+    const selection = parseInt(text.split('*')[2], 10);
+    console.log('Selection is', selection);
+    message = await buyermenus.renderProducts(selection);
   } else if (textValue === 4) {
-    const selection = parseInt(text.split('*')[3], 10);
-    buyermenus.renderProducts(res, selection);
-  } else if (textValue === 5) {
-    const selection = parseInt(text.split('*')[3], 10);
-    buyermenus.renderFarmOfferings(res, selection);
+    // const selection = parseInt(text.split('*')[3], 10);
+    message = await buyermenus.renderOfferings();
   }
+  return message;
 };
 export const checkFarmerSelection = (text, res, textValue) => {
-  const selection = text.split('*')[2];
+  const selection = text.split('*')[1];
   if (selection === '1') {
     farmerMenus.renderUpdateLocationMenu(res, textValue, text);
   } else if (selection === '2') {
