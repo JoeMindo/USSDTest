@@ -70,11 +70,29 @@ const checkFarmerVerification = async (id) => {
 };
 const checkVerification = () => true;
 
-const checkIfUserExists = async (phone) => {
-  const path = `${BASEURL}/api/user/details/`;
+const getUsers = async (pageNumber = 1) => {
+  const actualUrl = `${BASEURL}/api/user/details/?page=${pageNumber}`;
+  console.log('Actual url', actualUrl);
   try {
-    const userresponse = await axios.get(path);
-    const found = userresponse.data.data.some((profile) => profile.phone_no === phone);
+    const users = await axios.get(actualUrl);
+    return users.data.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const getEntireUserList = async (pageNumber = 1) => {
+  const userresponse = await getUsers(pageNumber);
+  if (userresponse.length > 0) {
+    return userresponse.concat(await getEntireUserList(pageNumber + 1));
+  }
+  return userresponse;
+};
+
+const checkIfUserExists = async (phone) => {
+  try {
+    const userresponse = await getEntireUserList();
+    const found = userresponse.some((profile) => profile.phone_no === phone);
     if (!found) {
       return false;
     }
@@ -83,6 +101,7 @@ const checkIfUserExists = async (phone) => {
     throw new Error(error);
   }
 };
+
 export {
   clearData, registerUser, loginUser, addLocation, checkFarmerVerification, checkVerification,
   checkIfUserExists,
