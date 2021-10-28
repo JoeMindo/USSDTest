@@ -1,6 +1,7 @@
 /* eslint-disable import/extensions */
 import axios from 'axios';
 import { fetchCategories, fetchProducts } from '../core/productmanagement.js';
+import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 
 let message = '';
@@ -34,11 +35,11 @@ export const renderProducts = async (id) => {
     throw new Error(err);
   }
 };
-export const renderOfferings = async () => {
+export const renderOfferings = async (id) => {
   try {
-    const productOffering = await axios.get(`${BASEURL}/api/singleproductwithprice/1`);
+    const productOffering = await axios.get(`${BASEURL}/api/singleproductwithprice/${id}`);
     let offeringText;
-    if (productOffering.data.message.status !== '3') {
+    if (productOffering.data.message.status !== '3' && productOffering.data.status !== 'error') {
       const offer = productOffering.data.message;
       console.log('Farm offering', productOffering);
       offeringText = `${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
@@ -52,6 +53,7 @@ export const renderOfferings = async () => {
       message = `${con()} Choose a product to buy\n ${offeringText}`;
     } else {
       message = `${con()} Product not available`;
+      message += menus.footer;
     }
     console.log('Farm offering', productOffering);
     return message;

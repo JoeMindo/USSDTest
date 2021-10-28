@@ -87,22 +87,27 @@ export const checkBuyerSelection = async (textValue, text) => {
     console.log('Selection is', selection);
     message = await buyermenus.renderProducts(selection);
   } else if (textValue === 4) {
-    // const selection = parseInt(text.split('*')[3], 10);
-    message = await buyermenus.renderOfferings();
+    const selection = parseInt(text.split('*')[3], 10);
+    message = await buyermenus.renderOfferings(selection);
   }
   return message;
 };
-export const checkFarmerSelection = (text, res, textValue) => {
-  const selection = text.split('*')[1];
-  if (selection === '1') {
-    farmerMenus.renderUpdateLocationMenu(res, textValue, text);
-  } else if (selection === '2') {
-    farmerMenus.renderAddFarmDetailsMenu(res, textValue, text);
-  } else if (selection === '3') {
-    farmerMenus.renderFarmerAddProductMenu(res, textValue, text);
-  } else if (selection === '4') {
-    farmerMenus.renderFarmerUpdateDetailsMenu(res, textValue, text);
+export const checkFarmerSelection = async (text, textValue) => {
+  if (textValue === 1) {
+    message = renderFarmerMenus();
   } else {
-    res.send('CON Invalid Choice');
+    const selection = text.split('*')[1];
+    if (selection === '1') {
+      message = await farmerMenus.renderUpdateLocationMenu(textValue, text);
+    } else if (selection === '2') {
+      message = await farmerMenus.renderAddFarmDetailsMenu(textValue, text);
+    } else if (selection === '3') {
+      message = farmerMenus.renderFarmerAddProductMenu(textValue, text);
+    } else if (selection === '4') {
+      message = farmerMenus.renderFarmerUpdateDetailsMenu(textValue, text);
+    } else {
+      message = 'CON Invalid choice, try again';
+    }
   }
+  return message;
 };

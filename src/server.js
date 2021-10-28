@@ -141,29 +141,11 @@ app.post('/ussd', async (req, res) => {
         console.log('Farmer here');
         client.set('role', 'farmer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = menuItems.renderFarmerMenus();
-
-        const isUpdateLocation = text.split('*')[1] === '1';
-        const isAddFarmDetails = text.split('*')[1] === '2';
-        const isAddProduct = text.split('*')[1] === '3';
-        const isUpdateFarmerDetails = text.split('*')[1] === '4';
-        if (isUpdateLocation) {
-          menuItems.checkFarmerSelection(text, res, textValue);
-        } else if (isAddFarmDetails) {
-          menuItems.checkFarmerSelection(text, res, textValue);
-        } else if (isAddProduct) {
-          menuItems.checkFarmerSelection(text, res, textValue);
-        } else if (isUpdateFarmerDetails) {
-          menuItems.checkFarmerSelection(text, res, textValue);
-        } else {
-          message = 'CON Invalid choice';
-          message += menus.footer;
-        }
+        message = await menuItems.checkFarmerSelection(text, textValue);
       } else if (response.status === 200 && response.data.role === 'buyer') {
         client.set('role', 'buyer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
         message = await menuItems.checkBuyerSelection(textValue, text);
-        // res.send(message);
       } else if (response.status === 404) {
         message = 'CON User not found';
       } else {
@@ -171,7 +153,6 @@ app.post('/ussd', async (req, res) => {
       }
     } else {
       message = 'END Something went wrong on our end, try again later';
-      // res.send(message);
     }
     res.send(message);
   }
