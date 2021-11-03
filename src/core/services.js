@@ -36,10 +36,15 @@ export const postrequest = async (
 export const retreiveCachedItems = (client, fields = []) => {
   const resultFields = [];
   fields.forEach((key) => {
-    const field = client.getAsync(key).then((reply) => reply);
+    const field = client.hgetAsync(key).then((reply) => reply);
     resultFields.push(field);
   });
   return Promise.all(resultFields);
+};
+
+export const retreiveHashItems = async (client, key) => {
+  const fields = await client.getAsync(key);
+  return fields;
 };
 
 export const setToCache = (text, index, client, key) => {

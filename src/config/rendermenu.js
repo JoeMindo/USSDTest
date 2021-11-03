@@ -5,10 +5,12 @@
 import { menus } from './menuoptions.js';
 import * as farmerMenus from './farmermenus.js';
 import * as buyermenus from './buyermenus.js';
+import { client } from '../server.js';
 
 export const con = () => 'CON';
 export const end = () => 'END';
 let message = '';
+const offeringStatus = [];
 
 // Register Menus
 let completedStatus = false;
@@ -88,7 +90,20 @@ export const checkBuyerSelection = async (textValue, text) => {
     message = await buyermenus.renderProducts(selection);
   } else if (textValue === 4) {
     const selection = parseInt(text.split('*')[3], 10);
-    message = await buyermenus.renderOfferings(selection);
+    const result = await buyermenus.renderOfferings(client, selection);
+    console.log('Farm offering status', result.status);
+    offeringStatus.push(result.status);
+    message = result.message;
+
+    console.log('Farm offerings', message);
+  } else if (textValue === 5 && text.split('*')[4] !== '67') {
+    const selection = text.split('*')[4];
+    message = buyermenus.checkGroupAndIndividualPrice(offeringStatus[0][selection]);
+  } else if (textValue === 6 && text.split('*')[5] === '1') {
+    message = buyermenus.askForQuantity();
+  } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
+    message = await buyermenus.confirmQuantityWithPrice(client);
+    console.log('The offers cached are', message);
   }
   return message;
 };

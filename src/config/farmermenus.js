@@ -191,26 +191,6 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     } else {
       message = `${end()} Could not fetch answers at the moment, try later`;
     }
-    // getAnswersPerQuestion(questionId).then((response) => {
-    //   if (response.status === 200) {
-    //     let menuPrompt = '';
-
-    //     response.data[0].kyc_metrics_possible_answers.forEach((answer) => {
-    //       menuPrompt += `\n${answer.id}. ${answer.possible_answer}`;
-    //       questionanswers[answer.id] = answer.possible_answer;
-    //       questionanswers.question_id = answer.question_id;
-    //     });
-    //     console.log('Question and answers object', questionanswers);
-    //     message = `${con()} Select any of the following separated by a space`;
-    //     message += menuPrompt;
-    //     message += '\n0. Other';
-    //     message += menus.footer;
-    //     res.send(message);
-    //   } else {
-    //     message = `${end()} Could not fetch answers at the moment, try later`;
-    //     res.send(message);
-    //   }
-    // });
   } else if (textValue === 5) {
     const userAnswers = text.split('*')[4];
     if (userAnswers === '0') {
@@ -234,22 +214,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     if (text.split('*')[4] === '0') {
       setToCache(text, 4, client, 'answers');
     }
-    // retreiveCachedItems(client, ['user_id', 'answers', 'questionId'])
-    //   .then((results) => {
-    //     const kycInfo = {
-    //       metric_id: results[2],
-    //       answer: results[1],
-    //     };
-    //     addFarmerKYC(kycInfo, results[0]).then((response) => {
-    //       if (response.status === 200) {
-    //         message = `${end()} Thank you for your submission`;
-    //         res.send(message);
-    //       } else {
-    //         message = 'CON Something went wrong!!!';
-    //         res.send(message);
-    //       }
-    //     });
-    //   });
+
     const results = await retreiveCachedItems(client, ['user_id', 'answers', 'questionId']);
     console.log('Results of KYC', results);
     const kycInfo = {

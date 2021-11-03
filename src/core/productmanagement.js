@@ -8,7 +8,8 @@ async function fetchCategories() {
   let results = '';
   try {
     const response = await axios.get(`${BASEURL}/api/prodcategories`);
-    response.data.forEach((category) => {
+    console.log('Fetching categories', response.data.data.data);
+    response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);
       results += `\n${category.id}. ${category.category_name}`;
     });
@@ -21,7 +22,8 @@ async function fetchProducts(id) {
   let results = '';
   try {
     const response = await axios.get(`${BASEURL}/api/prodcategories`);
-    response.data.forEach((item) => {
+
+    response.data.data.data.forEach((item) => {
       item.products.forEach((description) => {
         if (description.category_id === id) {
           results += `${description.id}. ${description.product_name}\n `;
