@@ -1,7 +1,6 @@
 /* eslint-disable import/extensions */
 import axios from 'axios';
 import { fetchCategories, fetchProducts } from '../core/productmanagement.js';
-import { retreiveHashItems } from '../core/services.js';
 import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 
@@ -9,7 +8,10 @@ let message = '';
 const con = () => 'CON';
 const end = () => 'END';
 const userViewOffers = {};
-const offersArray = [];
+export const offersArray = [];
+export const cartItems = [];
+export const totalCost = {};
+export const itemSelection = {};
 
 export const renderProductCategories = async () => {
   try {
@@ -106,19 +108,40 @@ export const askForQuantity = () => {
   return message;
 };
 
-export const confirmQuantityWithPrice = async (arrayOfOffers) => {
+export const confirmQuantityWithPrice = (arrayOfOffers, userQuantity) => {
   // TODO:confirm quantity
-  let availableUnits;
-  // let unitPrice;
-  // if (quantity <= availableUnits) {
-  //   const price = quantity * unitPrice;
-  //   message = `${con()} Buying ${quantity} ${item} from ${relevantFarm} Grade${itemGrade} at ${price}\n 1. Add To Cart`;
-  // } else {
-  //   message = `${con()} The quantity you requested is more than the available`;
-  // }
-  // message += menus.footer;
-  // return message;
-  arrayOfOffers.forEach((offer) => {
-    offer[0].available_units;
-  });
+  let availableUnits = 0;
+
+  availableUnits = arrayOfOffers[0].availableUnits;
+  console.log('Array of offers', arrayOfOffers[0]);
+  if (userQuantity > availableUnits) {
+    // eslint-disable-next-line semi
+    message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`
+  } else {
+    const total = userQuantity * arrayOfOffers[0].unitPrice;
+    console.log('User quantity is', userQuantity);
+    const prompt = `${arrayOfOffers[0].product} from ${arrayOfOffers[0].farmName} of grade:${arrayOfOffers[0].grade} at ${arrayOfOffers[0].unitPrice}`;
+    itemSelection.product = `${arrayOfOffers[0].product}`;
+    itemSelection.farmName = `${arrayOfOffers[0].farmName}`;
+    itemSelection.grade = `${arrayOfOffers[0].grade}`;
+    itemSelection.totalCost = total;
+    totalCost.total = total;
+    message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
+  }
+  message += menus.footer;
+  return message;
+};
+
+export const addToCart = (itemsObject, totalPriceObject) => {
+  if (itemsObject && totalPriceObject) {
+    cartItems.push(itemsObject);
+    cartItems.push(totalPriceObject);
+    message = `${con()} Cart Items added successfully\n`;
+    console.log('Cart Items are', cartItems);
+    message += '67. View Cart';
+  } else {
+    message = `${con()} You have not selected any item to add to cart`;
+  }
+  message += menus.footer;
+  return message;
 };

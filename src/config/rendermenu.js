@@ -6,6 +6,7 @@ import { menus } from './menuoptions.js';
 import * as farmerMenus from './farmermenus.js';
 import * as buyermenus from './buyermenus.js';
 import { client } from '../server.js';
+import { offersArray } from './buyermenus.js';
 
 export const con = () => 'CON';
 export const end = () => 'END';
@@ -102,8 +103,10 @@ export const checkBuyerSelection = async (textValue, text) => {
   } else if (textValue === 6 && text.split('*')[5] === '1') {
     message = buyermenus.askForQuantity();
   } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
-    message = await buyermenus.confirmQuantityWithPrice(client);
-    console.log('The offers cached are', message);
+    const userQuantity = parseInt(text.split('*')[6], 10);
+    message = buyermenus.confirmQuantityWithPrice(offersArray, userQuantity);
+  } else if (textValue === 8 && text.split('*')[7] === '1') {
+    message = buyermenus.addToCart(buyermenus.itemSelection, buyermenus.totalCost);
   }
   return message;
 };
