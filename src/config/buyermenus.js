@@ -3,6 +3,7 @@ import axios from 'axios';
 import { fetchCategories, fetchProducts } from '../core/productmanagement.js';
 import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
+import { retreiveCachedItems } from '../core/services.js';
 
 let message = '';
 const con = () => 'CON';
@@ -108,7 +109,7 @@ export const askForQuantity = () => {
   return message;
 };
 
-export const confirmQuantityWithPrice = (arrayOfOffers, userQuantity) => {
+export const confirmQuantityWithPrice = (client, arrayOfOffers, userQuantity) => {
   // TODO:confirm quantity
   let availableUnits = 0;
 
@@ -125,7 +126,7 @@ export const confirmQuantityWithPrice = (arrayOfOffers, userQuantity) => {
     itemSelection.farmName = `${arrayOfOffers[0].farmName}`;
     itemSelection.grade = `${arrayOfOffers[0].grade}`;
     itemSelection.totalCost = total;
-    totalCost.total = total;
+    client.set('totalCost', total);
     message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
   }
   message += menus.footer;
@@ -143,5 +144,17 @@ export const addToCart = (itemsObject, totalPriceObject) => {
     message = `${con()} You have not selected any item to add to cart`;
   }
   message += menus.footer;
+  return message;
+};
+
+export const displayCartItems = async (client) => {
+  let prompt = '';
+  cartItems.forEach((item, index) => {
+    prompt += `${index}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
+    console.log('Cart Items are', prompt);
+  });
+  const total = await retreiveCachedItems(client, ['totalCost']);
+  message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout`;
+
   return message;
 };
