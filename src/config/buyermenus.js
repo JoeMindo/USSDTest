@@ -75,7 +75,7 @@ export const renderOfferings = async (client, id) => {
         offersArray.push(userViewOffers);
       });
       offeringText += menus.viewCart;
-      console.log('User offers are', userViewOffers);
+
       message = `${con()} Choose a product to buy. ${offeringText}`;
     } else {
       message = `${con()} Product not available`;
@@ -110,14 +110,11 @@ export const askForQuantity = () => {
 };
 
 export const confirmQuantityWithPrice = (client, arrayOfOffers, userQuantity) => {
-  // TODO:confirm quantity
   let availableUnits = 0;
-
   availableUnits = arrayOfOffers[0].availableUnits;
-  console.log('Array of offers', arrayOfOffers[0]);
+
   if (userQuantity > availableUnits) {
-    // eslint-disable-next-line semi
-    message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`
+    message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
     const total = userQuantity * arrayOfOffers[0].unitPrice;
     console.log('User quantity is', userQuantity);
@@ -151,10 +148,9 @@ export const displayCartItems = async (client) => {
   let prompt = '';
   cartItems.forEach((item, index) => {
     prompt += `${index}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
-    console.log('Cart Items are', prompt);
   });
   const total = await retreiveCachedItems(client, ['totalCost']);
-  message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout`;
+  message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout\n 2. Update Cart`;
 
   return message;
 };

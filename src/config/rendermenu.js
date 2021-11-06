@@ -109,6 +109,10 @@ export const checkBuyerSelection = async (textValue, text) => {
     message = buyermenus.addToCart(buyermenus.itemSelection, buyermenus.totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '67') {
     message = await buyermenus.displayCartItems(client);
+  } else if (textValue === 10 && text.split('*')[9] === '1') {
+    message = buyermenus.checkOut();
+  } else if (textValue === 10 && text.split('*')[9] === '2') {
+    message = buyermenus.updateCart();
   }
   return message;
 };
