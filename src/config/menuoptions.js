@@ -17,7 +17,7 @@ export const menus = {
     gender: 'What is the gender\n1. Male\n2. Female',
     password: 'Enter your password',
     confirmPassword: 'Confirm your password',
-    role: 'Who are you?\n1. Farmer\n2. Buyer\n3. DEAN',
+    role: 'Who are you?\n1. Farmer\n2. Buyer',
   },
   login: {
     password: 'Enter your password',
@@ -72,6 +72,7 @@ export const menus = {
   },
   errorMessage: 'Error!',
   footer: '\n 98. Back 99.Home',
+  viewCart: '\n67. View cart',
 
   submitDetails: 'Submit details?\n 1.Yes',
 

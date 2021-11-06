@@ -88,6 +88,7 @@ const getEntireUserList = async (pageNumber = 1) => {
   }
   return userresponse;
 };
+
 const checkIfUserExists = async (phone) => {
   try {
     const userresponse = await getEntireUserList();
@@ -100,6 +101,7 @@ const checkIfUserExists = async (phone) => {
     throw new Error(error);
   }
 };
+
 export {
   clearData, registerUser, loginUser, addLocation, checkFarmerVerification, checkVerification,
   checkIfUserExists,
