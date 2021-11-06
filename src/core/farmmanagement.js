@@ -8,6 +8,7 @@ export const addFarm = async (farm) => {
     const response = await axios.post(`${BASEURL}/api/farm/save`, farm);
     return response;
   } catch (err) {
+    console.log(err);
     throw new Error(err);
   }
 };
