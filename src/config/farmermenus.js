@@ -1,6 +1,5 @@
 /* eslint-disable import/extensions */
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
-import { getLocations, getRegions } from '../core/listlocations.js';
 import { menus } from './menuoptions.js';
 import { client } from '../server.js';
 import { addLocation } from '../core/usermanagement.js';
@@ -12,6 +11,7 @@ import {
   addFarm, addFarmerKYC, getAnswersPerQuestion, getFarmerMetricSections, getQuestionsPerSection,
 } from '../core/farmmanagement.js';
 import { responsePrompt } from './prompts.js';
+import { promptToGive } from './farmerlocation.js';
 
 const con = () => 'CON';
 const end = () => 'END';
@@ -20,80 +20,38 @@ const questionanswers = {};
 
 export const renderUpdateLocationMenu = async (textValue, text) => {
   let message;
-  console.log('Update location here');
   if (textValue === 2) {
-    console.log('Text value level 1', textValue);
-    let menuPrompt = `${con()} ${menus.updateLocation[0]}`;
-    const regions = await getRegions();
-    const list = await regions;
-    menuPrompt += `${list.items}`;
-    menuPrompt += menus.footer;
+    const menuPrompt = await promptToGive(client, 'region');
     message = menuPrompt;
-    // res.send(message);
   } else if (textValue === 3) {
-    console.log('Text value level 2', textValue);
     let regionId = parseInt(text.split('*')[2], 10);
     regionId += 1;
-    let menuPrompt = `${con()} ${menus.updateLocation[1]}`;
-    const counties = await getLocations('counties', regionId, 'county_name');
-    const list = await counties;
-    menuPrompt += `${list.items}`;
-    client.set('usercountyIds', list.ids.toString());
-    menuPrompt += menus.footer;
+    const menuPrompt = await promptToGive(client, 'county', regionId);
     message = menuPrompt;
-    // res.send(message);
   } else if (textValue === 4) {
     const countyId = parseInt(text.split('*')[3], 10);
-    const countyIds = await retreiveCachedItems(client, ['usercountyIds']);
-    let userCountySelection = countyIds[0].split(',')[countyId];
-    userCountySelection = parseInt(userCountySelection, 10);
-    const subcounties = await getLocations('subcounties', userCountySelection, 'sub_county_name');
-    console.log('Subcounties are here', subcounties);
-    let menuPrompt = `${con()} ${menus.updateLocation[2]}`;
-    menuPrompt += `${subcounties.items}`;
-    client.set('userSubcountyIds', subcounties.ids.toString());
-    menuPrompt += menus.footer;
+    const menuPrompt = await promptToGive(client, 'subcounty', countyId);
     message = menuPrompt;
-    // res.send(message);
   } else if (textValue === 5) {
     const subcountyId = parseInt(text.split('*')[4], 10);
-    const subcountyIds = await retreiveCachedItems(client, ['userSubcountyIds']);
-    let userSubcountySelection = subcountyIds[0].split(',')[subcountyId];
-    userSubcountySelection = parseInt(userSubcountySelection, 10);
-    client.set('userSubCountySelection', userSubcountySelection);
-    const locations = await getLocations('locations', userSubcountySelection, 'location_name');
-    console.log('Locations are here', locations);
-    let menuPrompt = `${con()} ${menus.updateLocation[3]}`;
-    menuPrompt += `${locations.items}`;
-    console.log('Here are the location items', locations.ids.toString());
-    client.set('userLocationIds', locations.ids.toString());
-    menuPrompt += menus.footer;
+    const menuPrompt = await promptToGive(client, 'location', subcountyId);
     message = menuPrompt;
-    console.log('Here is the text value', textValue);
   } else if (textValue === 6) {
-    const locationId = parseInt(text.split('*')[5], 10);
-    const locationIds = await retreiveCachedItems(client, ['userLocationIds']);
-    let userLocationSelection = locationIds[0].split(',')[locationId];
-    console.log('UserLocationSelection', userLocationSelection);
-    userLocationSelection = parseInt(userLocationSelection, 10);
-    client.set('userLocationSelection', userLocationSelection);
-    let menuPrompt = `${con()} ${menus.updateLocation[4]}`;
-    menuPrompt += menus.footer;
+    const menuPrompt = await promptToGive(client, 'area');
     message = menuPrompt;
-    // res.send(menuPrompt);
   } else {
     client.set('userArea', text.split('*')[6]);
-    console.log('THe user area is', text.split('*')[6]);
+
     const postLocationDetails = await retreiveCachedItems(client, ['userSubCountySelection', 'userLocationSelection', 'userArea', 'user_id']);
     const postDetails = {
       sub_county_id: postLocationDetails[0],
       location_id: postLocationDetails[1],
       area: postLocationDetails[2],
     };
-    console.log('The post details are', postDetails);
+
     const userId = parseInt(postLocationDetails[3], 10);
     const response = await addLocation(postDetails, userId);
-    console.log('The end response', response);
+
     if (response.status === 201) {
       const menuPrompt = `${end()} ${menus.updateLocation.success}`;
       message = menuPrompt;
