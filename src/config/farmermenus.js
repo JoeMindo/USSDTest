@@ -5,10 +5,17 @@ import { client } from '../server.js';
 import { addLocation } from '../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../core/services.js';
 import {
-  fetchCategories, fetchProducts, getSpecificProduct, addProduct,
+  fetchCategories,
+  fetchProducts,
+  getSpecificProduct,
+  addProduct,
 } from '../core/productmanagement.js';
 import {
-  addFarm, addFarmerKYC, getAnswersPerQuestion, getFarmerMetricSections, getQuestionsPerSection,
+  addFarm,
+  addFarmerKYC,
+  getAnswersPerQuestion,
+  getFarmerMetricSections,
+  getQuestionsPerSection,
 } from '../core/farmmanagement.js';
 import { responsePrompt } from './prompts.js';
 import { promptToGive } from './farmerlocation.js';
@@ -42,7 +49,12 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
   } else {
     client.set('userArea', text.split('*')[6]);
 
-    const postLocationDetails = await retreiveCachedItems(client, ['userSubCountySelection', 'userLocationSelection', 'userArea', 'user_id']);
+    const postLocationDetails = await retreiveCachedItems(client, [
+      'userSubCountySelection',
+      'userLocationSelection',
+      'userArea',
+      'user_id',
+    ]);
     const postDetails = {
       sub_county_id: postLocationDetails[0],
       location_id: postLocationDetails[1],
@@ -97,7 +109,13 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     // res.send(message);
   } else {
     client.set('capacity', parseInt(text.split('*')[6], 10));
-    const farmDetails = await retreiveCachedItems(client, ['farm_name', 'farm_location', 'productID', 'capacity', 'user_id']);
+    const farmDetails = await retreiveCachedItems(client, [
+      'farm_name',
+      'farm_location',
+      'productID',
+      'capacity',
+      'user_id',
+    ]);
     const postDetails = {
       farm_name: farmDetails[0],
       farm_location: farmDetails[1],
@@ -126,7 +144,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     message = responsePrompt(farmerMetrics, 'sections');
   } else if (textValue === 3) {
     const sectionId = parseInt(text.split('*')[2], 10);
-    console.log(sectionId);
+
     client.set('sectionId', sectionId);
     const questions = await getQuestionsPerSection(sectionId);
     message = responsePrompt(questions, 'questions');
@@ -137,11 +155,13 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     if (answersPerQuestion.status === 200) {
       let menuPrompt = '';
 
-      answersPerQuestion.data[0].kyc_metrics_possible_answers.forEach((answer) => {
-        menuPrompt += `\n${answer.id}. ${answer.possible_answer}`;
-        questionanswers[answer.id] = answer.possible_answer;
-        questionanswers.question_id = answer.question_id;
-      });
+      answersPerQuestion.data[0].kyc_metrics_possible_answers.forEach(
+        (answer) => {
+          menuPrompt += `\n${answer.id}. ${answer.possible_answer}`;
+          questionanswers[answer.id] = answer.possible_answer;
+          questionanswers.question_id = answer.question_id;
+        },
+      );
       message = `${con()} Select any of the following separated by a space`;
       message += menuPrompt;
       message += '\n0. Other';
@@ -156,7 +176,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
       // res.send(message);
     } else {
       const userAnswersArray = userAnswers.split(' ');
-      console.log('User answers array', userAnswersArray);
+
       let answers = '';
       userAnswersArray.forEach((answer) => {
         const answerId = parseInt(answer, 10);
@@ -164,17 +184,20 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
         console.log('Answers are displayed here', answers);
       });
       client.set('answers', answers);
-      console.log('Answers are here', answers);
+
       message = `${con()} Proceed?\n 1. Yes`;
-      // res.send(message);
     }
   } else if (textValue === 6) {
     if (text.split('*')[4] === '0') {
       setToCache(text, 4, client, 'answers');
     }
 
-    const results = await retreiveCachedItems(client, ['user_id', 'answers', 'questionId']);
-    console.log('Results of KYC', results);
+    const results = await retreiveCachedItems(client, [
+      'user_id',
+      'answers',
+      'questionId',
+    ]);
+
     const kycInfo = {
       metric_id: results[2],
       answer: results[1],
@@ -191,7 +214,11 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
 
 export const renderFarmerAddProductMenu = async (textValue, text) => {
   let message = '';
-  const items = await retreiveCachedItems(client, ['farm_id', 'productID', 'user_id']);
+  const items = await retreiveCachedItems(client, [
+    'farm_id',
+    'productID',
+    'user_id',
+  ]);
   const productID = parseInt(items[1], 10);
   const specificProduct = await getSpecificProduct(productID);
   message += `CON What quantity of \n ${specificProduct}`;
@@ -223,7 +250,12 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
       message = 'Invalid grade';
       message += menus.footer;
     }
-    const addProductDetails = await retreiveCachedItems(client, ['farm_id', 'productID', 'units', 'grade']);
+    const addProductDetails = await retreiveCachedItems(client, [
+      'farm_id',
+      'productID',
+      'units',
+      'grade',
+    ]);
 
     const addProductResponse = await addProductDetails;
     const postDetails = {
