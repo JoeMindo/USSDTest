@@ -47,9 +47,10 @@ export const renderOfferings = async (client, id) => {
   try {
     const endpointUrl = `${BASEURL}/api/productsbyproductid`;
     const productOffering = await axios.get(`${endpointUrl}/${id}`);
+    console.log('Product offering', productOffering.data.message);
     let offeringText = '';
-    if (productOffering.data.message.data.status !== '3' && productOffering.data.status !== 'error') {
-      const offers = productOffering.data.message.data;
+    if (productOffering.data.message.status !== '3' && productOffering.data.status !== 'error') {
+      const offers = productOffering.data.message;
       console.log('Here are the offers', offers);
       offers.forEach((offer) => {
         offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
@@ -94,7 +95,7 @@ export const renderOfferings = async (client, id) => {
 export const checkGroupAndIndividualPrice = (status) => {
   console.log('Status of group');
   if (status === 'both') {
-    message = `${con} Select the price you want to buy at\n 1. Group\n 2. Unit price \n`;
+    message = `${con()} Select the price you want to buy at\n 1. Group\n 2. Unit price \n`;
   } else if (status === 'unit') {
     message = `${con()} Buy item at unit price\n 1. Yes\n `;
   } else if (status === 'group') {
