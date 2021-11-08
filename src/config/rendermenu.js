@@ -13,7 +13,6 @@ export const end = () => 'END';
 let message = '';
 const offeringStatus = [];
 
-// Register Menus
 let completedStatus = false;
 export const renderRegisterMenu = (textValue, text) => {
   if (textValue === 1 && text.length === 0) {
@@ -111,8 +110,22 @@ export const checkBuyerSelection = async (textValue, text) => {
     message = await buyermenus.displayCartItems(client);
   } else if (textValue === 10 && text.split('*')[9] === '1') {
     message = buyermenus.checkOut();
+  } else if (textValue === 11 && text.split('*')[9] === '1' && text.split('*')[10] === '2') {
+    message = buyermenus.checkoutUsingDifferentNumber();
+  } else if (textValue === 11 && text.split('*')[9] === '1' && text.split('*')[10] === '1') {
+    message = buyermenus.displayTotalCost(client);
   } else if (textValue === 10 && text.split('*')[9] === '2') {
     message = buyermenus.updateCart();
+  } else if (textValue === 11 && text.split('*')[10] === '1') {
+    message = buyermenus.updateType('remove');
+  } else if (textValue === 11 && text.split('*')[10] === '2') {
+    message = buyermenus.updateType('updateQuantity');
+  } else if (textValue === 12 && text.split('*')[10] === '1') {
+    const offeringId = text.split('*')[11];
+    message = buyermenus.removeItemFromCart(offeringId);
+  } else if (textValue === 12 && text.split('*')[10] === '2') {
+    const offeringId = text.split('*')[11];
+    message = buyermenus.updateQuantityinCart(offeringId);
   }
   return message;
 };

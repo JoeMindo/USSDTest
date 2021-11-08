@@ -47,11 +47,12 @@ export const renderOfferings = async (client, id) => {
   try {
     const endpointUrl = `${BASEURL}/api/productsbyproductid`;
     const productOffering = await axios.get(`${endpointUrl}/${id}`);
-    let offeringText;
+    let offeringText = '';
     if (productOffering.data.message.data.status !== '3' && productOffering.data.status !== 'error') {
       const offers = productOffering.data.message.data;
+      console.log('Here are the offers', offers);
       offers.forEach((offer) => {
-        offeringText = `${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
+        offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
         userViewOffers.id = `${offer.id}`;
         userViewOffers.product = `${offer.product_name}`;
         userViewOffers.farmName = `${offer.farm_name}`;
@@ -145,12 +146,89 @@ export const addToCart = (itemsObject, totalPriceObject) => {
 };
 
 export const displayCartItems = async (client) => {
+  try {
+    let prompt = '';
+    cartItems.forEach((item, index) => {
+      prompt += `${index}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
+    });
+    const total = await retreiveCachedItems(client, ['totalCost']);
+    message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout\n 2. Update Cart`;
+    return message;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateCart = () => {
+  message = `${con()} Choose an operation\n 1. Remove Item\n 2. Change Item quantity`;
+  message += menus.footer;
+  return message;
+};
+export const checkOut = () => {
+  message = `${con()} Checkout using\n 1. This Number\n 2. Other number`;
+  return message;
+};
+
+export const checkoutUsingDifferentNumber = () => {
+  message = `${con()} Enter phone number to checkout with`;
+  message += menus.footer;
+  return message;
+};
+
+export const showCartItems = () => {
   let prompt = '';
+  console.log('Cart items show', cartItems);
   cartItems.forEach((item, index) => {
     prompt += `${index}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
   });
-  const total = await retreiveCachedItems(client, ['totalCost']);
-  message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout\n 2. Update Cart`;
+  return prompt;
+};
 
+export const updateType = (type) => {
+  if (type === 'remove') {
+    message = `${con()} Select an item to remove\n`;
+  } else {
+    message = `${con()} Select an item to update\n`;
+  }
+  const cartItems = showCartItems();
+  message += cartItems;
+  message += menus.footer;
+  return message;
+};
+
+export const removeItemFromCart = async (id) => {
+  try {
+    const response = await axios.delete(`${BASEURL}/api/cart/${id}`);
+    if (response.status === 200) {
+      message = `${con()} Cart Item removed successfully`;
+    } else {
+      message = `${con()} Something went wrong`;
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateQuantityinCart = async (id) => {
+  try {
+    const response = await axios.put(`${BASEURL}/api/cart/${id}`);
+    if (response.status === 200) {
+      message = `${con()} Cart Item removed successfully`;
+    } else {
+      message = `${con()} Something went wrong`;
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const displayTotalCost = async (client) => {
+  try {
+    const chargeToUser = await retreiveCachedItems(client, ['totalCost']);
+    message = `${con()} Proceed to pay KES ${chargeToUser}\n 1. Yes`;
+    message += menus.footer;
+  } catch (error) {
+    throw new Error(error);
+  }
   return message;
 };
