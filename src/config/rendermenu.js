@@ -105,7 +105,7 @@ export const checkBuyerSelection = async (textValue, text) => {
     const userQuantity = parseInt(text.split('*')[6], 10);
     message = buyermenus.confirmQuantityWithPrice(client, offersArray, userQuantity);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
-    message = buyermenus.addToCart(buyermenus.itemSelection, buyermenus.totalCost);
+    message = buyermenus.addToCart(client, buyermenus.itemSelection, buyermenus.totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '67') {
     message = await buyermenus.displayCartItems(client);
   } else if (textValue === 10 && text.split('*')[9] === '1') {

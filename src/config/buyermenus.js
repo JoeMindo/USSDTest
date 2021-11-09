@@ -132,10 +132,10 @@ export const confirmQuantityWithPrice = (client, arrayOfOffers, userQuantity) =>
   return message;
 };
 
-export const addToCart = (itemsObject, totalPriceObject) => {
+export const addToCart = (client, itemsObject, totalPriceObject) => {
   if (itemsObject && totalPriceObject) {
     cartItems.push(itemsObject);
-    cartItems.push(totalPriceObject);
+    client.set('cartItems', JSON.stringify(cartItems));
     message = `${con()} Cart Items added successfully\n`;
     console.log('Cart Items are', cartItems);
     message += '67. View Cart';
@@ -150,9 +150,12 @@ export const displayCartItems = async (client) => {
   try {
     let prompt = '';
     cartItems.forEach((item, index) => {
-      prompt += `${index}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
+      prompt += `${index}. ${item.product} from ${item.farmName} grade: ${item.grade}  at KES ${item.totalCost}\n`;
     });
     const total = await retreiveCachedItems(client, ['totalCost']);
+    const fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
+    console.log('Cart Items Redis', fetchCartItems);
+    console.log('Cart Items Parsed', JSON.parse(fetchCartItems));
     message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout\n 2. Update Cart`;
     return message;
   } catch (error) {
