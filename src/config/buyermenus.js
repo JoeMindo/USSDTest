@@ -1,9 +1,11 @@
 /* eslint-disable import/extensions */
 import axios from 'axios';
+import { parse } from 'dotenv';
 import { fetchCategories, fetchProducts } from '../core/productmanagement.js';
 import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 import { retreiveCachedItems } from '../core/services.js';
+import { client } from '../server.js';
 
 let message = '';
 const con = () => 'CON';
@@ -50,7 +52,7 @@ export const renderOfferings = async (client, id) => {
     console.log('Product offering', productOffering.data.message);
     let offeringText = '';
     if (productOffering.data.message.status !== '3' && productOffering.data.status !== 'error') {
-      const offers = productOffering.data.message;
+      const offers = productOffering.data.message.data;
       console.log('Here are the offers', offers);
       offers.forEach((offer) => {
         offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
@@ -121,11 +123,11 @@ export const confirmQuantityWithPrice = (client, arrayOfOffers, userQuantity) =>
     const total = userQuantity * arrayOfOffers[0].unitPrice;
     console.log('User quantity is', userQuantity);
     const prompt = `${arrayOfOffers[0].product} from ${arrayOfOffers[0].farmName} of grade:${arrayOfOffers[0].grade} at ${arrayOfOffers[0].unitPrice}`;
+    itemSelection.id = `${arrayOfOffers[0].id}`;
     itemSelection.product = `${arrayOfOffers[0].product}`;
     itemSelection.farmName = `${arrayOfOffers[0].farmName}`;
     itemSelection.grade = `${arrayOfOffers[0].grade}`;
     itemSelection.totalCost = total;
-    client.set('totalCost', total);
     message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
   }
   message += menus.footer;
@@ -137,7 +139,6 @@ export const addToCart = (client, itemsObject, totalPriceObject) => {
     cartItems.push(itemsObject);
     client.set('cartItems', JSON.stringify(cartItems));
     message = `${con()} Cart Items added successfully\n`;
-    console.log('Cart Items are', cartItems);
     message += '67. View Cart';
   } else {
     message = `${con()} You have not selected any item to add to cart`;
@@ -149,14 +150,19 @@ export const addToCart = (client, itemsObject, totalPriceObject) => {
 export const displayCartItems = async (client) => {
   try {
     let prompt = '';
-    cartItems.forEach((item, index) => {
-      prompt += `${index}. ${item.product} from ${item.farmName} grade: ${item.grade}  at KES ${item.totalCost}\n`;
-    });
-    const total = await retreiveCachedItems(client, ['totalCost']);
-    const fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
-    console.log('Cart Items Redis', fetchCartItems);
-    console.log('Cart Items Parsed', JSON.parse(fetchCartItems));
-    message = `${con()} Your cart items are\n ${prompt} Total ${total}\n 1. Checkout\n 2. Update Cart`;
+    let fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
+    console.log('Cached cart items', fetchCartItems);
+    fetchCartItems = JSON.parse(fetchCartItems);
+    if (fetchCartItems.length > 0) {
+      fetchCartItems.forEach((item) => {
+        prompt += `${item.id}. ${item.product} from ${item.farmName} grade: ${item.grade}  at KES ${item.totalCost}\n`;
+      });
+      const availableTotal = fetchCartItems.reduce((total, obj) => obj.totalCost + total, 0);
+      message = `${con()} Your cart items are\n ${prompt} Total ${availableTotal}\n 1. Checkout\n 2. Update Cart`;
+    } else {
+      message = `${con()} You have no items at the moment\n Go home and add products`;
+      message += menus.footer;
+    }
     return message;
   } catch (error) {
     throw new Error(error);
@@ -179,22 +185,24 @@ export const checkoutUsingDifferentNumber = () => {
   return message;
 };
 
-export const showCartItems = () => {
+export const showCartItems = async (client) => {
   let prompt = '';
-  console.log('Cart items show', cartItems);
-  cartItems.forEach((item, index) => {
-    prompt += `${index}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
+  let fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
+  fetchCartItems = JSON.parse(fetchCartItems);
+  fetchCartItems.forEach((item) => {
+    prompt += `${item.id}. ${item.product}, ${item.farmName}, ${item.grade} ${item.totalCost}\n`;
   });
   return prompt;
 };
 
-export const updateType = (type) => {
+export const updateType = async (type) => {
   if (type === 'remove') {
     message = `${con()} Select an item to remove\n`;
   } else {
     message = `${con()} Select an item to update\n`;
   }
-  const cartItems = showCartItems();
+  const cartItems = await showCartItems(client);
+
   message += cartItems;
   message += menus.footer;
   return message;
@@ -202,25 +210,42 @@ export const updateType = (type) => {
 
 export const removeItemFromCart = async (id) => {
   try {
-    const response = await axios.delete(`${BASEURL}/api/cart/${id}`);
-    if (response.status === 200) {
-      message = `${con()} Cart Item removed successfully`;
-    } else {
-      message = `${con()} Something went wrong`;
-    }
+    let cartItems = await retreiveCachedItems(client, ['cartItems']);
+    cartItems = JSON.parse(cartItems);
+
+    cartItems.forEach((item) => {
+      if (item.id === id) {
+        const indexOfItem = cartItems.indexOf(item);
+        cartItems.splice(indexOfItem, 1);
+        client.set('cartItems', JSON.stringify(cartItems));
+        message = `${con()} Item removed successfully\n`;
+        message += '67. View cart';
+        message += menus.footer;
+      } else {
+        message = `${con()} Item not found`;
+      }
+    });
+    return message;
   } catch (error) {
     throw new Error(error);
   }
 };
 
 export const updateQuantityinCart = async (id) => {
+  const price = [];
   try {
-    const response = await axios.put(`${BASEURL}/api/cart/${id}`);
-    if (response.status === 200) {
-      message = `${con()} Cart Item removed successfully`;
-    } else {
-      message = `${con()} Something went wrong`;
-    }
+    let cartItems = await retreiveCachedItems(client, ['cartItems']);
+    cartItems = JSON.parse(cartItems);
+
+    cartItems.forEach((item) => {
+      if (item.id === id) {
+        message = `${con()} What is the quantity you want?`;
+        const index = cartItems.indexOf(item);
+        price.push(cartItems[index].totalCost);
+      }
+    });
+
+    return { message, price: price[0] };
   } catch (error) {
     throw new Error(error);
   }
@@ -235,4 +260,11 @@ export const displayTotalCost = async (client) => {
     throw new Error(error);
   }
   return message;
+};
+
+export const updateRequest = (request) => {
+  const array = request.body.text.split('*');
+  array.splice(2, array.length);
+  request.text = array.join('*');
+  return request;
 };

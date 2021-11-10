@@ -79,7 +79,7 @@ export const renderBuyerMenus = () => {
   return message;
 };
 
-export const checkBuyerSelection = async (textValue, text) => {
+export const checkBuyerSelection = async (textValue, text, req) => {
   if (textValue === 1) {
     message = renderBuyerMenus();
   } else if (textValue === 2) {
@@ -94,8 +94,6 @@ export const checkBuyerSelection = async (textValue, text) => {
     console.log('Farm offering status', result.status);
     offeringStatus.push(result.status);
     message = result.message;
-
-    console.log('Farm offerings', message);
   } else if (textValue === 5 && text.split('*')[4] !== '67') {
     const selection = text.split('*')[4];
     message = buyermenus.checkGroupAndIndividualPrice(offeringStatus[0][selection]);
@@ -117,7 +115,7 @@ export const checkBuyerSelection = async (textValue, text) => {
   } else if (textValue === 10 && text.split('*')[9] === '2') {
     message = buyermenus.updateCart();
   } else if (textValue === 11 && text.split('*')[10] === '1') {
-    message = buyermenus.updateType('remove');
+    message = await buyermenus.updateType('remove');
   } else if (textValue === 11 && text.split('*')[10] === '2') {
     message = buyermenus.updateType('updateQuantity');
   } else if (textValue === 12 && text.split('*')[10] === '1') {
@@ -125,8 +123,19 @@ export const checkBuyerSelection = async (textValue, text) => {
     message = buyermenus.removeItemFromCart(offeringId);
   } else if (textValue === 12 && text.split('*')[10] === '2') {
     const offeringId = text.split('*')[11];
-    message = buyermenus.updateQuantityinCart(offeringId);
+    const prompt = await buyermenus.updateQuantityinCart(offeringId);
+    console.log('Prompt is', prompt);
+    message = prompt.message;
+  } else if (textValue === 13 && text.split('*')[12] === '67') {
+    message = await buyermenus.displayCartItems(client);
+  } else if (textValue === 13 && text.split('*')[10] === '2') {
+    const offeringId = text.split('*')[11];
+    const prompt = buyermenus.updateQuantityinCart(offeringId);
+    console.log('Prompt is', prompt.price);
+    message = `${con()} You are now buying ${text.split('*')[12]} items`;
+    message += menus.footer;
   }
+
   return message;
 };
 export const checkFarmerSelection = async (text, textValue) => {

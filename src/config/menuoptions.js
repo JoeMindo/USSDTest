@@ -71,7 +71,7 @@ export const menus = {
 
   },
   errorMessage: 'Error!',
-  footer: '\n 98. Back 99.Home',
+  footer: '\n 00. Back 0.Home',
   viewCart: '\n67. View cart',
 
   submitDetails: 'Submit details?\n 1.Yes',

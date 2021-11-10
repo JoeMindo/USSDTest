@@ -12,10 +12,9 @@ import redis from 'redis';
 import bluebird from 'bluebird';
 // import cors from 'cors';
 import { ussdRouter } from 'ussd-router';
+import { routing } from './config/navigationMenus.js';
 import * as menuItems from './config/rendermenu.js';
 import { registerUser, loginUser, checkIfUserExists } from './core/usermanagement.js';
-import { retreiveCachedItems } from './core/services.js';
-import { menus } from './config/menuoptions.js';
 
 const port = process.env.PORT || 3032;
 
@@ -75,7 +74,7 @@ app.post('/ussd', async (req, res) => {
   };
 
   const rawtext = req.body.text;
-  const text = ussdRouter(rawtext, '99', '98');
+  const text = ussdRouter(rawtext, '0', '00');
   // TODO: Migrate this to usermanagement
 
   console.log(`incoming text ${text}`);
@@ -127,8 +126,6 @@ app.post('/ussd', async (req, res) => {
     }
   } else if (userStatus === true) {
     let message;
-    // message = menuItems.renderLoginMenus();
-    // res.send(message);
     if (text.length === 0) {
       message = menuItems.renderLoginMenus();
     } else if (text.length > 0) {
@@ -145,7 +142,7 @@ app.post('/ussd', async (req, res) => {
       } else if (response.status === 200 && response.data.role === 'buyer') {
         client.set('role', 'buyer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = await menuItems.checkBuyerSelection(textValue, text);
+        message = await menuItems.checkBuyerSelection(textValue, text, req);
       } else if (response.status === 404) {
         message = 'CON User not found';
       } else {
