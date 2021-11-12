@@ -168,7 +168,7 @@ export const confirmNewQuantity = (client, itemsObject, totalPriceObject) => {
   }
   message += menus.footer;
   return message;
-}
+};
 
 export const displayCartItems = async (client) => {
   try {

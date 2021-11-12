@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/extensions */
 import axios from 'axios';
-import { postrequest } from './services.js';
+import { postrequest, retreiveCachedItems } from './services.js';
 import { BASEURL } from '../config/urls.js';
 
 const clearData = (details) => {
@@ -89,16 +89,26 @@ const getEntireUserList = async (pageNumber = 1) => {
   return userresponse;
 };
 
-const checkIfUserExists = async (phone) => {
+// const checkIfUserExistsOld = async (phone) => {
+//   try {
+//     const userresponse = await getEntireUserList();
+//     const found = userresponse.some((profile) => profile.phone_no === phone);
+//     if (!found) {
+//       return false;
+//     }
+//     return true;
+//   } catch (error) {
+//     throw new Error(error);
+//   }
+// };
+
+const checkIfUserExists = async (phone, client) => {
+  let userStatus;
   try {
-    const userresponse = await getEntireUserList();
-    const found = userresponse.some((profile) => profile.phone_no === phone);
-    if (!found) {
-      return false;
-    }
-    return true;
-  } catch (error) {
-    throw new Error(error);
+    userStatus = await retreiveCachedItems(client, ['userStatus']);
+    console.log(userStatus);
+  } catch (err) {
+    throw new Error(err);
   }
 };
 

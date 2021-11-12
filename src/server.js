@@ -81,7 +81,7 @@ app.post('/ussd', async (req, res) => {
   const textValue = text.split('*').length;
   console.log('Textvalue', textValue);
   console.log('Length of text', text.length);
-  const userStatus = await checkIfUserExists(req.body.phoneNumber);
+  const userStatus = await checkIfUserExists(req.body.phoneNumber, client);
   console.log('User Status', userStatus);
 
   if (userStatus === false) {
