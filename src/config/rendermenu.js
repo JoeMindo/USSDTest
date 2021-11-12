@@ -11,7 +11,6 @@ import { offersArray } from './buyermenus.js';
 export const con = () => 'CON';
 export const end = () => 'END';
 let message = '';
-const offeringStatus = [];
 
 let completedStatus = false;
 export const renderRegisterMenu = (textValue, text) => {
@@ -73,7 +72,8 @@ export const renderFarmerMenus = () => {
   return message;
 };
 export const renderBuyerMenus = () => {
-  let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}`;
+  let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
+  menuPrompt += `${menus.buyermenu.myCart}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
@@ -82,58 +82,14 @@ export const renderBuyerMenus = () => {
 export const checkBuyerSelection = async (textValue, text, req) => {
   if (textValue === 1) {
     message = renderBuyerMenus();
-  } else if (textValue === 2) {
-    message = await buyermenus.renderProductCategories();
-  } else if (textValue === 3) {
-    const selection = parseInt(text.split('*')[2], 10);
-    console.log('Selection is', selection);
-    message = await buyermenus.renderProducts(selection);
-  } else if (textValue === 4) {
-    const selection = parseInt(text.split('*')[3], 10);
-    const result = await buyermenus.renderOfferings(client, selection);
-    console.log('Farm offering status', result.status);
-    offeringStatus.push(result.status);
-    message = result.message;
-  } else if (textValue === 5 && text.split('*')[4] !== '67') {
-    const selection = text.split('*')[4];
-    message = buyermenus.checkGroupAndIndividualPrice(offeringStatus[0][selection]);
-  } else if (textValue === 6 && text.split('*')[5] === '1') {
-    message = buyermenus.askForQuantity();
-  } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
-    const userQuantity = parseInt(text.split('*')[6], 10);
-    message = buyermenus.confirmQuantityWithPrice(client, offersArray, userQuantity);
-  } else if (textValue === 8 && text.split('*')[7] === '1') {
-    message = buyermenus.addToCart(client, buyermenus.itemSelection, buyermenus.totalCost);
-  } else if (textValue === 9 && text.split('*')[8] === '67') {
-    message = await buyermenus.displayCartItems(client);
-  } else if (textValue === 10 && text.split('*')[9] === '1') {
-    message = buyermenus.checkOut();
-  } else if (textValue === 11 && text.split('*')[9] === '1' && text.split('*')[10] === '2') {
-    message = buyermenus.checkoutUsingDifferentNumber();
-  } else if (textValue === 11 && text.split('*')[9] === '1' && text.split('*')[10] === '1') {
-    message = buyermenus.displayTotalCost(client);
-  } else if (textValue === 10 && text.split('*')[9] === '2') {
-    message = buyermenus.updateCart();
-  } else if (textValue === 11 && text.split('*')[10] === '1') {
-    message = await buyermenus.updateType('remove');
-  } else if (textValue === 11 && text.split('*')[10] === '2') {
-    message = buyermenus.updateType('updateQuantity');
-  } else if (textValue === 12 && text.split('*')[10] === '1') {
-    const offeringId = text.split('*')[11];
-    message = buyermenus.removeItemFromCart(offeringId);
-  } else if (textValue === 12 && text.split('*')[10] === '2') {
-    const offeringId = text.split('*')[11];
-    const prompt = await buyermenus.updateQuantityinCart(offeringId);
-    console.log('Prompt is', prompt);
-    message = prompt.message;
-  } else if (textValue === 13 && text.split('*')[12] === '67') {
-    message = await buyermenus.displayCartItems(client);
-  } else if (textValue === 13 && text.split('*')[10] === '2') {
-    const offeringId = text.split('*')[11];
-    const prompt = buyermenus.updateQuantityinCart(offeringId);
-    console.log('Prompt is', prompt.price);
-    message = `${con()} You are now buying ${text.split('*')[12]} items`;
-    message += menus.footer;
+  } else {
+    const selection = text.split('*')[1];
+    if (selection === '1') {
+      message = await buyermenus.showAvailableProducts(textValue, text);
+    } else if (selection === '2') {
+      message = await buyermenus.cartOperations(text, textValue);
+      console.log(message);
+    }
   }
 
   return message;
