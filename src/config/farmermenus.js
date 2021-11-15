@@ -152,10 +152,11 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     const questionId = parseInt(text.split('*')[3], 10);
     client.set('questionId', questionId);
     const answersPerQuestion = await getAnswersPerQuestion(questionId);
+    console.log('Possible answers', answersPerQuestion.data);
     if (answersPerQuestion.status === 200) {
       let menuPrompt = '';
 
-      answersPerQuestion.data[0].kyc_metrics_possible_answers.forEach(
+      answersPerQuestion.data.message[0].kyc_metrics_possible_answers.forEach(
         (answer) => {
           menuPrompt += `\n${answer.id}. ${answer.possible_answer}`;
           questionanswers[answer.id] = answer.possible_answer;

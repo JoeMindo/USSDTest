@@ -5,7 +5,9 @@ import { BASEURL } from '../config/urls.js';
 
 export const addFarm = async (farm) => {
   try {
+    // TODO:Backend resolve this issue
     const response = await axios.post(`${BASEURL}/api/farm/save`, farm);
+    console.log('Add farm response', response);
     return response;
   } catch (err) {
     console.log(err);

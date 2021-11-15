@@ -11,9 +11,7 @@ import { offersArray } from './buyermenus.js';
 export const con = () => 'CON';
 export const end = () => 'END';
 let message = '';
-const offeringStatus = [];
 
-// Register Menus
 let completedStatus = false;
 export const renderRegisterMenu = (textValue, text) => {
   if (textValue === 1 && text.length === 0) {
@@ -74,46 +72,26 @@ export const renderFarmerMenus = () => {
   return message;
 };
 export const renderBuyerMenus = () => {
-  let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}`;
+  let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
+  menuPrompt += `${menus.buyermenu.myCart}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
 };
 
-export const checkBuyerSelection = async (textValue, text) => {
+export const checkBuyerSelection = async (textValue, text, req) => {
   if (textValue === 1) {
     message = renderBuyerMenus();
-  } else if (textValue === 2) {
-    message = await buyermenus.renderProductCategories();
-  } else if (textValue === 3) {
-    const selection = parseInt(text.split('*')[2], 10);
-    console.log('Selection is', selection);
-    message = await buyermenus.renderProducts(selection);
-  } else if (textValue === 4) {
-    const selection = parseInt(text.split('*')[3], 10);
-    const result = await buyermenus.renderOfferings(client, selection);
-    console.log('Farm offering status', result.status);
-    offeringStatus.push(result.status);
-    message = result.message;
-
-    console.log('Farm offerings', message);
-  } else if (textValue === 5 && text.split('*')[4] !== '67') {
-    const selection = text.split('*')[4];
-    message = buyermenus.checkGroupAndIndividualPrice(offeringStatus[0][selection]);
-  } else if (textValue === 6 && text.split('*')[5] === '1') {
-    message = buyermenus.askForQuantity();
-  } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
-    const userQuantity = parseInt(text.split('*')[6], 10);
-    message = buyermenus.confirmQuantityWithPrice(client, offersArray, userQuantity);
-  } else if (textValue === 8 && text.split('*')[7] === '1') {
-    message = buyermenus.addToCart(buyermenus.itemSelection, buyermenus.totalCost);
-  } else if (textValue === 9 && text.split('*')[8] === '67') {
-    message = await buyermenus.displayCartItems(client);
-  } else if (textValue === 10 && text.split('*')[9] === '1') {
-    message = buyermenus.checkOut();
-  } else if (textValue === 10 && text.split('*')[9] === '2') {
-    message = buyermenus.updateCart();
+  } else {
+    const selection = text.split('*')[1];
+    if (selection === '1') {
+      message = await buyermenus.showAvailableProducts(textValue, text);
+    } else if (selection === '2') {
+      message = await buyermenus.cartOperations(text, textValue);
+      console.log(message);
+    }
   }
+
   return message;
 };
 export const checkFarmerSelection = async (text, textValue) => {
