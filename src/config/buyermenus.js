@@ -126,6 +126,8 @@ export const confirmQuantityWithPrice = async (userQuantity) => {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
     const pricePoint = parseInt(offers[0].unitPrice, 10);
+    console.log('The price point is', pricePoint);
+    console.log('The user quantity is', userQuantity);
     const total = userQuantity * pricePoint;
 
     [offers] = offers;
@@ -306,7 +308,7 @@ export const showAvailableProducts = async (textValue, text) => {
     message = askForQuantity();
   } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
     const userQuantity = parseInt(text.split('*')[6], 10);
-    message = confirmQuantityWithPrice(client, offersArray, userQuantity);
+    message = confirmQuantityWithPrice(userQuantity);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = addToCart(client, itemSelection, totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '67') {
