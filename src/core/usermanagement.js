@@ -89,24 +89,28 @@ const getEntireUserList = async (pageNumber = 1) => {
   return userresponse;
 };
 
-// const checkIfUserExistsOld = async (phone) => {
-//   try {
-//     const userresponse = await getEntireUserList();
-//     const found = userresponse.some((profile) => profile.phone_no === phone);
-//     if (!found) {
-//       return false;
-//     }
-//     return true;
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// };
+const checkIfUserExistsOld = async (phone) => {
+  try {
+    const userresponse = await getEntireUserList();
+    const found = userresponse.some((profile) => profile.phone_no === phone);
+    if (!found) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 const checkIfUserExists = async (phone, client) => {
   let userStatus;
   try {
     userStatus = await retreiveCachedItems(client, ['userStatus']);
-    console.log(userStatus);
+    if (userStatus[0] === null) {
+      userStatus = await checkIfUserExistsOld(phone);
+    }
+    console.log('Updated status is', userStatus);
+    return userStatus;
   } catch (err) {
     throw new Error(err);
   }
