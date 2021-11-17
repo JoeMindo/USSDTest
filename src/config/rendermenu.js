@@ -73,22 +73,24 @@ export const renderFarmerMenus = () => {
 };
 export const renderBuyerMenus = () => {
   let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
-  menuPrompt += `${menus.buyermenu.myCart}\n`;
+  // menuPrompt += `${menus.buyermenu.myCart}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
 };
 
-export const checkBuyerSelection = async (textValue, text, req) => {
+export const checkBuyerSelection = async (textValue, text) => {
   if (textValue === 1) {
     message = renderBuyerMenus();
   } else {
     const selection = text.split('*')[1];
     if (selection === '1') {
       message = await buyermenus.showAvailableProducts(textValue, text);
-    } else if (selection === '2') {
-      message = await buyermenus.cartOperations(text, textValue);
-      console.log(message);
+    // } else if (selection === '2') {
+    //   message = await buyermenus.cartOperations(text, 'outer', 0);
+    //   console.log(message);
+    } else {
+      message = 'CON Invalid menus ';
     }
   }
 

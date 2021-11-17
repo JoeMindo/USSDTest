@@ -6,16 +6,23 @@ import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 import { retreiveCachedItems } from '../core/services.js';
 import { client } from '../server.js';
+import { increaseCount } from '../helpers.js';
 
 let message = '';
 const con = () => 'CON';
 const end = () => 'END';
-const userViewOffers = {};
+
 export const offersArray = [];
 export const cartItems = [];
 export const totalCost = {};
 export const itemSelection = {};
 const offeringStatus = [];
+
+const centersMapping = {
+  1: 'Center 1',
+  2: 'Center 2',
+  3: 'Center 4',
+};
 
 export const renderProductCategories = async () => {
   try {
@@ -50,12 +57,14 @@ export const renderOfferings = async (client, id) => {
   try {
     const endpointUrl = `${BASEURL}/api/productsbyproductid`;
     const productOffering = await axios.get(`${endpointUrl}/${id}`);
+    client.set('viewedProductID', id);
     console.log('Product offering', productOffering.data.message);
     let offeringText = '';
     if (productOffering.data.message.status !== '3' && productOffering.data.status !== 'error') {
       const offers = productOffering.data.message.data;
       console.log('Here are the offers', offers);
       offers.forEach((offer) => {
+        const userViewOffers = {};
         offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
         userViewOffers.id = `${offer.id}`;
         userViewOffers.product = `${offer.product_name}`;
@@ -78,10 +87,11 @@ export const renderOfferings = async (client, id) => {
           status[offer.id] = 'both';
         }
         offersArray.push(userViewOffers);
+
         client.set('offersArray', JSON.stringify(offersArray));
       });
-      offeringText += menus.viewCart;
-
+      // offeringText += menus.viewCart;
+      console.log('The offers array is', offersArray);
       message = `${con()} Choose a product to buy. ${offeringText}`;
     } else {
       message = `${con()} Product not available`;
@@ -116,26 +126,29 @@ export const askForQuantity = () => {
 };
 // Array of offers should be cached
 
-export const confirmQuantityWithPrice = async (userQuantity) => {
+export const confirmQuantityWithPrice = async (userQuantity, productID) => {
   let availableUnits = 0;
   let offers = await retreiveCachedItems(client, ['offersArray']);
   offers = JSON.parse(offers);
-  availableUnits = offers.availableUnits;
+  const buyerSelesction = offers.filter((item) => item.id === productID);
+  console.log('The buyer selection is', buyerSelesction[0]);
+  availableUnits = buyerSelesction[0].availableUnits;
 
   if (userQuantity > availableUnits) {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
-    const pricePoint = parseInt(offers[0].unitPrice, 10);
+    const pricePoint = parseInt(buyerSelesction[0].unitPrice, 10);
+    console.log('The price point is', pricePoint);
+    console.log('The user quantity is', userQuantity);
     const total = userQuantity * pricePoint;
+    console.log('offers in cart price confirmation', [offers], `${offers}`);
 
-    [offers] = offers;
+    const prompt = `${buyerSelesction[0].product} from ${buyerSelesction[0].farmName} of grade:${buyerSelesction[0].grade} at ${buyerSelesction[0].unitPrice}`;
 
-    const prompt = `${offers.product} from ${offers.farmName} of grade:${offers.grade} at ${offers.unitPrice}`;
-
-    itemSelection.id = `${offers.id}`;
-    itemSelection.product = `${offers.product}`;
-    itemSelection.farmName = `${offers.farmName}`;
-    itemSelection.grade = `${offers.grade}`;
+    itemSelection.id = `${buyerSelesction[0].id}`;
+    itemSelection.product = `${buyerSelesction[0].product}`;
+    itemSelection.farmName = `${buyerSelesction[0].farmName}`;
+    itemSelection.grade = `${buyerSelesction[0].grade}`;
     itemSelection.totalCost = total;
     message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
   }
@@ -192,7 +205,7 @@ export const displayCartItems = async (client) => {
   }
 };
 
-export const checkOut = () => {
+export const askForNumber = () => {
   message = `${con()} Checkout using\n 1. This Number\n 2. Other number`;
   return message;
 };
@@ -230,9 +243,11 @@ export const removeItemFromCart = async (id) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
     cartItems = JSON.parse(cartItems);
+    console.log('Remove the cat items here are', cartItems);
 
     cartItems.forEach((item) => {
       if (item.id === id) {
+        console.log('The item id is', item.id);
         const indexOfItem = cartItems.indexOf(item);
         cartItems.splice(indexOfItem, 1);
         client.set('cartItems', JSON.stringify(cartItems));
@@ -287,57 +302,6 @@ export const updateRequest = (request) => {
   return request;
 };
 
-export const showAvailableProducts = async (textValue, text) => {
-  if (textValue === 2) {
-    message = await renderProductCategories();
-  } else if (textValue === 3) {
-    const selection = parseInt(text.split('*')[2], 10);
-    message = await renderProducts(selection);
-  } else if (textValue === 4) {
-    const selection = parseInt(text.split('*')[3], 10);
-    const result = await renderOfferings(client, selection);
-    console.log('Farm offering status', result.status);
-    offeringStatus.push(result.status);
-    message = result.message;
-  } else if (textValue === 5 && text.split('*')[4] !== '67') {
-    const selection = text.split('*')[4];
-    message = checkGroupAndIndividualPrice(offeringStatus[0][selection]);
-  } else if (textValue === 6 && text.split('*')[5] === '1') {
-    message = askForQuantity();
-  } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
-    const userQuantity = parseInt(text.split('*')[6], 10);
-    message = confirmQuantityWithPrice(client, offersArray, userQuantity);
-  } else if (textValue === 8 && text.split('*')[7] === '1') {
-    message = addToCart(client, itemSelection, totalCost);
-  } else if (textValue === 9 && text.split('*')[8] === '67') {
-    message = await displayCartItems(client);
-  } else if (textValue === 10 && text.split('*')[9] === '1') {
-    message = checkOut();
-    // } else if (textValue === 11 && text.split('*')[9] === '1' && text.split('*')[10] === '2') {
-    //   message = checkoutUsingDifferentNumber();
-    // } else if (textValue === 11 && text.split('*')[9] === '1' && text.split('*')[10] === '1') {
-    //   message = displayTotalCost(client);
-  } else if (textValue === 10 && text.split('*')[9] === '2') {
-    message = updateCart();
-  } else if (textValue === 11 && text.split('*')[10] === '1') {
-    message = await updateType('remove');
-  } else if (textValue === 11 && text.split('*')[10] === '2') {
-    message = updateType('updateQuantity');
-  } else if (textValue === 12 && text.split('*')[10] === '1') {
-    const offeringId = text.split('*')[11];
-    message = removeItemFromCart(offeringId);
-  } else if (textValue === 12 && text.split('*')[10] === '2') {
-    const offeringId = text.split('*')[11];
-    const prompt = await updateQuantityinCart(offeringId);
-    console.log('Prompt is', prompt);
-    message = prompt.message;
-  } else {
-    message = `${con()} Option not found`;
-    message += menus.footer;
-  }
-  return message;
-};
-
 export const updateCart = async (operation, id = null) => {
   if (operation === 'firstscreen') {
     message = `${con()} Choose an operation\n 1. Remove Item\n 2. Change Item quantity`;
@@ -352,37 +316,119 @@ export const updateCart = async (operation, id = null) => {
   return message;
 };
 
-export const cartOperations = async (text, textValue) => {
-  const selection = text.split('*')[2];
-  if (textValue === 2) {
+/*
+1. Level 0: Display all the cart items
+2. Level 1: Choose between checkout and update cart
+3. Level 2: If update cart choose remove or update count
+4. Level 3: Remove item or update quantity
+5. Level 4: Check quantity if matches
+6. level 5: If checkout then ask for details and make order
+*/
+
+export const cartOperations = async (text, menuLevel, level, itemId = null) => {
+  let selection;
+  if (menuLevel === 'inner') {
+    // eslint-disable-next-line prefer-destructuring
+    selection = text.split('*')[9];
+  } else if (menuLevel === 'outer') {
+    // eslint-disable-next-line prefer-destructuring
+    selection = text.split('*')[2];
+  }
+  console.log('Selection is', selection);
+  if (level === 0) {
     message = await displayCartItems(client);
-    console.log('Cart stuff', message);
-  } else if (selection === '1' && textValue === 3) {
-    message = checkOut();
-  } else if (selection === '2' && textValue === 3) {
+  } else if (selection === '1' && level === 1) {
+    message = askForNumber();
+  } else if (selection === '2' && level === 1) {
     message = updateCart('firstscreen');
-  } else if (textValue === 4 && text.split('*')[3] === '1') {
+  } else if (level === 2) {
     message = await updateType('remove');
-  } else if (textValue === 4 && text.split('*')[3] === '2') {
+  } else if (level === 3) {
     message = await updateType('updateItemCount');
-  } else if (textValue === 5 && text.split('*')[3] === '1') {
-    const id = text.split('*')[4];
-    message = await removeItemFromCart(id);
+  } else if (level === 4) {
+    message = await removeItemFromCart(itemId);
     console.log('Here is remove', message);
-  } else if (textValue === 5 && text.split('*')[3] === '2') {
-    const id = text.split('*')[4];
-    const response = await updateQuantityinCart(id);
+  } else if (level === 5) {
+    const response = await updateQuantityinCart(itemId);
     message = response.message;
-  } else if (textValue === 6 && text.split('*')[3] === '2') {
-    const userQuantity = parseInt(text.split('*')[5], 10);
-    console.log('User Quantity Text', userQuantity);
-    message = await confirmQuantityWithPrice(userQuantity);
-  } else if (textValue === 7 && text.split('*')[6] === '1') {
+  } else if (level === 6) {
+    console.log('Item selection at update ', itemSelection);
+    console.log('Cost', totalCost);
     message = confirmNewQuantity(client, itemSelection, totalCost);
   }
   return message;
 };
 
-// export const compareNewQuantity = async () => {
-//   const offers = await retreiveCachedItems(client, ['offersArray']);
-//   if ()
+export const chooseCenter = (administrativeID) => {
+  let message = `${con()} Choose a place where you will pick your goods\n`;
+  message += `1. ${centersMapping[administrativeID]}`;
+  return message;
+};
+
+export const makeOrder = async (orderDetails) => {
+  try {
+    const makeOrderRequest = await axios.post(`${BASEURL}/api/savebasicorder`, orderDetails);
+    // if (makeOrderRequest.data.status !== 'success') {
+    //   message = `${con()} Something went wrong, please try again`;
+    //   message += menus.footer;
+    // } else {
+    //   message = `${end()} ${makeOrderRequest.data.message
+    //   }`;
+    // }
+    console.log('Request is', makeOrderRequest);
+    return message;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const showAvailableProducts = async (textValue, text) => {
+  if (textValue === 2) {
+    message = await renderProductCategories();
+  } else if (textValue === 3) {
+    const selection = parseInt(text.split('*')[2], 10);
+    message = await renderProducts(selection);
+  } else if (textValue === 4) {
+    const selection = parseInt(text.split('*')[3], 10);
+    const result = await renderOfferings(client, selection);
+    console.log('Farm offering status', result.status);
+    offeringStatus.push(result.status);
+    message = result.message;
+  } else if (textValue === 5) {
+    const selection = parseInt(text.split('*')[4], 10);
+    message = checkGroupAndIndividualPrice(offeringStatus[0][selection]);
+  } else if (textValue === 6 && text.split('*')[5] === '1') {
+    message = askForQuantity();
+  } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
+    const userQuantity = parseInt(text.split('*')[6], 10);
+    const id = text.split('*')[4];
+    message = confirmQuantityWithPrice(userQuantity, id);
+  } else if (textValue === 8 && text.split('*')[7] === '1') {
+    message = await addToCart(client, itemSelection, totalCost);
+  } else if (textValue === 9 && text.split('*')[8] === '1') {
+    message = 'CON Checkout here';
+  } else if (textValue === 9 && text.split('*')[8] === '67') {
+    message = await cartOperations(text, 'inner', 0);
+  } else if (textValue === 10 && text.split('*')[9] === '1') {
+    message = 'CON Checkout will be here';
+  } else if (textValue === 10 && text.split('*')[9] === '2') {
+    message = await cartOperations(text, 'inner', 1);
+  } else if (textValue === 11 && text.split('*')[10] === '1') {
+    message = await cartOperations(text, 'inner', 2);
+  } else if (textValue === 11 && text.split('*')[10] === '2') {
+    message = await cartOperations(text, 'inner', 3);
+  } else if (textValue === 12 && text.split('*')[10] === '1') {
+    // TODO: Convert to a string
+    const itemID = text.split('*')[11];
+    message = await cartOperations(text, 'inner', 4, itemID);
+  } else if (textValue === 12 && text.split('*')[10] === '2') {
+    // TODO: Convert to a string
+    const itemID = text.split('*')[11];
+    message = await cartOperations(text, 'inner', 5, itemID);
+  } else if (textValue === 13 && text.split('*')[10] === '2') {
+    message = await cartOperations(text, 'inner', 6);
+  } else if (textValue === 13 && text.split('*')[10] === '1' && text.split('*')[12] === '67') {
+    message = await cartOperations(text, 'inner', 0);
+  }
+  return message;
+};
