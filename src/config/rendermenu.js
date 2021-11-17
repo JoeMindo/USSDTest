@@ -86,11 +86,28 @@ export const checkBuyerSelection = async (textValue, text) => {
     const selection = text.split('*')[1];
     if (selection === '1') {
       message = await buyermenus.showAvailableProducts(textValue, text);
-    // } else if (selection === '2') {
-    //   message = await buyermenus.cartOperations(text, 'outer', 0);
-    //   console.log(message);
-    } else {
-      message = 'CON Invalid menus ';
+    } else if (selection === '2') {
+      if (textValue === 2) {
+        message = await buyermenus.cartOperations(text, 'outer', 0);
+      } else if (textValue === 3 && text.split('*')[2] === '1') {
+        message = await buyermenus.cartOperations(text, 'outer', 1);
+      } else if (textValue === 3 && text.split('*')[2] === '2') {
+        message = await buyermenus.cartOperations(text, 'outer', 1);
+      } else if (textValue === 4 && text.split('*')[3] === '1') {
+        message = await buyermenus.cartOperations(text, 'outer', 2);
+      } else if (textValue === 4 && text.split('*')[3] === '2') {
+        message = await buyermenus.cartOperations(text, 'outer', 3);
+      } else if (textValue === 5 && text.split('*')[3] === '1') {
+        const id = text.split('*')[4];
+        message = await buyermenus.cartOperations(text, 'outer', 4, id);
+      } else if (textValue === 5 && text.split('*')[3] === '2') {
+        const id = text.split('*')[4];
+        message = await buyermenus.cartOperations(text, 'outer', 5, id);
+      } else if (textValue === 6 && text.split('*')[3] === '1' && text.split('*')[5] === '67') {
+        message = await buyermenus.cartOperations(text, 'outer', 0);
+      } else if (textValue === 6 && text.split('*')[3] === '2') {
+        message = await buyermenus.cartOperations(text, 'outer', 6);
+      }
     }
   }
 

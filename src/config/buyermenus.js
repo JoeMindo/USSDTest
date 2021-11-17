@@ -275,6 +275,7 @@ export const updateQuantityinCart = async (id) => {
         message = `${con()} What is the quantity you want?`;
         const index = cartItems.indexOf(item);
         price.push(cartItems[index].totalCost);
+        addToCart(client, item, price[0]);
       }
     });
 
@@ -396,6 +397,7 @@ export const showAvailableProducts = async (textValue, text) => {
     message = result.message;
   } else if (textValue === 5) {
     const selection = parseInt(text.split('*')[4], 10);
+    console.log('Check group and individual price', offeringStatus[0][selection]);
     message = checkGroupAndIndividualPrice(offeringStatus[0][selection]);
   } else if (textValue === 6 && text.split('*')[5] === '1') {
     message = askForQuantity();
