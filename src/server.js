@@ -142,7 +142,7 @@ app.post('/ussd', async (req, res) => {
       } else if (response.status === 200 && response.data.role === 'buyer') {
         client.set('role', 'buyer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = await menuItems.checkBuyerSelection(textValue, text, req);
+        message = await menuItems.checkBuyerSelection(textValue, text);
       } else if (response.status === 404) {
         message = 'CON User not found';
       } else {

@@ -11,7 +11,7 @@ import { increaseCount } from '../helpers.js';
 let message = '';
 const con = () => 'CON';
 const end = () => 'END';
-const userViewOffers = {};
+
 export const offersArray = [];
 export const cartItems = [];
 export const totalCost = {};
@@ -64,6 +64,7 @@ export const renderOfferings = async (client, id) => {
       const offers = productOffering.data.message.data;
       console.log('Here are the offers', offers);
       offers.forEach((offer) => {
+        const userViewOffers = {};
         offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
         userViewOffers.id = `${offer.id}`;
         userViewOffers.product = `${offer.product_name}`;
@@ -86,10 +87,11 @@ export const renderOfferings = async (client, id) => {
           status[offer.id] = 'both';
         }
         offersArray.push(userViewOffers);
+
         client.set('offersArray', JSON.stringify(offersArray));
       });
       // offeringText += menus.viewCart;
-
+      console.log('The offers array is', offersArray);
       message = `${con()} Choose a product to buy. ${offeringText}`;
     } else {
       message = `${con()} Product not available`;
@@ -124,28 +126,29 @@ export const askForQuantity = () => {
 };
 // Array of offers should be cached
 
-export const confirmQuantityWithPrice = async (userQuantity) => {
+export const confirmQuantityWithPrice = async (userQuantity, productID) => {
   let availableUnits = 0;
   let offers = await retreiveCachedItems(client, ['offersArray']);
   offers = JSON.parse(offers);
-  availableUnits = offers.availableUnits;
+  const buyerSelesction = offers.filter((item) => item.id === productID);
+  console.log('The buyer selection is', buyerSelesction[0]);
+  availableUnits = buyerSelesction[0].availableUnits;
 
   if (userQuantity > availableUnits) {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
-    const pricePoint = parseInt(offers[0].unitPrice, 10);
+    const pricePoint = parseInt(buyerSelesction[0].unitPrice, 10);
     console.log('The price point is', pricePoint);
     console.log('The user quantity is', userQuantity);
     const total = userQuantity * pricePoint;
+    console.log('offers in cart price confirmation', [offers], `${offers}`);
 
-    [offers] = offers;
+    const prompt = `${buyerSelesction[0].product} from ${buyerSelesction[0].farmName} of grade:${buyerSelesction[0].grade} at ${buyerSelesction[0].unitPrice}`;
 
-    const prompt = `${offers.product} from ${offers.farmName} of grade:${offers.grade} at ${offers.unitPrice}`;
-
-    itemSelection.id = `${offers.id}`;
-    itemSelection.product = `${offers.product}`;
-    itemSelection.farmName = `${offers.farmName}`;
-    itemSelection.grade = `${offers.grade}`;
+    itemSelection.id = `${buyerSelesction[0].id}`;
+    itemSelection.product = `${buyerSelesction[0].product}`;
+    itemSelection.farmName = `${buyerSelesction[0].farmName}`;
+    itemSelection.grade = `${buyerSelesction[0].grade}`;
     itemSelection.totalCost = total;
     message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
   }
@@ -349,6 +352,8 @@ export const cartOperations = async (text, menuLevel, level, itemId = null) => {
     const response = await updateQuantityinCart(itemId);
     message = response.message;
   } else if (level === 6) {
+    console.log('Item selection at update ', itemSelection);
+    console.log('Cost', totalCost);
     message = confirmNewQuantity(client, itemSelection, totalCost);
   }
   return message;
@@ -389,14 +394,15 @@ export const showAvailableProducts = async (textValue, text) => {
     console.log('Farm offering status', result.status);
     offeringStatus.push(result.status);
     message = result.message;
-  } else if (textValue === 5 && text.split('*')[4] !== '67') {
-    const selection = text.split('*')[4];
+  } else if (textValue === 5) {
+    const selection = parseInt(text.split('*')[4], 10);
     message = checkGroupAndIndividualPrice(offeringStatus[0][selection]);
   } else if (textValue === 6 && text.split('*')[5] === '1') {
     message = askForQuantity();
   } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
     const userQuantity = parseInt(text.split('*')[6], 10);
-    message = confirmQuantityWithPrice(userQuantity);
+    const id = text.split('*')[4];
+    message = confirmQuantityWithPrice(userQuantity, id);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '1') {
@@ -421,6 +427,8 @@ export const showAvailableProducts = async (textValue, text) => {
     message = await cartOperations(text, 'inner', 5, itemID);
   } else if (textValue === 13 && text.split('*')[10] === '2') {
     message = await cartOperations(text, 'inner', 6);
+  } else if (textValue === 13 && text.split('*')[10] === '1' && text.split('*')[12] === '67') {
+    message = await cartOperations(text, 'inner', 0);
   }
   return message;
 };
