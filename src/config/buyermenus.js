@@ -130,25 +130,26 @@ export const confirmQuantityWithPrice = async (userQuantity, productID) => {
   let availableUnits = 0;
   let offers = await retreiveCachedItems(client, ['offersArray']);
   offers = JSON.parse(offers);
-  const buyerSelesction = offers.filter((item) => item.id === productID);
-  console.log('The buyer selection is', buyerSelesction[0]);
-  availableUnits = buyerSelesction[0].availableUnits;
+  const buyerSelection = offers.filter((item) => item.id === productID);
+  console.log('The buyer selection is', buyerSelection[0]);
+  availableUnits = buyerSelection[0].availableUnits;
 
   if (userQuantity > availableUnits) {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
-    const pricePoint = parseInt(buyerSelesction[0].unitPrice, 10);
+    const pricePoint = parseInt(buyerSelection[0].unitPrice, 10);
     console.log('The price point is', pricePoint);
     console.log('The user quantity is', userQuantity);
     const total = userQuantity * pricePoint;
     console.log('offers in cart price confirmation', [offers], `${offers}`);
 
-    const prompt = `${buyerSelesction[0].product} from ${buyerSelesction[0].farmName} of grade:${buyerSelesction[0].grade} at ${buyerSelesction[0].unitPrice}`;
+    const prompt = `${buyerSelection[0].product} from ${buyerSelection[0].farmName} of grade:${buyerSelection[0].grade} at ${buyerSelection[0].unitPrice}`;
 
-    itemSelection.id = `${buyerSelesction[0].id}`;
-    itemSelection.product = `${buyerSelesction[0].product}`;
-    itemSelection.farmName = `${buyerSelesction[0].farmName}`;
-    itemSelection.grade = `${buyerSelesction[0].grade}`;
+    itemSelection.id = `${buyerSelection[0].id}`;
+    itemSelection.product = `${buyerSelection[0].product}`;
+    itemSelection.farmName = `${buyerSelection[0].farmName}`;
+    itemSelection.grade = `${buyerSelection[0].grade}`;
+    itemSelection.unitPrice = pricePoint;
     itemSelection.totalCost = total;
     message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
   }
@@ -243,8 +244,6 @@ export const removeItemFromCart = async (id) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
     cartItems = JSON.parse(cartItems);
-    console.log('Remove the cat items here are', cartItems);
-
     cartItems.forEach((item) => {
       if (item.id === id) {
         console.log('The item id is', item.id);
@@ -264,24 +263,46 @@ export const removeItemFromCart = async (id) => {
   }
 };
 
-export const updateQuantityinCart = async (id) => {
-  const price = [];
+export const changeQuantity = async (amount, object) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
     cartItems = JSON.parse(cartItems);
-
+    console.log('The amount is', parseInt(amount, 10));
+    const newTotalCost = object.unitPrice * parseInt(amount, 10);
+    object.totalCost = newTotalCost;
+    const updatedObject = object;
+    console.log('The new price is', newTotalCost);
+    console.log('The updated object now', updatedObject);
+    cartItems[cartItems.indexOf(object)] = updatedObject;
+    console.log('Updated object', updatedObject);
+    client.set('cartItems', JSON.stringify(cartItems));
+    const newCartItems = await retreiveCachedItems(client, ['cartItems']);
+    console.log('New cart items', newCartItems);
+    message = `${end()} Updated successfully`;
+    return message;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+export const findItemToChangeQuantity = async (id) => {
+  let itemToUpdate;
+  try {
+    let cartItems = await retreiveCachedItems(client, ['cartItems']);
+    cartItems = JSON.parse(cartItems);
     cartItems.forEach((item) => {
       if (item.id === id) {
+        itemToUpdate = item;
         message = `${con()} What is the quantity you want?`;
-        const index = cartItems.indexOf(item);
-        price.push(cartItems[index].totalCost);
-        addToCart(client, item, price[0]);
+      } else {
+        message = `${con()} Item not found\n`;
       }
     });
-
-    return { message, price: price[0] };
-  } catch (error) {
-    throw new Error(error);
+    return {
+      message,
+      itemToUpdate,
+    };
+  } catch (err) {
+    throw new Error(err);
   }
 };
 
@@ -310,7 +331,7 @@ export const updateCart = async (operation, id = null) => {
   } else if (operation === 'removeItem') {
     message = await removeItemFromCart(id);
   } else if (operation === 'updateItemCount') {
-    message = await updateQuantityinCart(id);
+    message = await findItemToChangeQuantity(id);
   } else {
     message = `${end()} Selection not found`;
   }
@@ -326,7 +347,7 @@ export const updateCart = async (operation, id = null) => {
 6. level 5: If checkout then ask for details and make order
 */
 
-export const cartOperations = async (text, menuLevel, level, itemId = null) => {
+export const cartOperations = async (text, menuLevel, level, itemId = null, index = null) => {
   let selection;
   if (menuLevel === 'inner') {
     // eslint-disable-next-line prefer-destructuring
@@ -350,9 +371,13 @@ export const cartOperations = async (text, menuLevel, level, itemId = null) => {
     message = await removeItemFromCart(itemId);
     console.log('Here is remove', message);
   } else if (level === 5) {
-    const response = await updateQuantityinCart(itemId);
+    const response = await findItemToChangeQuantity(itemId);
     message = response.message;
   } else if (level === 6) {
+    const response = await findItemToChangeQuantity(itemId);
+    const item = response.itemToUpdate;
+    message = changeQuantity(index, item);
+  } else if (level === 7) {
     console.log('Item selection at update ', itemSelection);
     console.log('Cost', totalCost);
     message = confirmNewQuantity(client, itemSelection, totalCost);
@@ -428,7 +453,11 @@ export const showAvailableProducts = async (textValue, text) => {
     const itemID = text.split('*')[11];
     message = await cartOperations(text, 'inner', 5, itemID);
   } else if (textValue === 13 && text.split('*')[10] === '2') {
-    message = await cartOperations(text, 'inner', 6);
+    const itemID = text.split('*')[11];
+    const index = parseInt(text.split('*')[12], 10);
+    // Point A
+    console.log('The index is', index);
+    message = await cartOperations(text, 'inner', 6, itemID, index);
   } else if (textValue === 13 && text.split('*')[10] === '1' && text.split('*')[12] === '67') {
     message = await cartOperations(text, 'inner', 0);
   }

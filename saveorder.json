@@ -1,0 +1,13 @@
+{
+    "center_id": 1,
+    "user_id": 2,
+    "products": [
+        {
+            "id": 1,
+            "product_id": 2,
+            "units": 3,
+            "amount": 45
+        }
+    ],
+    "order_priority": "medium"
+}

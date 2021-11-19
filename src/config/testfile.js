@@ -1,24 +1,17 @@
 import axios from 'axios';
 
-const offers = [
-  {
-    id: '10',
-    product: 'Tomatoes',
-    farmName: 'Now Farm',
-    grade: 'GRADE A',
-    availableUnits: '94',
-    unitPrice: '51',
-    groupPrice: '37',
-  },
-  {
-    id: '2',
-    product: 'Tomatoes',
-    farmName: 'Now Farm',
-    grade: 'GRADE A',
-    availableUnits: '94',
-    unitPrice: '51',
-    groupPrice: '37',
-  },
-];  
+const changeQuantity = (amount, object) => {
+  const newTotalCost = object.unitPrice * amount;
+  object.totalCost = newTotalCost;
+  return object;
+};
 
-console.log(offers.filter((item) => item.id === '10'));
+const item = {
+  id: '2',
+  product: 'Tomatoes',
+  farmName: 'Primes Tomato Farm',
+  grade: 'C',
+  unitPrice: 3000,
+  totalCost: 9000,
+};
+console.log(changeQuantity(2, item));

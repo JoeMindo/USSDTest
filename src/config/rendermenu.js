@@ -106,7 +106,9 @@ export const checkBuyerSelection = async (textValue, text) => {
       } else if (textValue === 6 && text.split('*')[3] === '1' && text.split('*')[5] === '67') {
         message = await buyermenus.cartOperations(text, 'outer', 0);
       } else if (textValue === 6 && text.split('*')[3] === '2') {
-        message = await buyermenus.cartOperations(text, 'outer', 6);
+        message = await buyermenus.cartOperations(text, 'outer', 7);
+      } else if (textValue === 6 && text.split('*')[3] === '2') {
+        message = await buyermenus.changeQuantity()
       }
     }
   }
