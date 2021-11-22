@@ -93,6 +93,8 @@ export const checkBuyerSelection = async (textValue, text) => {
         message = await buyermenus.cartOperations(text, 'outer', 1);
       } else if (textValue === 3 && text.split('*')[2] === '2') {
         message = await buyermenus.cartOperations(text, 'outer', 1);
+      } else if (textValue === 4 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
+        message = await buyermenus.cartOperations(text, 'outer', 8);
       } else if (textValue === 4 && text.split('*')[3] === '1') {
         message = await buyermenus.cartOperations(text, 'outer', 2);
       } else if (textValue === 4 && text.split('*')[3] === '2') {
@@ -107,8 +109,6 @@ export const checkBuyerSelection = async (textValue, text) => {
         message = await buyermenus.cartOperations(text, 'outer', 0);
       } else if (textValue === 6 && text.split('*')[3] === '2') {
         message = await buyermenus.cartOperations(text, 'outer', 7);
-      } else if (textValue === 6 && text.split('*')[3] === '2') {
-        message = await buyermenus.changeQuantity()
       }
     }
   }

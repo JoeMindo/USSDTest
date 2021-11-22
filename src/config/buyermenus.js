@@ -272,8 +272,6 @@ export const changeQuantity = async (amount, object) => {
     console.log('The updated cart items', updatedCartItems);
     const newTotalCost = oldObject.unitPrice * parseInt(amount, 10);
     oldObject.totalCost = newTotalCost;
-    // const updatedObject = object;
-    // updatedCartItems.push(updatedObject);
     console.log('New object', updatedCartItems);
     client.set('cartItems', JSON.stringify(updatedCartItems));
     const newCartItems = await retreiveCachedItems(client, ['cartItems']);
@@ -381,6 +379,32 @@ export const cartOperations = async (text, menuLevel, level, itemId = null, inde
     console.log('Item selection at update ', itemSelection);
     console.log('Cost', totalCost);
     message = confirmNewQuantity(client, itemSelection, totalCost);
+  } else if (level === 8) {
+    let cartItems = await retreiveCachedItems(client, ['user_id', 'cartItems']);
+    cartItems = JSON.parse(cartItems[0]);
+    /*
+    [
+  {
+    id: '2',
+    product: 'Tomatoes',
+    farmName: 'Primes Tomato Farm',
+    grade: 'C',
+    unitPrice: 3000,
+    totalCost: 24000
+  }
+]
+     */
+    const orderDetails = {
+      center_id: 5,
+      user_id: cartItems[0],
+      products: [
+        cartItems[1].id,
+        cartItems[2].id,
+      ],
+
+
+    };
+    console.log('The cart item at making request', cartItems);
   }
   return message;
 };
@@ -394,13 +418,6 @@ export const chooseCenter = (administrativeID) => {
 export const makeOrder = async (orderDetails) => {
   try {
     const makeOrderRequest = await axios.post(`${BASEURL}/api/savebasicorder`, orderDetails);
-    // if (makeOrderRequest.data.status !== 'success') {
-    //   message = `${con()} Something went wrong, please try again`;
-    //   message += menus.footer;
-    // } else {
-    //   message = `${end()} ${makeOrderRequest.data.message
-    //   }`;
-    // }
     console.log('Request is', makeOrderRequest);
     return message;
   } catch (err) {
