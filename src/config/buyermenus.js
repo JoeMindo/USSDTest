@@ -6,7 +6,6 @@ import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 import { retreiveCachedItems } from '../core/services.js';
 import { client } from '../server.js';
-import { increaseCount } from '../helpers.js';
 
 let message = '';
 const con = () => 'CON';
@@ -267,15 +266,16 @@ export const changeQuantity = async (amount, object) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
     cartItems = JSON.parse(cartItems);
-    console.log('The amount is', parseInt(amount, 10));
-    const newTotalCost = object.unitPrice * parseInt(amount, 10);
-    object.totalCost = newTotalCost;
-    const updatedObject = object;
-    console.log('The new price is', newTotalCost);
-    console.log('The updated object now', updatedObject);
-    cartItems[cartItems.indexOf(object)] = updatedObject;
-    console.log('Updated object', updatedObject);
-    client.set('cartItems', JSON.stringify(cartItems));
+    const oldObject = object;
+    console.log('The old object is', oldObject);
+    const updatedCartItems = cartItems.splice(cartItems.indexOf(object), 1);
+    console.log('The updated cart items', updatedCartItems);
+    const newTotalCost = oldObject.unitPrice * parseInt(amount, 10);
+    oldObject.totalCost = newTotalCost;
+    // const updatedObject = object;
+    // updatedCartItems.push(updatedObject);
+    console.log('New object', updatedCartItems);
+    client.set('cartItems', JSON.stringify(updatedCartItems));
     const newCartItems = await retreiveCachedItems(client, ['cartItems']);
     console.log('New cart items', newCartItems);
     message = `${end()} Updated successfully`;
