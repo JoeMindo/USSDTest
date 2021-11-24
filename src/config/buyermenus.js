@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable import/extensions */
 import axios from 'axios';
 
@@ -172,9 +173,18 @@ export const addToCart = async (client, itemsObject, totalPriceObject) => {
         client.set('cartItems', JSON.stringify(cartItems));
       } else if (ok === 1) {
         existingItems = JSON.parse(existingItems);
-        existingItems.push(itemsObject);
-        console.log('The new items', existingItems);
-        client.set('cartItems', JSON.stringify(existingItems));
+        // Check if item is already in cart
+        const index = existingItems.findIndex((item) => item.id === itemsObject.id);
+        console.log('Index of this item is there as', index);
+        if (index === -1) {
+          existingItems.push(itemsObject);
+          client.set('cartItems', JSON.stringify(existingItems));
+        } else {
+          // Increase quantity function
+          existingItems[index].userQuantity += itemsObject.userQuantity;
+          existingItems[index].totalCost = existingItems[index].userQuantity * existingItems[index].unitPrice;
+          client.set('cartItems', JSON.stringify(existingItems));
+        }
       }
     });
     message = `${con()} Cart Items added successfully\n`;
