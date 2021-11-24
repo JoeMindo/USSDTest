@@ -73,7 +73,8 @@ export const renderFarmerMenus = () => {
 };
 export const renderBuyerMenus = () => {
   let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
-  // menuPrompt += `${menus.buyermenu.myCart}\n`;
+  menuPrompt += `${menus.buyermenu.myCart}\n`;
+  menuPrompt += `${menus.buyermenu.myOrders}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
@@ -99,16 +100,24 @@ export const checkBuyerSelection = async (textValue, text) => {
         message = await buyermenus.cartOperations(text, 'outer', 2);
       } else if (textValue === 4 && text.split('*')[3] === '2') {
         message = await buyermenus.cartOperations(text, 'outer', 3);
+      } else if (textValue === 5 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
+        // TODO: Make payment
+        message = await buyermenus.cartOperations(text, 'outer', 9);
       } else if (textValue === 5 && text.split('*')[3] === '1') {
-        const id = text.split('*')[4];
+        const id = parseInt(text.split('*')[4], 10);
         message = await buyermenus.cartOperations(text, 'outer', 4, id);
       } else if (textValue === 5 && text.split('*')[3] === '2') {
-        const id = text.split('*')[4];
+        const id = parseInt(text.split('*')[4], 10);
         message = await buyermenus.cartOperations(text, 'outer', 5, id);
       } else if (textValue === 6 && text.split('*')[3] === '1' && text.split('*')[5] === '67') {
         message = await buyermenus.cartOperations(text, 'outer', 0);
       } else if (textValue === 6 && text.split('*')[3] === '2') {
-        message = await buyermenus.cartOperations(text, 'outer', 7);
+        const id = parseInt(text.split('*')[4], 10);
+        const newQuantity = parseInt(text.split('*')[5], 10);
+        message = await buyermenus.cartOperations(text, 'outer', 6, id, newQuantity);
+      } else if (textValue === 7 && text.split('*')[3] === '2') {
+        const id = parseInt(text.split('*')[4], 10);
+        message = await buyermenus.cartOperations(text, 'outer', 6, id);
       }
     }
   }

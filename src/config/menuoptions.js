@@ -79,6 +79,7 @@ export const menus = {
   buyermenu: {
     viewProducts: '1. View available products',
     myCart: '2. My cart',
+    myOrders: '3. My orders',
   },
 
 };
