@@ -7,6 +7,7 @@ import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 import { retreiveCachedItems } from '../core/services.js';
 import { client } from '../server.js';
+import { renderBuyerMenus } from './rendermenu.js';
 
 let message = '';
 const con = () => 'CON';
@@ -386,7 +387,7 @@ export const cartOperations = async (text, menuLevel, level, itemId = null, inde
   console.log('Selection is', selection);
   if (level === 0) {
     message = await displayCartItems(client);
-  } else if (selection === '1' && level === 1) {
+  } else if ((selection === '1' && level === 1) || (text.split('*')[8] === '1' && level === 1)) {
     message = askForNumber();
   } else if (selection === '2' && level === 1) {
     message = updateCart('firstscreen');
@@ -492,11 +493,11 @@ export const showAvailableProducts = async (textValue, text) => {
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '1') {
-    message = 'CON Checkout here';
+    message = await cartOperations(text, 'inner', 1);
   } else if (textValue === 9 && text.split('*')[8] === '67') {
     message = await cartOperations(text, 'inner', 0);
   } else if (textValue === 10 && text.split('*')[9] === '1') {
-    message = 'CON Checkout will be here';
+    message = await cartOperations(text, 'inner', 8);
   } else if (textValue === 10 && text.split('*')[9] === '2') {
     message = await cartOperations(text, 'inner', 1);
   } else if (textValue === 11 && text.split('*')[10] === '1') {
@@ -524,3 +525,34 @@ export const showAvailableProducts = async (textValue, text) => {
 };
 
 export const makePayment = () => `${con()} Make payment here`;
+
+export const getOrders = async (id) => {
+  let result;
+  try {
+    const viewOrdersRequest = await axios.get(`${BASEURL}/api/showmyorders/${id}`);
+    if (viewOrdersRequest.data.status === 'error') {
+      result = viewOrdersRequest.data.message;
+    } else {
+      result = viewOrdersRequest.data.message.data;
+    }
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const viewOrders = async (id) => {
+  const cachedOrders = await retreiveCachedItems(client, ['myOrders']);
+  let result;
+  const isPresent = await client.exists('myOrders');
+  console.log('Is present', isPresent);
+  console.log('the cached', typeof (cachedOrders[0]));
+  if (isPresent === true && typeof (cachedOrders[0]) === 'string') {
+    const orders = await getOrders(id);
+    client.set('myOrders', JSON.stringify(orders));
+    console.log('Fetched orders', orders);
+    const newOrders = await retreiveCachedItems(client, ['myOrders']);
+    console.log('The new orders are', newOrders);
+  }
+  return result;
+};

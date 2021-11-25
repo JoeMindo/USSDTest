@@ -7,6 +7,7 @@ import * as farmerMenus from './farmermenus.js';
 import * as buyermenus from './buyermenus.js';
 import { client } from '../server.js';
 import { offersArray } from './buyermenus.js';
+import { retreiveCachedItems } from '../core/services.js';
 
 export const con = () => 'CON';
 export const end = () => 'END';
@@ -119,6 +120,13 @@ export const checkBuyerSelection = async (textValue, text) => {
         const id = parseInt(text.split('*')[4], 10);
         message = await buyermenus.cartOperations(text, 'outer', 6, id);
       }
+    } else if (selection === '3') {
+      let userId = await retreiveCachedItems(client, ['user_id']);
+      userId = parseInt(userId[0], 10);
+      console.log('The user ID', userId);
+      const result = await buyermenus.viewOrders(userId);
+      message += `${con()} ${result}`;
+      message += menus.footer;
     }
   }
 
