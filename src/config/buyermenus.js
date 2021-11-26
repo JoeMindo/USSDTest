@@ -542,17 +542,16 @@ export const getOrders = async (id) => {
 };
 
 export const viewOrders = async (id) => {
-  const cachedOrders = await retreiveCachedItems(client, ['myOrders']);
-  let result;
-  const isPresent = await client.exists('myOrders');
-  console.log('Is present', isPresent);
-  console.log('the cached', typeof (cachedOrders[0]));
-  if (isPresent === true && typeof (cachedOrders[0]) === 'string') {
-    const orders = await getOrders(id);
-    client.set('myOrders', JSON.stringify(orders));
-    console.log('Fetched orders', orders);
-    const newOrders = await retreiveCachedItems(client, ['myOrders']);
-    console.log('The new orders are', newOrders);
+  let prompt = '';
+  const orders = await getOrders(id);
+  if (typeof (orders) === 'string') {
+    message = orders;
+  } else if (typeof (orders) === 'object') {
+    orders.forEach((order, index) => {
+      prompt += `${index}. ${order.order_id} ${order.amount} ${order.payment_status}\n`;
+    });
+    message = prompt;
   }
-  return result;
+
+  return message;
 };
