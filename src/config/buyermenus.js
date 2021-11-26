@@ -25,6 +25,17 @@ const centersMapping = {
   3: 'Center 4',
 };
 
+export const priceToUse = (availablePriceType, choice) => {
+  let status;
+  if ((availablePriceType === 'both' && choice === '1') || (availablePriceType === 'unit')) {
+    status = 'unit';
+  } else if ((availablePriceType === 'both' && choice === '2') || availablePriceType === 'group') {
+    status = 'group';
+  }
+  console.log('The price to use', status);
+  return status;
+};
+
 export const renderProductCategories = async () => {
   try {
     const response = await fetchCategories();
@@ -94,7 +105,7 @@ export const renderOfferings = async (client, id) => {
       });
       // offeringText += menus.viewCart;
       console.log('The offers array is', offersArray);
-      message = `${con()} Choose a product to buy. ${offeringText}`;
+      message = `${con()} Choose one of the available options to buy. ${offeringText}`;
     } else {
       message = `${con()} Product not available`;
       message += menus.footer;
@@ -109,7 +120,6 @@ export const renderOfferings = async (client, id) => {
 };
 
 export const checkGroupAndIndividualPrice = (status) => {
-  console.log('Status of group');
   if (status === 'both') {
     message = `${con()} Select the price you want to buy at\n 1. Group\n 2. Unit price \n`;
   } else if (status === 'unit') {
@@ -128,8 +138,9 @@ export const askForQuantity = () => {
 };
 // Array of offers should be cached
 
-export const confirmQuantityWithPrice = async (userQuantity, productID) => {
+export const confirmQuantityWithPrice = async (userQuantity, productID, status) => {
   let availableUnits = 0;
+  let pricePoint;
   let offers = await retreiveCachedItems(client, ['offersArray']);
   offers = JSON.parse(offers);
   const buyerSelection = offers.filter((item) => item.id === productID);
@@ -139,7 +150,14 @@ export const confirmQuantityWithPrice = async (userQuantity, productID) => {
   if (userQuantity > availableUnits) {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
-    const pricePoint = parseInt(buyerSelection[0].unitPrice, 10);
+    if (status === 'unit') {
+      pricePoint = parseInt(buyerSelection[0].unitPrice, 10);
+      console.log('The unit price', pricePoint);
+    } else if (status === 'group') {
+      console.log('The buyerSelection', buyerSelection[0]);
+      pricePoint = parseInt(buyerSelection[0].groupPrice, 10);
+      console.log('The unit price', pricePoint);
+    }
     console.log('The price point is', pricePoint);
     console.log('The user quantity is', userQuantity);
     const total = userQuantity * pricePoint;
@@ -480,16 +498,19 @@ export const showAvailableProducts = async (textValue, text) => {
     console.log('Offering status array at 4', offeringStatus);
     message = result.message;
   } else if (textValue === 5) {
-    console.log('Offering status array at 5', offeringStatus);
     const selection = parseInt(text.split('*')[4], 10);
-    console.log('Check group and individual price', offeringStatus[offeringStatus.length - 1][selection]);
     message = checkGroupAndIndividualPrice(offeringStatus[offeringStatus.length - 1][selection]);
-  } else if (textValue === 6 && text.split('*')[5] === '1') {
+  } else if (textValue === 6) {
     message = askForQuantity();
   } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
     const userQuantity = parseInt(text.split('*')[6], 10);
     const id = text.split('*')[4];
-    message = confirmQuantityWithPrice(userQuantity, id);
+    const typeOfOffering = offeringStatus[offeringStatus.length - 1];
+    const selection = parseInt(text.split('*')[4], 10);
+    const purchasingOption = text.split('*')[5];
+    console.log('This', typeOfOffering[selection]);
+    const price = priceToUse(typeOfOffering[selection], purchasingOption);
+    message = confirmQuantityWithPrice(userQuantity, id, price);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '1') {
