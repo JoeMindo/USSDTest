@@ -234,15 +234,15 @@ export const displayCartItems = async (client) => {
   try {
     let prompt = '';
     let fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
-    console.log('Cached cart items', fetchCartItems);
-    fetchCartItems = JSON.parse(fetchCartItems);
-    if (fetchCartItems.length > 0) {
+    console.log('Cached cart items', fetchCartItems[0]);
+    if (fetchCartItems.length > 0 && fetchCartItems[0] !== null) {
+      fetchCartItems = JSON.parse(fetchCartItems);
       fetchCartItems.forEach((item) => {
         prompt += `${item.id}. ${item.product} from ${item.farmName} grade: ${item.grade}  at KES ${item.totalCost}\n`;
       });
       const availableTotal = fetchCartItems.reduce((total, obj) => obj.totalCost + total, 0);
       message = `${con()} Your cart items are\n ${prompt} Total ${availableTotal}\n 1. Checkout\n 2. Update Cart`;
-    } else {
+    } else if (fetchCartItems[0] === null) {
       message = `${con()} You have no items at the moment\n Go home and add products`;
       message += menus.footer;
     }
