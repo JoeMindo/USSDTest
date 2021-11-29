@@ -20,6 +20,7 @@ export const itemSelection = {};
 const offeringStatus = [];
 
 const centersMapping = {
+
   1: 'Center 1',
   2: 'Center 2',
   3: 'Center 4',
@@ -121,7 +122,7 @@ export const renderOfferings = async (client, id) => {
 
 export const checkGroupAndIndividualPrice = (status) => {
   if (status === 'both') {
-    message = `${con()} Select the price you want to buy at\n 1. Group\n 2. Unit price \n`;
+    message = `${con()} Select the price you want to buy at\n 1. Unit Price\n 2. Group price \n`;
   } else if (status === 'unit') {
     message = `${con()} Buy item at unit price\n 1. Yes\n `;
   } else if (status === 'group') {
@@ -163,7 +164,7 @@ export const confirmQuantityWithPrice = async (userQuantity, productID, status) 
     const total = userQuantity * pricePoint;
     console.log('offers in cart price confirmation', [offers], `${offers}`);
 
-    const prompt = `${buyerSelection[0].product} from ${buyerSelection[0].farmName} of grade:${buyerSelection[0].grade} at ${buyerSelection[0].unitPrice}`;
+    const prompt = `${buyerSelection[0].product} from ${buyerSelection[0].farmName} of grade:${buyerSelection[0].grade} at ${pricePoint}`;
 
     itemSelection.id = parseInt(`${buyerSelection[0].id}`, 10);
     itemSelection.product = `${buyerSelection[0].product}`;
@@ -508,7 +509,11 @@ export const showAvailableProducts = async (textValue, text) => {
     const typeOfOffering = offeringStatus[offeringStatus.length - 1];
     const selection = parseInt(text.split('*')[4], 10);
     const purchasingOption = text.split('*')[5];
-    console.log('This', typeOfOffering[selection]);
+    console.log('This is the type of offering', typeOfOffering);
+    console.log('This is the user quantity', userQuantity);
+    console.log('This is the selection', selection);
+    console.log('This is the purchasing option', purchasingOption);
+    console.log('Available price type', typeOfOffering[selection]);
     const price = priceToUse(typeOfOffering[selection], purchasingOption);
     message = confirmQuantityWithPrice(userQuantity, id, price);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
