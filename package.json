@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "mocha test/**/*.js",
+    "test": "mocha test/**/*.js --timeout 10000",
     "start": "node --experimental-json-modules src/server.js",
     "dev": "nodemon src/server.js"
   },
@@ -31,6 +31,7 @@
     "jest": "^27.3.1",
     "mocha": "^9.0.3",
     "mocha-axios": "^1.4.2",
+    "nock": "^13.2.1",
     "nodemon": "^2.0.13",
     "sinon": "^11.1.2",
     "stylelint": "^13.13.1",
