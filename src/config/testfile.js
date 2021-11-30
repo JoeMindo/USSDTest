@@ -1,15 +1,19 @@
-import { text } from 'body-parser';
-import { retreiveCachedItems } from '../core/services.js';
-import { client } from '../server.js';
+import axios from 'axios';
+import { BASEURL } from './urls.js';
 
-const test = async () => {
-  const isPresent = await retreiveCachedItems(client, ['myOrders']);
-  return isPresent;
+const checkIfUserExists = async (phone) => {
+  let userStatus;
+  try {
+    const details = {
+      phone_no: phone,
+    };
+    const response = await axios.post(`${BASEURL}/api/isuser`, details);
+    userStatus = response.data.message;
+    return userStatus;
+  } catch (err) {
+    throw new Error(err);
+  }
 };
-const gotten = async () => {
-  const isPresent = await test();
-  return isPresent[0];
-};
-console.log(await gotten());
 
 // eslint-disable-next-line import/prefer-default-export
+console.log(await checkIfUserExists('0719408977'));

@@ -1,4 +1,4 @@
-const registerResponse = {
+export const registerResponse = {
   status: 'success',
   data: {
     phone_no: '+254710431513',
@@ -14,11 +14,11 @@ const registerResponse = {
   token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMjU5YTg0NmI4MzBlNjVjMDNiZjZlZjJlYzU3MjcxN2M2NWQ5MWI4YzQxOGM2MmMzMGE3NGJlNTg5ZjYwYTgxMWMxNGEyMzcyNTVkOTY2NzAiLCJpYXQiOjE2MzgyMDk2MDAuNzkzMDk1LCJuYmYiOjE2MzgyMDk2MDAuNzkzMTA0LCJleHAiOjE2Njk3NDU2MDAuNzY5MzI0LCJzdWIiOiIyNSIsInNjb3BlcyI6W119.ow6dwMZBWYJ_Xe44lWVlAjQFT5q54mbH-3Jk7eqUz9H6s0wehJeEAAwxzAIRDe6-sw3OYmPTzEmCeJ8Y61GNV77ZsmsFL75iwhwxlllR0yiBeBXOJGTgMMmYxQNZMRtVMd1o1BUNRk833eUljsagtyeN8_6XQ_p5OnCjSUq4cWXst68yeXEYnOevHF7DrPtmdMHSJJ2wckcFl4GbcpNJ4PQIpLDWoLAuasb06fyQiNEozJ0rLP-4b9q6EXZPOmUIJtY5g4egZgti1K8SIvcUtkd1l3o_Wt-HLKUudKZlx_6XW2_0VYGg7WwfXkabSNSp83QmXnrfqlanDGspp6u1kLIWC3w-H_AN2CAGKZGdiKNlWn3Un9Q7szMTAL14vyvpGmtF4fFg4GZiu3G1rBjUBmPv1VrqAzl4ryRCWrlkIQbRKuyxcAcVORJOzJUL5DF2KV2ZCThfHJjH4H7N1lr9krhxAY8cOkzyN8_NeKbWhgTxcjrrO6CKuJyiXEL3cam2w1u7S2As6JWSlGN3ZVPBWGc7kSSFo47vFIg1hewTmARDZdVNx5auriysDuaYGZhagrQNprnYbOQIkmJcY2Cu5d0eJxbyArOOd8RAfFNSewasUHyeDmJnpUmBeNmKqaeZjPhonUZTNz2dCfBlfGORaVJR3umKXDeIEQZamqR9Alk',
 };
 
-export const loginResponse = {
+export const loginResponseSuccess = {
   status: 'success',
   login: 'true',
   role_id: 3,
-  role: 'dean',
+  role: 'buyer',
   user_id: 2,
   location: false,
   geo_status: false,
@@ -27,5 +27,91 @@ export const loginResponse = {
     userId: 2,
   },
 };
+export const loginResponseFailure = {
 
+  status: 'error',
+  message: 'kindly check your credentials',
+
+};
+export const registrationFailureMissingFields = {
+  status: 'error',
+  data: {
+    phone_no: null,
+    password: null,
+    password_confirmation: null,
+    role_id: null,
+  },
+  errors: {
+    phone_no: [
+      'The phone no field is required.',
+    ],
+    password: [
+      'The password field is required.',
+    ],
+    role_id: [
+      'The role id must be a string.',
+    ],
+  },
+};
+
+export const registrationFailureDuplicateNumber = {
+  status: 'error',
+  data: {
+    phone_no: '0713289481',
+    password: null,
+    password_confirmation: null,
+    role_id: null,
+  },
+  errors: {
+    phone_no: [
+      'The phone no has already been taken.',
+    ],
+    password: [
+      'The password field is required.',
+    ],
+    role_id: [
+      'The role id must be a string.',
+    ],
+  },
+};
+export const registrationFailureWrongDataTypeForFields = {
+  status: 'error',
+  data: {
+    phone_no: '254700000567',
+    password: 'TestPass',
+    password_confirmation: 'TestPass',
+    role_id: 1,
+  },
+  errors: {
+    role_id: [
+      'The role id must be a string.',
+    ],
+  },
+
+};
+export const registrationFailurePasswordTooShort = {
+  status: 'error',
+  data: {
+    phone_no: '254700000567',
+    password: 'Test',
+    password_confirmation: 'Test',
+    role_id: '1',
+  },
+  errors: {
+    password: [
+      'The password must be at least 8 characters.',
+    ],
+  },
+
+};
+
+export const isUserSuccess = {
+  status: 'success',
+  message: true,
+};
+
+export const isUserFailure = {
+  status: 'error',
+  message: false,
+};
 export default registerResponse;
