@@ -80,6 +80,11 @@ export const menus = {
     viewProducts: '1. View available products',
     myCart: '2. My cart',
     myOrders: '3. My orders',
+    groupOrder: '4. Group order\n',
+    createGroup: '1. Create Group\n',
+    groupToJoin: '1. What group would you like to buy from?\n',
+    groupName: '1. What is the name of your group?\n',
+
   },
 
 };

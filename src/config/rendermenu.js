@@ -5,6 +5,7 @@
 import { menus } from './menuoptions.js';
 import * as farmerMenus from './farmermenus.js';
 import * as buyermenus from './buyermenus.js';
+import * as groupOrderMenus from './groupOrder.js';
 import { client } from '../server.js';
 import { offersArray } from './buyermenus.js';
 import { retreiveCachedItems } from '../core/services.js';
@@ -76,6 +77,7 @@ export const renderBuyerMenus = () => {
   let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
   menuPrompt += `${menus.buyermenu.myCart}\n`;
   menuPrompt += `${menus.buyermenu.myOrders}\n`;
+  menuPrompt += `${menus.buyermenu.groupOrder}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
@@ -123,10 +125,33 @@ export const checkBuyerSelection = async (textValue, text) => {
     } else if (selection === '3') {
       let userId = await retreiveCachedItems(client, ['user_id']);
       userId = parseInt(userId[0], 10);
-      console.log('The user ID', userId);
       const result = await buyermenus.viewOrders(userId);
-      message += `${con()} ${result}`;
+      message = `${con()} ${result}`;
       message += menus.footer;
+    } else if (selection === '4') {
+      // const status = await groupOrderMenus.checkIfUserIsInGroup();
+      message = groupOrderMenus.actionToTake(false);
+      if (textValue === 3) {
+        message = groupOrderMenus.requestGroupName();
+      } else if (textValue === 4) {
+        let userId = await retreiveCachedItems(client, ['user_id']);
+        userId = parseInt(userId[0], 10);
+        const groupData = {
+          dean_id: 4,
+          group_name: text.split('*')[3],
+          group_type: 2,
+          status: 1,
+        };
+        const response = await groupOrderMenus.createGroup(groupData);
+        message = groupOrderMenus.groupCreationMessage(response);
+      } else {
+        // const groupMembershipStatus = await groupOrderMenus.checkIfUserIsInGroup();
+        // if (typeof groupMembershipStatus === 'number') {
+        //   // const groupID = groupMembershipStatus;
+        //   console.log('The next stop');
+        // }
+        message = await groupOrderMenus.groupPricedItems(textValue, text);
+      }
     }
   }
 

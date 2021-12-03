@@ -448,20 +448,20 @@ export const cartOperations = async (text, menuLevel, level, itemId = null, inde
     });
 
     const cartSelections = {
-      center_id: 5,
-      user_id: details[0],
+      centre_id: 5,
+      user_id: parseInt(details[0], 10),
       products,
       order_priority: 'medium',
 
     };
     console.log('The final selections', cartSelections);
     const response = await makeOrder(cartSelections);
-    if (response.data.status === 'success') {
+    console.log('The response is', response);
+    if (response.status === 200) {
       client.del('cartItems');
       message = `${end()} ${response.data.message}`;
-    } else if (response.data.status === 'error') {
-      message = `${con()} ${response.data.message}`;
-      message += menus.footer;
+    } else if (response === 'Error') {
+      message = `${end()} Similar order exists for this user`;
     }
   } else if (level === 9) {
     message = makePayment();
@@ -471,17 +471,20 @@ export const cartOperations = async (text, menuLevel, level, itemId = null, inde
 
 export const chooseCenter = (administrativeID) => {
   let message = `${con()} Choose a place where you will pick your goods\n`;
-  message += `1. ${centersMapping[administrativeID]}`;
+  const center = centersMapping[`${administrativeID}`];
+  message += `1. ${center}`;
   return message;
 };
 
 export const makeOrder = async (cartSelections) => {
   try {
     const makeOrderRequest = await axios.post(`${BASEURL}/api/savebasicorder`, cartSelections);
-    console.log('The make order request is', makeOrderRequest);
-    return makeOrderRequest;
+    console.log(makeOrderRequest);
+    if (makeOrderRequest.status === 200) {
+      return makeOrderRequest;
+    }
   } catch (err) {
-    throw new Error(err);
+    return 'Error';
   }
 };
 
@@ -509,12 +512,8 @@ export const showAvailableProducts = async (textValue, text) => {
     const typeOfOffering = offeringStatus[offeringStatus.length - 1];
     const selection = parseInt(text.split('*')[4], 10);
     const purchasingOption = text.split('*')[5];
-    console.log('This is the type of offering', typeOfOffering);
-    console.log('This is the user quantity', userQuantity);
-    console.log('This is the selection', selection);
-    console.log('This is the purchasing option', purchasingOption);
-    console.log('Available price type', typeOfOffering[selection]);
-    const price = priceToUse(typeOfOffering[selection], purchasingOption);
+    const availablePrice = typeOfOffering[`${selection}`];
+    const price = priceToUse(availablePrice, purchasingOption);
     message = confirmQuantityWithPrice(userQuantity, id, price);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
@@ -573,8 +572,12 @@ export const viewOrders = async (id) => {
   if (typeof (orders) === 'string') {
     message = orders;
   } else if (typeof (orders) === 'object') {
+    let paymentStatus = '';
     orders.forEach((order, index) => {
-      prompt += `${index}. ${order.order_id} ${order.amount} ${order.payment_status}\n`;
+      if (order.payment_status === null) {
+        paymentStatus = 'Not paid';
+      }
+      prompt += `${index}. ${order.order_id} KES${order.amount} Payment-Status:${paymentStatus} \n`;
     });
     message = prompt;
   }
