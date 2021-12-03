@@ -102,14 +102,14 @@ const checkIfUserExistsOld = async (phone) => {
   }
 };
 
-const checkIfUserExists = async (phone, client) => {
+const checkIfUserExists = async (phone) => {
   let userStatus;
   try {
-    userStatus = await retreiveCachedItems(client, ['userStatus']);
-    if (userStatus[0] === null) {
-      userStatus = await checkIfUserExistsOld(phone);
-    }
-    console.log('Updated status is', userStatus);
+    const details = {
+      phone_no: phone,
+    };
+    const response = await axios.post(`${BASEURL}/api/isuser`, details);
+    userStatus = response.data.message;
     return userStatus;
   } catch (err) {
     throw new Error(err);

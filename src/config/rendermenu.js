@@ -5,8 +5,10 @@
 import { menus } from './menuoptions.js';
 import * as farmerMenus from './farmermenus.js';
 import * as buyermenus from './buyermenus.js';
+import * as groupOrderMenus from './groupOrder.js';
 import { client } from '../server.js';
 import { offersArray } from './buyermenus.js';
+import { retreiveCachedItems } from '../core/services.js';
 
 export const con = () => 'CON';
 export const end = () => 'END';
@@ -73,7 +75,9 @@ export const renderFarmerMenus = () => {
 };
 export const renderBuyerMenus = () => {
   let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
-  // menuPrompt += `${menus.buyermenu.myCart}\n`;
+  menuPrompt += `${menus.buyermenu.myCart}\n`;
+  menuPrompt += `${menus.buyermenu.myOrders}\n`;
+  menuPrompt += `${menus.buyermenu.groupOrder}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
@@ -86,11 +90,68 @@ export const checkBuyerSelection = async (textValue, text) => {
     const selection = text.split('*')[1];
     if (selection === '1') {
       message = await buyermenus.showAvailableProducts(textValue, text);
-    // } else if (selection === '2') {
-    //   message = await buyermenus.cartOperations(text, 'outer', 0);
-    //   console.log(message);
-    } else {
-      message = 'CON Invalid menus ';
+    } else if (selection === '2') {
+      if (textValue === 2) {
+        message = await buyermenus.cartOperations(text, 'outer', 0);
+      } else if (textValue === 3 && text.split('*')[2] === '1') {
+        message = await buyermenus.cartOperations(text, 'outer', 1);
+      } else if (textValue === 3 && text.split('*')[2] === '2') {
+        message = await buyermenus.cartOperations(text, 'outer', 1);
+      } else if (textValue === 4 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
+        message = await buyermenus.cartOperations(text, 'outer', 8);
+      } else if (textValue === 4 && text.split('*')[3] === '1') {
+        message = await buyermenus.cartOperations(text, 'outer', 2);
+      } else if (textValue === 4 && text.split('*')[3] === '2') {
+        message = await buyermenus.cartOperations(text, 'outer', 3);
+      } else if (textValue === 5 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
+        // TODO: Make payment
+        message = await buyermenus.cartOperations(text, 'outer', 9);
+      } else if (textValue === 5 && text.split('*')[3] === '1') {
+        const id = parseInt(text.split('*')[4], 10);
+        message = await buyermenus.cartOperations(text, 'outer', 4, id);
+      } else if (textValue === 5 && text.split('*')[3] === '2') {
+        const id = parseInt(text.split('*')[4], 10);
+        message = await buyermenus.cartOperations(text, 'outer', 5, id);
+      } else if (textValue === 6 && text.split('*')[3] === '1' && text.split('*')[5] === '67') {
+        message = await buyermenus.cartOperations(text, 'outer', 0);
+      } else if (textValue === 6 && text.split('*')[3] === '2') {
+        const id = parseInt(text.split('*')[4], 10);
+        const newQuantity = parseInt(text.split('*')[5], 10);
+        message = await buyermenus.cartOperations(text, 'outer', 6, id, newQuantity);
+      } else if (textValue === 7 && text.split('*')[3] === '2') {
+        const id = parseInt(text.split('*')[4], 10);
+        message = await buyermenus.cartOperations(text, 'outer', 6, id);
+      }
+    } else if (selection === '3') {
+      let userId = await retreiveCachedItems(client, ['user_id']);
+      userId = parseInt(userId[0], 10);
+      const result = await buyermenus.viewOrders(userId);
+      message = `${con()} ${result}`;
+      message += menus.footer;
+    } else if (selection === '4') {
+      // const status = await groupOrderMenus.checkIfUserIsInGroup();
+      message = groupOrderMenus.actionToTake(false);
+      if (textValue === 3) {
+        message = groupOrderMenus.requestGroupName();
+      } else if (textValue === 4) {
+        let userId = await retreiveCachedItems(client, ['user_id']);
+        userId = parseInt(userId[0], 10);
+        const groupData = {
+          dean_id: 4,
+          group_name: text.split('*')[3],
+          group_type: 2,
+          status: 1,
+        };
+        const response = await groupOrderMenus.createGroup(groupData);
+        message = groupOrderMenus.groupCreationMessage(response);
+      } else {
+        // const groupMembershipStatus = await groupOrderMenus.checkIfUserIsInGroup();
+        // if (typeof groupMembershipStatus === 'number') {
+        //   // const groupID = groupMembershipStatus;
+        //   console.log('The next stop');
+        // }
+        message = await groupOrderMenus.groupPricedItems(textValue, text);
+      }
     }
   }
 

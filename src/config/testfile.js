@@ -1,24 +1,19 @@
 import axios from 'axios';
+import { BASEURL } from './urls.js';
 
-const offers = [
-  {
-    id: '10',
-    product: 'Tomatoes',
-    farmName: 'Now Farm',
-    grade: 'GRADE A',
-    availableUnits: '94',
-    unitPrice: '51',
-    groupPrice: '37',
-  },
-  {
-    id: '2',
-    product: 'Tomatoes',
-    farmName: 'Now Farm',
-    grade: 'GRADE A',
-    availableUnits: '94',
-    unitPrice: '51',
-    groupPrice: '37',
-  },
-];  
+const checkIfUserExists = async (phone) => {
+  let userStatus;
+  try {
+    const details = {
+      phone_no: phone,
+    };
+    const response = await axios.post(`${BASEURL}/api/isuser`, details);
+    userStatus = response.data.message;
+    return userStatus;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
 
-console.log(offers.filter((item) => item.id === '10'));
+// eslint-disable-next-line import/prefer-default-export
+console.log(await checkIfUserExists('0719408977'));

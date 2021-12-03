@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable import/extensions */
 import axios from 'axios';
 
@@ -6,7 +7,7 @@ import { menus } from './menuoptions.js';
 import { BASEURL } from './urls.js';
 import { retreiveCachedItems } from '../core/services.js';
 import { client } from '../server.js';
-import { increaseCount } from '../helpers.js';
+import { renderBuyerMenus } from './rendermenu.js';
 
 let message = '';
 const con = () => 'CON';
@@ -19,9 +20,21 @@ export const itemSelection = {};
 const offeringStatus = [];
 
 const centersMapping = {
+
   1: 'Center 1',
   2: 'Center 2',
   3: 'Center 4',
+};
+
+export const priceToUse = (availablePriceType, choice) => {
+  let status;
+  if ((availablePriceType === 'both' && choice === '1') || (availablePriceType === 'unit')) {
+    status = 'unit';
+  } else if ((availablePriceType === 'both' && choice === '2') || availablePriceType === 'group') {
+    status = 'group';
+  }
+  console.log('The price to use', status);
+  return status;
 };
 
 export const renderProductCategories = async () => {
@@ -70,6 +83,7 @@ export const renderOfferings = async (client, id) => {
         userViewOffers.product = `${offer.product_name}`;
         userViewOffers.farmName = `${offer.farm_name}`;
         userViewOffers.grade = `${offer.grade}`;
+        userViewOffers.product_id = `${offer.product_id}`;
         userViewOffers.availableUnits = `${offer.available_units}`;
 
         if (offer.status === '0') {
@@ -92,7 +106,7 @@ export const renderOfferings = async (client, id) => {
       });
       // offeringText += menus.viewCart;
       console.log('The offers array is', offersArray);
-      message = `${con()} Choose a product to buy. ${offeringText}`;
+      message = `${con()} Choose one of the available options to buy. ${offeringText}`;
     } else {
       message = `${con()} Product not available`;
       message += menus.footer;
@@ -107,9 +121,8 @@ export const renderOfferings = async (client, id) => {
 };
 
 export const checkGroupAndIndividualPrice = (status) => {
-  console.log('Status of group');
   if (status === 'both') {
-    message = `${con()} Select the price you want to buy at\n 1. Group\n 2. Unit price \n`;
+    message = `${con()} Select the price you want to buy at\n 1. Unit Price\n 2. Group price \n`;
   } else if (status === 'unit') {
     message = `${con()} Buy item at unit price\n 1. Yes\n `;
   } else if (status === 'group') {
@@ -126,29 +139,41 @@ export const askForQuantity = () => {
 };
 // Array of offers should be cached
 
-export const confirmQuantityWithPrice = async (userQuantity, productID) => {
+export const confirmQuantityWithPrice = async (userQuantity, productID, status) => {
   let availableUnits = 0;
+  let pricePoint;
   let offers = await retreiveCachedItems(client, ['offersArray']);
   offers = JSON.parse(offers);
-  const buyerSelesction = offers.filter((item) => item.id === productID);
-  console.log('The buyer selection is', buyerSelesction[0]);
-  availableUnits = buyerSelesction[0].availableUnits;
+  const buyerSelection = offers.filter((item) => item.id === productID);
+  console.log('The buyer selection is', buyerSelection[0]);
+  availableUnits = buyerSelection[0].availableUnits;
 
   if (userQuantity > availableUnits) {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
-    const pricePoint = parseInt(buyerSelesction[0].unitPrice, 10);
+    if (status === 'unit') {
+      pricePoint = parseInt(buyerSelection[0].unitPrice, 10);
+      console.log('The unit price', pricePoint);
+    } else if (status === 'group') {
+      console.log('The buyerSelection', buyerSelection[0]);
+      pricePoint = parseInt(buyerSelection[0].groupPrice, 10);
+      console.log('The unit price', pricePoint);
+    }
     console.log('The price point is', pricePoint);
     console.log('The user quantity is', userQuantity);
     const total = userQuantity * pricePoint;
     console.log('offers in cart price confirmation', [offers], `${offers}`);
 
-    const prompt = `${buyerSelesction[0].product} from ${buyerSelesction[0].farmName} of grade:${buyerSelesction[0].grade} at ${buyerSelesction[0].unitPrice}`;
+    const prompt = `${buyerSelection[0].product} from ${buyerSelection[0].farmName} of grade:${buyerSelection[0].grade} at ${pricePoint}`;
 
-    itemSelection.id = `${buyerSelesction[0].id}`;
-    itemSelection.product = `${buyerSelesction[0].product}`;
-    itemSelection.farmName = `${buyerSelesction[0].farmName}`;
-    itemSelection.grade = `${buyerSelesction[0].grade}`;
+    itemSelection.id = parseInt(`${buyerSelection[0].id}`, 10);
+    itemSelection.product = `${buyerSelection[0].product}`;
+    itemSelection.farmName = `${buyerSelection[0].farmName}`;
+    itemSelection.grade = `${buyerSelection[0].grade}`;
+    // TODO: This should return an integer
+    itemSelection.product_id = parseInt(`${buyerSelection[0].product_id}`, 10);
+    itemSelection.userQuantity = parseInt(`${userQuantity}`, 10);
+    itemSelection.unitPrice = pricePoint;
     itemSelection.totalCost = total;
     message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
   }
@@ -156,10 +181,32 @@ export const confirmQuantityWithPrice = async (userQuantity, productID) => {
   return message;
 };
 
-export const addToCart = (client, itemsObject, totalPriceObject) => {
+export const addToCart = async (client, itemsObject, totalPriceObject) => {
+  console.log('The items object at this instance', itemsObject);
   if (itemsObject && totalPriceObject) {
-    cartItems.push(itemsObject);
-    client.set('cartItems', JSON.stringify(cartItems));
+    let existingItems = await retreiveCachedItems(client, ['cartItems']);
+    client.exists('cartItems', (err, ok) => {
+      if (err) throw err;
+      if (ok === 0) {
+        cartItems.push(itemsObject);
+        console.log('The cart items at add to cart are', cartItems);
+        client.set('cartItems', JSON.stringify(cartItems));
+      } else if (ok === 1) {
+        existingItems = JSON.parse(existingItems);
+        // Check if item is already in cart
+        const index = existingItems.findIndex((item) => item.id === itemsObject.id);
+        console.log('Index of this item is there as', index);
+        if (index === -1) {
+          existingItems.push(itemsObject);
+          client.set('cartItems', JSON.stringify(existingItems));
+        } else {
+          // Increase quantity function
+          existingItems[index].userQuantity += itemsObject.userQuantity;
+          existingItems[index].totalCost = existingItems[index].userQuantity * existingItems[index].unitPrice;
+          client.set('cartItems', JSON.stringify(existingItems));
+        }
+      }
+    });
     message = `${con()} Cart Items added successfully\n`;
     message += '1. Checkout\n';
     message += '67. View Cart';
@@ -187,15 +234,15 @@ export const displayCartItems = async (client) => {
   try {
     let prompt = '';
     let fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
-    console.log('Cached cart items', fetchCartItems);
-    fetchCartItems = JSON.parse(fetchCartItems);
-    if (fetchCartItems.length > 0) {
+    console.log('Cached cart items', fetchCartItems[0]);
+    if (fetchCartItems.length > 0 && fetchCartItems[0] !== null) {
+      fetchCartItems = JSON.parse(fetchCartItems);
       fetchCartItems.forEach((item) => {
         prompt += `${item.id}. ${item.product} from ${item.farmName} grade: ${item.grade}  at KES ${item.totalCost}\n`;
       });
       const availableTotal = fetchCartItems.reduce((total, obj) => obj.totalCost + total, 0);
       message = `${con()} Your cart items are\n ${prompt} Total ${availableTotal}\n 1. Checkout\n 2. Update Cart`;
-    } else {
+    } else if (fetchCartItems[0] === null) {
       message = `${con()} You have no items at the moment\n Go home and add products`;
       message += menus.footer;
     }
@@ -243,8 +290,7 @@ export const removeItemFromCart = async (id) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
     cartItems = JSON.parse(cartItems);
-    console.log('Remove the cat items here are', cartItems);
-
+    console.log('The cart items at remove', cartItems);
     cartItems.forEach((item) => {
       if (item.id === id) {
         console.log('The item id is', item.id);
@@ -264,23 +310,46 @@ export const removeItemFromCart = async (id) => {
   }
 };
 
-export const updateQuantityinCart = async (id) => {
-  const price = [];
+export const changeQuantity = async (amount, object, id) => {
+  try {
+    console.log('The new quantity', amount);
+    let cartItems = await retreiveCachedItems(client, ['cartItems']);
+    cartItems = JSON.parse(cartItems);
+    const newCartItems = [...cartItems];
+    const oldObject = object;
+    const indexToRemove = cartItems.findIndex((x) => x.id === id);
+    newCartItems.splice(indexToRemove, 1);
+    const newTotalCost = oldObject.unitPrice * parseInt(amount, 10);
+    oldObject.totalCost = newTotalCost;
+    oldObject.userQuantity = parseInt(amount, 10);
+    newCartItems.push(oldObject);
+
+    client.set('cartItems', JSON.stringify(newCartItems));
+    message = `${end()} Updated successfully`;
+    return message;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+export const findItemToChangeQuantity = async (id) => {
+  let itemToUpdate;
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
     cartItems = JSON.parse(cartItems);
-
     cartItems.forEach((item) => {
       if (item.id === id) {
+        itemToUpdate = item;
         message = `${con()} What is the quantity you want?`;
-        const index = cartItems.indexOf(item);
-        price.push(cartItems[index].totalCost);
+      } else {
+        message = `${con()} Item not found\n`;
       }
     });
-
-    return { message, price: price[0] };
-  } catch (error) {
-    throw new Error(error);
+    return {
+      message,
+      itemToUpdate,
+    };
+  } catch (err) {
+    throw new Error(err);
   }
 };
 
@@ -309,7 +378,7 @@ export const updateCart = async (operation, id = null) => {
   } else if (operation === 'removeItem') {
     message = await removeItemFromCart(id);
   } else if (operation === 'updateItemCount') {
-    message = await updateQuantityinCart(id);
+    message = await findItemToChangeQuantity(id);
   } else {
     message = `${end()} Selection not found`;
   }
@@ -325,7 +394,7 @@ export const updateCart = async (operation, id = null) => {
 6. level 5: If checkout then ask for details and make order
 */
 
-export const cartOperations = async (text, menuLevel, level, itemId = null) => {
+export const cartOperations = async (text, menuLevel, level, itemId = null, index = null) => {
   let selection;
   if (menuLevel === 'inner') {
     // eslint-disable-next-line prefer-destructuring
@@ -337,7 +406,7 @@ export const cartOperations = async (text, menuLevel, level, itemId = null) => {
   console.log('Selection is', selection);
   if (level === 0) {
     message = await displayCartItems(client);
-  } else if (selection === '1' && level === 1) {
+  } else if ((selection === '1' && level === 1) || (text.split('*')[8] === '1' && level === 1)) {
     message = askForNumber();
   } else if (selection === '2' && level === 1) {
     message = updateCart('firstscreen');
@@ -349,36 +418,73 @@ export const cartOperations = async (text, menuLevel, level, itemId = null) => {
     message = await removeItemFromCart(itemId);
     console.log('Here is remove', message);
   } else if (level === 5) {
-    const response = await updateQuantityinCart(itemId);
+    const response = await findItemToChangeQuantity(itemId);
     message = response.message;
   } else if (level === 6) {
+    const response = await findItemToChangeQuantity(itemId);
+    const item = response.itemToUpdate;
+    message = changeQuantity(index, item, itemId);
+  } else if (level === 7) {
     console.log('Item selection at update ', itemSelection);
     console.log('Cost', totalCost);
     message = confirmNewQuantity(client, itemSelection, totalCost);
+  } else if (level === 8) {
+    const products = [];
+    const details = await retreiveCachedItems(client, ['user_id', 'cartItems']);
+    const cartItems = JSON.parse(details[1]);
+    cartItems.forEach((item) => {
+      const pickedFields = (({
+        id, product_id, userQuantity, totalCost,
+      }) => ({
+        id, product_id, userQuantity, totalCost,
+      }))(item);
+      const cartSelections = {
+        id: pickedFields.id,
+        product_id: pickedFields.product_id,
+        units: pickedFields.userQuantity,
+        amount: pickedFields.totalCost,
+      };
+      products.push(cartSelections);
+    });
+
+    const cartSelections = {
+      centre_id: 5,
+      user_id: parseInt(details[0], 10),
+      products,
+      order_priority: 'medium',
+
+    };
+    console.log('The final selections', cartSelections);
+    const response = await makeOrder(cartSelections);
+    console.log('The response is', response);
+    if (response.status === 200) {
+      client.del('cartItems');
+      message = `${end()} ${response.data.message}`;
+    } else if (response === 'Error') {
+      message = `${end()} Similar order exists for this user`;
+    }
+  } else if (level === 9) {
+    message = makePayment();
   }
   return message;
 };
 
 export const chooseCenter = (administrativeID) => {
   let message = `${con()} Choose a place where you will pick your goods\n`;
-  message += `1. ${centersMapping[administrativeID]}`;
+  const center = centersMapping[`${administrativeID}`];
+  message += `1. ${center}`;
   return message;
 };
 
-export const makeOrder = async (orderDetails) => {
+export const makeOrder = async (cartSelections) => {
   try {
-    const makeOrderRequest = await axios.post(`${BASEURL}/api/savebasicorder`, orderDetails);
-    // if (makeOrderRequest.data.status !== 'success') {
-    //   message = `${con()} Something went wrong, please try again`;
-    //   message += menus.footer;
-    // } else {
-    //   message = `${end()} ${makeOrderRequest.data.message
-    //   }`;
-    // }
-    console.log('Request is', makeOrderRequest);
-    return message;
+    const makeOrderRequest = await axios.post(`${BASEURL}/api/savebasicorder`, cartSelections);
+    console.log(makeOrderRequest);
+    if (makeOrderRequest.status === 200) {
+      return makeOrderRequest;
+    }
   } catch (err) {
-    throw new Error(err);
+    return 'Error';
   }
 };
 
@@ -393,24 +499,30 @@ export const showAvailableProducts = async (textValue, text) => {
     const result = await renderOfferings(client, selection);
     console.log('Farm offering status', result.status);
     offeringStatus.push(result.status);
+    console.log('Offering status array at 4', offeringStatus);
     message = result.message;
   } else if (textValue === 5) {
     const selection = parseInt(text.split('*')[4], 10);
-    message = checkGroupAndIndividualPrice(offeringStatus[0][selection]);
-  } else if (textValue === 6 && text.split('*')[5] === '1') {
+    message = checkGroupAndIndividualPrice(offeringStatus[offeringStatus.length - 1][selection]);
+  } else if (textValue === 6) {
     message = askForQuantity();
   } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
     const userQuantity = parseInt(text.split('*')[6], 10);
     const id = text.split('*')[4];
-    message = confirmQuantityWithPrice(userQuantity, id);
+    const typeOfOffering = offeringStatus[offeringStatus.length - 1];
+    const selection = parseInt(text.split('*')[4], 10);
+    const purchasingOption = text.split('*')[5];
+    const availablePrice = typeOfOffering[`${selection}`];
+    const price = priceToUse(availablePrice, purchasingOption);
+    message = confirmQuantityWithPrice(userQuantity, id, price);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
   } else if (textValue === 9 && text.split('*')[8] === '1') {
-    message = 'CON Checkout here';
+    message = await cartOperations(text, 'inner', 1);
   } else if (textValue === 9 && text.split('*')[8] === '67') {
     message = await cartOperations(text, 'inner', 0);
   } else if (textValue === 10 && text.split('*')[9] === '1') {
-    message = 'CON Checkout will be here';
+    message = await cartOperations(text, 'inner', 8);
   } else if (textValue === 10 && text.split('*')[9] === '2') {
     message = await cartOperations(text, 'inner', 1);
   } else if (textValue === 11 && text.split('*')[10] === '1') {
@@ -419,16 +531,56 @@ export const showAvailableProducts = async (textValue, text) => {
     message = await cartOperations(text, 'inner', 3);
   } else if (textValue === 12 && text.split('*')[10] === '1') {
     // TODO: Convert to a string
-    const itemID = text.split('*')[11];
+    const itemID = parseInt(text.split('*')[11], 10);
     message = await cartOperations(text, 'inner', 4, itemID);
   } else if (textValue === 12 && text.split('*')[10] === '2') {
     // TODO: Convert to a string
-    const itemID = text.split('*')[11];
+    const itemID = parseInt(text.split('*')[11], 10);
     message = await cartOperations(text, 'inner', 5, itemID);
   } else if (textValue === 13 && text.split('*')[10] === '2') {
-    message = await cartOperations(text, 'inner', 6);
+    const itemID = parseInt(text.split('*')[11], 10);
+    const index = parseInt(text.split('*')[12], 10);
+    // Point A
+    console.log('The index is', index);
+    message = await cartOperations(text, 'inner', 6, itemID, index);
   } else if (textValue === 13 && text.split('*')[10] === '1' && text.split('*')[12] === '67') {
     message = await cartOperations(text, 'inner', 0);
   }
+  return message;
+};
+
+export const makePayment = () => `${con()} Make payment here`;
+
+export const getOrders = async (id) => {
+  let result;
+  try {
+    const viewOrdersRequest = await axios.get(`${BASEURL}/api/showmyorders/${id}`);
+    if (viewOrdersRequest.data.status === 'error') {
+      result = viewOrdersRequest.data.message;
+    } else {
+      result = viewOrdersRequest.data.message.data;
+    }
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const viewOrders = async (id) => {
+  let prompt = '';
+  const orders = await getOrders(id);
+  if (typeof (orders) === 'string') {
+    message = orders;
+  } else if (typeof (orders) === 'object') {
+    let paymentStatus = '';
+    orders.forEach((order, index) => {
+      if (order.payment_status === null) {
+        paymentStatus = 'Not paid';
+      }
+      prompt += `${index}. ${order.order_id} KES${order.amount} Payment-Status:${paymentStatus} \n`;
+    });
+    message = prompt;
+  }
+
   return message;
 };
