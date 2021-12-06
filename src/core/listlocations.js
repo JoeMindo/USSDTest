@@ -35,12 +35,13 @@ export const getLocations = async (type, id, identifier) => {
     locationResult.data.data.forEach((location) => {
       locationType.push(location);
     });
+
     locationType.forEach((value, index) => {
-      const name = value[identifier];
+      const name = value[`${identifier}`];
       menuItems += `${index}. ${name}\n`;
       menuIDs.push(value.id);
     });
-    console.log('Locations result is', menuItems);
+
     return {
       items: menuItems,
       ids: menuIDs,
