@@ -18,14 +18,14 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
     results = list.items;
   } else if (locality === 'subcounty') {
     const countyIds = await retreiveCachedItems(client, ['usercountyIds']);
-    let userCountySelection = countyIds[0].split(',')[id];
+    let userCountySelection = countyIds[0].split(',')[`${id}`];
     userCountySelection = parseInt(userCountySelection, 10);
     const subcounties = await getLocations('subcounties', userCountySelection, 'sub_county_name');
     client.set('userSubcountyIds', subcounties.ids.toString());
     results = subcounties.items;
   } else if (locality === 'location') {
     const subcountyIds = await retreiveCachedItems(client, ['userSubcountyIds']);
-    let userSubcountySelection = subcountyIds[0].split(',')[id];
+    let userSubcountySelection = subcountyIds[0].split(',')[`${id}`];
     userSubcountySelection = parseInt(userSubcountySelection, 10);
     client.set('userSubCountySelection', userSubcountySelection);
     const locations = await getLocations('locations', userSubcountySelection, 'location_name');
@@ -33,7 +33,7 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
     results = locations.items;
   } else if (locality === 'area') {
     const locationIds = await retreiveCachedItems(client, ['userLocationIds']);
-    let userLocationSelection = locationIds[0].split(',')[id];
+    let userLocationSelection = locationIds[0].split(',')[`${id}`];
     userLocationSelection = parseInt(userLocationSelection, 10);
     client.set('userLocationSelection', userLocationSelection);
   } else {

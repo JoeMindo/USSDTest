@@ -3,7 +3,8 @@ import { retreiveCachedItems } from '../core/services.js';
 import client from '../server.js';
 import { con, end } from '../menus/rendermenu.js';
 import { menus } from '../menus/menuoptions.js';
-import { makebasicOrder } from '../orders/unitOrder';
+import makebasicOrder from '../orders/unitOrder.js';
+import makePayment from '../payment/payment.js';
 
 export const offersArray = [];
 export const cartItems = [];

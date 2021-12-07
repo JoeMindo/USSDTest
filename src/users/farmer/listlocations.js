@@ -50,4 +50,4 @@ export const getLocations = async (type, id, identifier) => {
   }
 };
 
-export const splitText = (text, index) => text.split('*')[index];
+export const splitText = (text, index) => text.split('*')[`${index}`];

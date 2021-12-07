@@ -6,7 +6,7 @@ import {
 import { menus } from '../../menus/menuoptions.js';
 import { BASEURL } from '../../core/urls.js';
 import { retreiveCachedItems } from '../../core/services.js';
-import { cartOperations } from '../../cart/cartoperations.js';
+import { cartOperations, addToCart } from '../../cart/cartoperations.js';
 
 let message = '';
 const con = () => 'CON';
@@ -201,7 +201,8 @@ export const chooseCenter = (administrativeID) => {
   return message;
 };
 
-export const showAvailableProducts = async (textValue, text) => {
+export const showAvailableProducts = async (client, textValue, text) => {
+  // Added client
   if (textValue === 2) {
     message = await renderProductCategories();
   } else if (textValue === 3) {
@@ -217,7 +218,7 @@ export const showAvailableProducts = async (textValue, text) => {
   } else if (textValue === 5) {
     const selection = parseInt(text.split('*')[4], 10);
     message = checkGroupAndIndividualPrice(
-      offeringStatus[offeringStatus.length - 1][selection],
+      offeringStatus[`${offeringStatus.length - 1}`][`${selection}`],
     );
   } else if (textValue === 6) {
     message = askForQuantity();
@@ -267,3 +268,5 @@ export const showAvailableProducts = async (textValue, text) => {
   }
   return message;
 };
+
+export const makePayment = () => `${con()} Make payment here`;

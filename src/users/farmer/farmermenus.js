@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
 import { menus } from '../../menus/menuoptions.js';
-import { client } from '../../server.js';
+import client from '../../server.js';
 import { addLocation } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
@@ -17,7 +17,7 @@ import {
   getFarmerMetricSections,
   getQuestionsPerSection,
 } from './farmmanagement.js';
-import { responsePrompt } from '../Users/Buyer/prompts.js.js.js';
+import { responsePrompt } from '../../menus/prompts.js';
 import { promptToGive } from './farmerlocation.js';
 
 const con = () => 'CON';
@@ -181,7 +181,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
       let answers = '';
       userAnswersArray.forEach((answer) => {
         const answerId = parseInt(answer, 10);
-        answers += `${questionanswers[answerId]} `;
+        answers += `${questionanswers[`${answerId}`]} `;
       });
       client.set('answers', answers);
 

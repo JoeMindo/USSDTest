@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/prefer-default-export */
 import axios from 'axios';
-import { BASEURL } from '../Users/Buyer/urls.js.js.js';
+import { BASEURL } from '../../core/urls.js';
 
 export const addFarm = async (farm) => {
   try {
