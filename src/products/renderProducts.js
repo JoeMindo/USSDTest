@@ -1,6 +1,5 @@
 export const renderOffers = (offers, offersArray, client) => {
   const status = {};
-  let message;
   let offeringText = '';
   offers.forEach((offer) => {
     const userViewOffers = {};
@@ -20,7 +19,7 @@ export const renderOffers = (offers, offersArray, client) => {
 
     client.set('groupOffersArray', JSON.stringify(offersArray));
   });
-  message = `CON Choose one of the available options to buy. ${offeringText}`;
+  const message = `CON Choose one of the available options to buy. ${offeringText}`;
   return message;
 };
 

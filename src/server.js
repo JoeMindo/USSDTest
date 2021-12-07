@@ -1,8 +1,3 @@
-/* eslint-disable import/no-cycle */
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable max-len */
-/* eslint-disable import/extensions */
-/* eslint-disable prefer-destructuring */
 import express from 'express';
 import bodyParser from 'body-parser';
 import logger from 'morgan';
@@ -10,26 +5,27 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 import bluebird from 'bluebird';
-// import cors from 'cors';
 import { ussdRouter } from 'ussd-router';
-import { routing } from './config/navigationMenus.js';
-import * as menuItems from './config/rendermenu.js';
-import { registerUser, loginUser, checkIfUserExists } from './core/usermanagement.js';
+import * as menuItems from './menus/rendermenu.js';
+import {
+  registerUser,
+  loginUser,
+  checkIfUserExists,
+} from './core/usermanagement.js';
 
 const port = process.env.PORT || 3032;
 
 const app = express();
 
-export const client = redis.createClient({
+const client = redis.createClient({
   host: 'redis-19100.c251.east-us-mz.azure.cloud.redislabs.com',
   port: 19100,
   password: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH',
 });
+
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
-client.on('connect', () => {
-  console.log('connected');
-});
+client.on('connect', () => {});
 client.on('error', (error) => {
   throw new Error(error);
 });
@@ -61,9 +57,6 @@ app.use((req, res, next) => {
 });
 
 app.post('/ussd', async (req, res) => {
-  console.log(`request payload${JSON.stringify(req.body)}`);
-  const message = '';
-
   const userLogin = {
     phone_no: '',
     password: '',
@@ -77,19 +70,15 @@ app.post('/ussd', async (req, res) => {
   const text = ussdRouter(rawtext, '0', '00');
   // TODO: Migrate this to usermanagement
 
-  console.log(`incoming text ${text}`);
   const textValue = text.split('*').length;
-  console.log('Textvalue', textValue);
-  console.log('Length of text', text.length);
+
   const userStatus = await checkIfUserExists(req.body.phoneNumber, client);
   // const userStatus = true;
-  console.log('User Status', userStatus);
 
   if (userStatus === false) {
-    console.log('Here is registering', textValue);
     let error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue, text);
-    let message = menus.message;
+    let { message } = menus;
     if (menus.completedStatus === true) {
       message = 'END Success';
       req.session.registration = text.split('*');
@@ -102,24 +91,19 @@ app.post('/ussd', async (req, res) => {
         password: req.session.registration[4],
         password_confirmation: req.session.registration[5],
         role_id: req.session.registration[6],
-
       };
-      console.log('DetailsHere', userDetails);
+
       const out = registerUser(userDetails, req.body.phoneNumber);
       const result = out.then((response) => {
-        console.log('Registation', response);
         if (response.status === 'error') {
           Object.keys(response.errors).forEach((key) => {
-            error += `${response.errors[key].toString()}`;
-
-            console.log(key, response.errors[key].toString());
+            error += `${response.errors[`${key}`].toString()}`;
           });
           return error;
         }
         return message;
       });
       result.then((response) => {
-        console.log('Message at end', response);
         res.send(response);
       });
     } else {
@@ -132,11 +116,11 @@ app.post('/ussd', async (req, res) => {
     } else if (text.length > 0) {
       req.session.login = text.split('*');
       userLogin.phone_no = req.body.phoneNumber;
-      userLogin.password = req.session.login[0];
-      console.log('Login', userLogin);
+      [userLogin.password] = req.session.login;
+      // userLogin.password = req.session.login[0];
+
       const response = await loginUser(userLogin);
       if (response.status === 200 && response.data.role === 'farmer') {
-        console.log('Farmer here');
         client.set('role', 'farmer');
         client.set('user_id', `${response.data.user_id}`, redis.print);
         message = await menuItems.checkFarmerSelection(text, textValue);
@@ -156,6 +140,6 @@ app.post('/ussd', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}, `);
-});
+app.listen(port, () => {});
+
+export default client;

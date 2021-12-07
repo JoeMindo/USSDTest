@@ -5,7 +5,7 @@ import { checkIfUserExists, loginUser } from '../../src/core/usermanagement.js';
 import {
   loginResponseSuccess, loginResponseFailure, isUserSuccess, isUserFailure,
 } from './responses.js';
-import { BASEURL } from '../../src/config/urls.js';
+import { BASEURL } from '../../src/users/buyer/urls.js.js.js.js';
 
 describe('Login', () => {
   beforeEach(() => {

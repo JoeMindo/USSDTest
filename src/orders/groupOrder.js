@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { retreiveCachedItems } from '../core/services.js';
-import { client } from '../server.js';
-import { BASEURL } from './urls.js';
-import { menus } from './menuoptions.js';
-import { askForNumber, askForQuantity, renderProductCategories, renderProducts } from './buyermenus.js';
-import renderOffers from '../core/renderProducts.js';
+import client from '../server.js';
+import { BASEURL } from '../core/urls.js';
+import { menus } from '../menus/menuoptions.js';
+import {
+  askForQuantity, renderProductCategories, renderProducts,
+} from '../users/buyer/buyermenus.js';
+import { renderOffers } from '../products/renderProducts.js';
 
 export const checkIfUserIsInGroup = async () => {
   const user = await retreiveCachedItems(client, ['user_id']);
@@ -50,7 +52,6 @@ export const renderGroupPricedItems = async (productId) => {
   try {
     let offers = await axios.get(`${BASEURL}/api/productsbyproductid/${productId}`);
     offers = offers.data.message.data;
-    // console.log('The offers for this are', offers.data.message.data);
     const message = renderOffers(offers, [], client);
     return message;
   } catch (err) {

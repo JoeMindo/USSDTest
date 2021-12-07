@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 const grades = {
   1: 'Grade A',
   2: 'Grade B',
@@ -88,3 +87,4 @@ export const menus = {
   },
 
 };
+export default menus;

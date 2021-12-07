@@ -1,14 +1,12 @@
-/* eslint-disable consistent-return */
-/* eslint-disable import/extensions */
 import axios from 'axios';
-import { BASEURL } from '../config/urls.js';
+import { BASEURL } from '../core/urls.js';
 
 const optionProducts = [];
 async function fetchCategories() {
   let results = '';
   try {
     const response = await axios.get(`${BASEURL}/api/prodcategories`);
-    console.log('Fetching categories', response.data.data.data);
+
     response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);
       results += `\n${category.id}. ${category.category_name}`;
@@ -54,8 +52,11 @@ const fetchFarmOfferings = async (id) => {
 
 const addProduct = async (productdata) => {
   try {
-    const newProduct = axios.post(`${BASEURL}/api/farmcatalog/save`, productdata);
-    console.log(newProduct);
+    const newProduct = axios.post(
+      `${BASEURL}/api/farmcatalog/save`,
+      productdata,
+    );
+
     return newProduct;
   } catch (err) {
     throw new Error(err);
@@ -76,5 +77,9 @@ const getSpecificProduct = async (id) => {
   }
 };
 export {
-  fetchCategories, fetchProducts, addProduct, getSpecificProduct, fetchFarmOfferings,
+  fetchCategories,
+  fetchProducts,
+  addProduct,
+  getSpecificProduct,
+  fetchFarmOfferings,
 };

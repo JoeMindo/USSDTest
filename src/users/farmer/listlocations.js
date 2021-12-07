@@ -1,6 +1,5 @@
-/* eslint-disable import/extensions */
 import axios from 'axios';
-import { BASEURL } from '../config/urls.js';
+import { BASEURL } from '../../core/urls.js';
 
 export const getRegions = async () => {
   const regions = [];

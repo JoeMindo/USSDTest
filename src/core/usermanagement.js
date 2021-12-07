@@ -1,8 +1,6 @@
-/* eslint-disable consistent-return */
-/* eslint-disable import/extensions */
 import axios from 'axios';
-import { postrequest, retreiveCachedItems } from './services.js';
-import { BASEURL } from '../config/urls.js';
+import { postrequest } from './services.js';
+import { BASEURL } from './urls.js';
 
 const clearData = (details) => {
   details.name = '';
@@ -69,38 +67,6 @@ const checkFarmerVerification = async (id) => {
   }
 };
 const checkVerification = () => true;
-
-const getUsers = async (pageNumber = 1) => {
-  const actualUrl = `${BASEURL}/api/user/details/?page=${pageNumber}`;
-  console.log('Actual url', actualUrl);
-  try {
-    const users = await axios.get(actualUrl);
-    return users.data.data;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const getEntireUserList = async (pageNumber = 1) => {
-  const userresponse = await getUsers(pageNumber);
-  if (userresponse.length > 0) {
-    return userresponse.concat(await getEntireUserList(pageNumber + 1));
-  }
-  return userresponse;
-};
-
-const checkIfUserExistsOld = async (phone) => {
-  try {
-    const userresponse = await getEntireUserList();
-    const found = userresponse.some((profile) => profile.phone_no === phone);
-    if (!found) {
-      return false;
-    }
-    return true;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const checkIfUserExists = async (phone) => {
   let userStatus;

@@ -7,7 +7,7 @@
 // const stored = userSelections.map((selection) => parseInt(selection, 10));
 // const cart = [];
 // let result = '';
-// console.log('Stored values are', stored);
+// 
 
 // const isGroup = (selection) => {
 //   if (selection === '1') {
@@ -36,7 +36,7 @@
 //         result += `${item.unit_price} \n`;
 //       }
 //     });
-//     console.log('Result is', result);
+//     
 //     return result;
 //   } catch (err) {
 //     throw new Error(err).message;
@@ -52,5 +52,5 @@ export const retreiveHashItems = async (client, key) => {
   return fields;
 };
 
-const result = retreiveHashItems(client, 'offers').then((response) => console.log('This is here', response));
+const result = retreiveHashItems(client, 'offers').then((response) => 
 

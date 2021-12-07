@@ -1,23 +1,23 @@
 /* eslint-disable import/extensions */
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
-import { menus } from './menuoptions.js';
-import { client } from '../server.js';
-import { addLocation } from '../core/usermanagement.js';
-import { retreiveCachedItems, setToCache } from '../core/services.js';
+import { menus } from '../../menus/menuoptions.js';
+import { client } from '../../server.js';
+import { addLocation } from '../../core/usermanagement.js';
+import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
   fetchCategories,
   fetchProducts,
   getSpecificProduct,
   addProduct,
-} from '../core/productmanagement.js';
+} from '../../products/productmanagement.js';
 import {
   addFarm,
   addFarmerKYC,
   getAnswersPerQuestion,
   getFarmerMetricSections,
   getQuestionsPerSection,
-} from '../core/farmmanagement.js';
-import { responsePrompt } from './prompts.js';
+} from './farmmanagement.js';
+import { responsePrompt } from '../Users/Buyer/prompts.js.js.js';
 import { promptToGive } from './farmerlocation.js';
 
 const con = () => 'CON';
@@ -88,7 +88,7 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
   } else if (textValue === 4) {
     client.set('farm_location', text.split('*')[3]);
     const categories = await fetchCategories();
-    console.log(categories);
+
     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
     menuPrompt += categories;
     menuPrompt += menus.footer;
@@ -152,7 +152,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     const questionId = parseInt(text.split('*')[3], 10);
     client.set('questionId', questionId);
     const answersPerQuestion = await getAnswersPerQuestion(questionId);
-    console.log('Possible answers', answersPerQuestion.data);
+
     if (answersPerQuestion.status === 200) {
       let menuPrompt = '';
 
@@ -182,7 +182,6 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
       userAnswersArray.forEach((answer) => {
         const answerId = parseInt(answer, 10);
         answers += `${questionanswers[answerId]} `;
-        console.log('Answers are displayed here', answers);
       });
       client.set('answers', answers);
 
@@ -229,7 +228,6 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
     const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
     message = menuPrompt;
   } else if (textValue === 4) {
-    console.log('Text value', textValue);
     let grade;
     const selection = text.split('*')[3];
     if (selection === '1') {

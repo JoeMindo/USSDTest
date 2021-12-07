@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import nock from 'nock';
 import { describe } from 'mocha';
 import { counties, regions, locationError } from './farmerResponses.js';
-import { BASEURL } from '../../src/config/urls.js';
+import { BASEURL } from '../../src/core/urls.js';
 import { getLocations, getRegions } from '../../src/core/listlocations.js';
 
 describe('Locality details', () => {

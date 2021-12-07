@@ -1,7 +1,6 @@
-/* eslint-disable import/extensions */
-import { getLocations, getRegions } from '../core/listlocations.js';
-import { menus } from './menuoptions.js';
-import { retreiveCachedItems } from '../core/services.js';
+import { getLocations, getRegions } from './listlocations.js';
+import { menus } from '../../menus/menuoptions.js';
+import { retreiveCachedItems } from '../../core/services.js';
 
 const con = () => 'CON';
 
