@@ -72,8 +72,8 @@ app.post('/ussd', async (req, res) => {
 
   const textValue = text.split('*').length;
 
-  const userStatus = await checkIfUserExists(req.body.phoneNumber, client);
-  // const userStatus = true;
+  const userStatus = await checkIfUserExists(req.body.phoneNumber);
+  console.log('The user status is', userStatus);
 
   if (userStatus === false) {
     let error = 'END ';
