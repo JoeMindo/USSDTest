@@ -69,14 +69,19 @@ const checkFarmerVerification = async (id) => {
 const checkVerification = () => true;
 
 const checkIfUserExists = async (phone) => {
-  let userStatus;
   try {
     const details = {
       phone_no: phone,
     };
     const response = await axios.post(`${BASEURL}/api/isuser`, details);
-    userStatus = response.data.message;
-    return userStatus;
+    if (response.data.status === 'success') {
+      return {
+        exists: response.data.message,
+        role: response.data.role,
+        user_id: response.data.userid,
+      };
+    }
+    return { exists: response.data.message };
   } catch (err) {
     throw new Error(err);
   }
