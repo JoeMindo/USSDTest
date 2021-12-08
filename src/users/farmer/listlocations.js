@@ -12,7 +12,7 @@ export const getRegions = async () => {
       regions.push(location);
     });
     regions.forEach((value, index) => {
-      menuItems += `${index}. ${value.region_name}\n`;
+      menuItems += `${index += 1}. ${value.region_name}\n`;
       menuIDs.push(value.id_regions);
     });
     return {
@@ -37,7 +37,7 @@ export const getLocations = async (type, id, identifier) => {
 
     locationType.forEach((value, index) => {
       const name = value[`${identifier}`];
-      menuItems += `${index}. ${name}\n`;
+      menuItems += `${index += 1}. ${name}\n`;
       menuIDs.push(value.id);
     });
 

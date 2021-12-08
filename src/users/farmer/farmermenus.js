@@ -27,27 +27,27 @@ const questionanswers = {};
 
 export const renderUpdateLocationMenu = async (textValue, text) => {
   let message;
-  if (textValue === 2) {
+  if (textValue === 1) {
     const menuPrompt = await promptToGive(client, 'region');
     message = menuPrompt;
-  } else if (textValue === 3) {
-    let regionId = parseInt(text.split('*')[2], 10);
-    regionId += 1;
+  } else if (textValue === 2) {
+    const regionId = parseInt(text.split('*')[1], 10);
+    console.log('The region ID', regionId);
     const menuPrompt = await promptToGive(client, 'county', regionId);
     message = menuPrompt;
-  } else if (textValue === 4) {
-    const countyId = parseInt(text.split('*')[3], 10);
+  } else if (textValue === 3) {
+    const countyId = parseInt(text.split('*')[2], 10);
     const menuPrompt = await promptToGive(client, 'subcounty', countyId);
     message = menuPrompt;
-  } else if (textValue === 5) {
-    const subcountyId = parseInt(text.split('*')[4], 10);
+  } else if (textValue === 4) {
+    const subcountyId = parseInt(text.split('*')[3], 10);
     const menuPrompt = await promptToGive(client, 'location', subcountyId);
     message = menuPrompt;
-  } else if (textValue === 6) {
+  } else if (textValue === 5) {
     const menuPrompt = await promptToGive(client, 'area');
     message = menuPrompt;
   } else {
-    client.set('userArea', text.split('*')[6]);
+    client.set('userArea', text.split('*')[5]);
 
     const postLocationDetails = await retreiveCachedItems(client, [
       'userSubCountySelection',

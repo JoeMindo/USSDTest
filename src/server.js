@@ -72,6 +72,7 @@ app.post('/ussd', async (req, res) => {
   // TODO: Migrate this to usermanagement
 
   const textValue = text.split('*').length;
+  console.log('The text value is', textValue);
 
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;

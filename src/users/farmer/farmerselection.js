@@ -3,10 +3,10 @@ import { renderFarmerMenus } from '../../menus/rendermenu.js';
 
 const checkFarmerSelection = async (text, textValue) => {
   let message;
-  if (textValue === 1) {
+  if (textValue === 1 && text === '') {
     message = renderFarmerMenus();
-  } else {
-    const selection = text.split('*')[1];
+  } else if (text !== '') {
+    const selection = text.split('*')[0];
     if (selection === '1') {
       message = await farmerMenus.renderUpdateLocationMenu(textValue, text);
     } else if (selection === '2') {

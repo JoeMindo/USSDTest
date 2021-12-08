@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { retreiveCachedItems } from '../core/services.js';
+import { renderOffers } from '../products/renderProducts.js';
 import client from '../server.js';
+
 import { BASEURL } from '../core/urls.js';
 import { menus } from '../menus/menuoptions.js';
 import {
-  askForQuantity, renderProductCategories, renderProducts,
+  askForQuantity, renderProductCategories,
 } from '../users/buyer/buyermenus.js';
-import { renderOffers } from '../products/renderProducts.js';
 
 export const checkIfUserIsInGroup = async () => {
   const user = await retreiveCachedItems(client, ['user_id']);

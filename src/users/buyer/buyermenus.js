@@ -1,22 +1,11 @@
-import axios from 'axios';
 import {
   fetchCategories,
-  fetchProducts,
 } from '../../products/productmanagement.js';
 import { menus } from '../../menus/menuoptions.js';
-import { BASEURL } from '../../core/urls.js';
-import { retreiveCachedItems } from '../../core/services.js';
-import { cartOperations, addToCart } from '../../cart/cartoperations.js';
 
 let message = '';
 const con = () => 'CON';
 const end = () => 'END';
-
-export const offersArray = [];
-export const cartItems = [];
-export const totalCost = {};
-export const itemSelection = {};
-const offeringStatus = [];
 
 const centersMapping = {
   1: 'Center 1',
@@ -56,89 +45,6 @@ export const renderProductCategories = async () => {
   }
 };
 
-export const renderProducts = async (id) => {
-  try {
-    const response = await fetchProducts(id);
-    if (response) {
-      message = `${con()} Choose a product to buy\n ${response}`;
-    } else {
-      message = `${con()} Could not fetch products at the moment try again later`;
-    }
-    return message;
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-export const renderOfferings = async (client, id) => {
-  const status = {};
-  try {
-    const endpointUrl = `${BASEURL}/api/productsbyproductid`;
-    const productOffering = await axios.get(`${endpointUrl}/${id}`);
-    client.set('viewedProductID', id);
-
-    let offeringText = '';
-    if (
-      productOffering.data.message.status !== '3'
-      && productOffering.data.status !== 'error'
-    ) {
-      const offers = productOffering.data.message.data;
-
-      offers.forEach((offer) => {
-        const userViewOffers = {};
-        offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
-        userViewOffers.id = `${offer.id}`;
-        userViewOffers.product = `${offer.product_name}`;
-        userViewOffers.farmName = `${offer.farm_name}`;
-        userViewOffers.grade = `${offer.grade}`;
-        userViewOffers.product_id = `${offer.product_id}`;
-        userViewOffers.availableUnits = `${offer.available_units}`;
-
-        if (offer.status === '0') {
-          offeringText += `KES ${offer.unit_price}`;
-          userViewOffers.unitPrice = `${offer.unit_price}`;
-          status[offer.id] = 'unit';
-        } else if (offer.status === '1') {
-          offeringText += `KES ${offer.group_price}`;
-          status[offer.id] = 'group';
-          userViewOffers.groupPrice = `${offer.group_price}`;
-        } else {
-          offeringText += `Group price: ${offer.group_price}, Unit Price: ${offer.unit_price}`;
-          userViewOffers.unitPrice = `${offer.unit_price}`;
-          userViewOffers.groupPrice = `${offer.group_price}`;
-          status[offer.id] = 'both';
-        }
-        offersArray.push(userViewOffers);
-
-        client.set('offersArray', JSON.stringify(offersArray));
-      });
-      // offeringText += menus.viewCart;
-
-      message = `${con()} Choose one of the available options to buy. ${offeringText}`;
-    } else {
-      message = `${con()} Product not available`;
-      message += menus.footer;
-    }
-    return {
-      message,
-      status,
-    };
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
-export const checkGroupAndIndividualPrice = (status) => {
-  if (status === 'both') {
-    message = `${con()} Select the price you want to buy at\n 1. Unit Price\n 2. Group price \n`;
-  } else if (status === 'unit') {
-    message = `${con()} Buy item at unit price\n 1. Yes\n `;
-  } else if (status === 'group') {
-    message = `${con()} Buy item at group price 1. Yes\n `;
-  }
-  message += menus.footer;
-  return message;
-};
-
 export const askForQuantity = () => {
   message = `${con()} Enter quantity you want to buy\n`;
   message += menus.footer;
@@ -146,53 +52,6 @@ export const askForQuantity = () => {
 };
 // Array of offers should be cached
 
-export const confirmQuantityWithPrice = async (
-  userQuantity,
-  productID,
-  status,
-  client,
-) => {
-  let availableUnits = 0;
-  let pricePoint;
-  let offers = await retreiveCachedItems(client, ['offersArray']);
-  offers = JSON.parse(offers);
-  const buyerSelection = offers.filter((item) => item.id === productID);
-
-  availableUnits = buyerSelection[0].availableUnits;
-
-  if (userQuantity > availableUnits) {
-    message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
-  } else {
-    if (status === 'unit') {
-      pricePoint = parseInt(buyerSelection[0].unitPrice, 10);
-    } else if (status === 'group') {
-      pricePoint = parseInt(buyerSelection[0].groupPrice, 10);
-    }
-
-    const total = userQuantity * pricePoint;
-
-    const prompt = `${buyerSelection[0].product} from ${buyerSelection[0].farmName} of grade:${buyerSelection[0].grade} at ${pricePoint}`;
-
-    itemSelection.id = parseInt(`${buyerSelection[0].id}`, 10);
-    itemSelection.product = `${buyerSelection[0].product}`;
-    itemSelection.farmName = `${buyerSelection[0].farmName}`;
-    itemSelection.grade = `${buyerSelection[0].grade}`;
-    // TODO: This should return an integer
-    itemSelection.product_id = parseInt(`${buyerSelection[0].product_id}`, 10);
-    itemSelection.userQuantity = parseInt(`${userQuantity}`, 10);
-    itemSelection.unitPrice = pricePoint;
-    itemSelection.totalCost = total;
-    message = `${con()} Buy ${prompt}\n Total ${total}\n 1. Add to cart`;
-  }
-  message += menus.footer;
-  return message;
-};
-
-export const checkoutUsingDifferentNumber = () => {
-  message = `${con()} Enter phone number to checkout with`;
-  message += menus.footer;
-  return message;
-};
 
 export const chooseCenter = (administrativeID) => {
   let message = `${con()} Choose a place where you will pick your goods\n`;
