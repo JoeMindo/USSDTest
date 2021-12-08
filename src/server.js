@@ -9,9 +9,10 @@ import { ussdRouter } from 'ussd-router';
 import * as menuItems from './menus/rendermenu.js';
 import {
   registerUser,
-  loginUser,
   checkIfUserExists,
 } from './core/usermanagement.js';
+import checkFarmerSelection from './users/farmer/farmerselection.js';
+import checkBuyerSelection from './users/buyer/buyerselection.js';
 
 const port = process.env.PORT || 3032;
 
@@ -73,7 +74,7 @@ app.post('/ussd', async (req, res) => {
   const textValue = text.split('*').length;
 
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
-  console.log('The user status is', userStatus);
+  let message;
 
   if (userStatus === false) {
     let error = 'END ';
@@ -109,35 +110,21 @@ app.post('/ussd', async (req, res) => {
     } else {
       res.send(message);
     }
-  } else if (userStatus === true) {
-    let message;
-    if (text.length === 0) {
-      message = menuItems.renderLoginMenus();
-    } else if (text.length > 0) {
-      req.session.login = text.split('*');
-      userLogin.phone_no = req.body.phoneNumber;
-      [userLogin.password] = req.session.login;
-      // userLogin.password = req.session.login[0];
-
-      const response = await loginUser(userLogin);
-      if (response.status === 200 && response.data.role === 'farmer') {
-        client.set('role', 'farmer');
-        client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = await menuItems.checkFarmerSelection(text, textValue);
-      } else if (response.status === 200 && response.data.role === 'buyer') {
-        client.set('role', 'buyer');
-        client.set('user_id', `${response.data.user_id}`, redis.print);
-        message = await menuItems.checkBuyerSelection(textValue, text);
-      } else if (response.status === 404) {
-        message = 'CON User not found';
-      } else {
-        message = 'END Invalid credentials';
-      }
-    } else {
-      message = 'END Something went wrong on our end, try again later';
+  } else if (userStatus.exists === true) {
+    client.set('user_id', userStatus.user_id);
+    if (userStatus.role === 'FARMER') {
+      client.set('role', 'farmer');
+      message = await checkFarmerSelection(text, textValue);
+    } else if (userStatus.role === 'BUYER') {
+      client.set('role', 'buyer');
+      message = await checkBuyerSelection(textValue, text);
+    } else if (userStatus.message === false) {
+      message = 'CON User not found';
     }
-    res.send(message);
+  } else {
+    message = 'END Something went wrong on our end, try again later';
   }
+  res.send(message);
 });
 
 app.listen(port, () => {});

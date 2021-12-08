@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import axios from 'axios';
 import { postrequest } from './services.js';
 import { BASEURL } from './urls.js';
@@ -81,9 +82,8 @@ const checkIfUserExists = async (phone) => {
         user_id: response.data.userid,
       };
     }
-    return { exists: response.data.message };
   } catch (err) {
-    throw new Error(err);
+    return false;
   }
 };
 

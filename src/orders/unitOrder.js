@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BASEURL } from '../core/urls';
+import { BASEURL } from '../core/urls.js';
 
 const makebasicOrder = async (cartSelections) => {
   try {
