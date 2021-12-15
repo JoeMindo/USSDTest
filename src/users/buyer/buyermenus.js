@@ -52,7 +52,6 @@ export const askForQuantity = () => {
 };
 // Array of offers should be cached
 
-
 export const chooseCenter = (administrativeID) => {
   let message = `${con()} Choose a place where you will pick your goods\n`;
   const center = centersMapping[`${administrativeID}`];

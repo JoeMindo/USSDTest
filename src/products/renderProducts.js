@@ -3,7 +3,7 @@ import { fetchCategories, fetchProducts } from './productmanagement.js';
 import { con, end } from '../menus/rendermenu.js';
 import { BASEURL } from '../core/urls.js';
 import { menus } from '../menus/menuoptions.js';
-import {cartOperations} from '../cart/cartoperations.js'
+import { cartOperations } from '../cart/cartoperations.js';
 
 let message;
 export const offersArray = [];

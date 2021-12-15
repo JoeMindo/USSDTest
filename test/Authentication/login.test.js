@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import nock from 'nock';
 import { describe } from 'mocha';
+import { BASEURL } from '../../src/core/urls.js';
 import { checkIfUserExists, loginUser } from '../../src/core/usermanagement.js';
 import {
   loginResponseSuccess, loginResponseFailure, isUserSuccess, isUserFailure,
 } from './responses.js';
-import { BASEURL } from '../../src/users/buyer/urls.js.js.js.js';
 
 describe('Login', () => {
   beforeEach(() => {
@@ -62,6 +62,9 @@ describe('User', () => {
       phone_no: '0719408977',
     };
     const response = await checkIfUserExists(details);
-    expect(response).to.equal(true);
+    const present = response.exists;
+    const userRole = response.role;
+    expect(present).to.equal(true);
+    expect(userRole).to.equal('Farmer');
   });
 });

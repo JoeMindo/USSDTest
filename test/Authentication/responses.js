@@ -108,6 +108,8 @@ export const registrationFailurePasswordTooShort = {
 export const isUserSuccess = {
   status: 'success',
   message: true,
+  role: 'Farmer',
+  user_id: 1,
 };
 
 export const isUserFailure = {

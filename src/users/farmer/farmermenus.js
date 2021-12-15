@@ -32,7 +32,6 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
     message = menuPrompt;
   } else if (textValue === 2) {
     const regionId = parseInt(text.split('*')[1], 10);
-    console.log('The region ID', regionId);
     const menuPrompt = await promptToGive(client, 'county', regionId);
     message = menuPrompt;
   } else if (textValue === 3) {
@@ -76,39 +75,39 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
 };
 export const renderAddFarmDetailsMenu = async (textValue, text) => {
   let message;
-  if (textValue === 2) {
+  if (textValue === 1) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 3) {
+  } else if (textValue === 2) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-    client.set('farm_name', text.split('*')[2]);
-  } else if (textValue === 4) {
-    client.set('farm_location', text.split('*')[3]);
+    client.set('farm_name', text.split('*')[1]);
+  } else if (textValue === 3) {
+    client.set('farm_location', text.split('*')[2]);
     const categories = await fetchCategories();
 
     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
     menuPrompt += categories;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 5) {
-    const category = parseInt(text.split('*')[4], 10);
+  } else if (textValue === 4) {
+    const category = parseInt(text.split('*')[3], 10);
     const product = await fetchProducts(category);
     let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
     menuPrompt += `${product}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 6) {
-    const productId = parseInt(text.split('*')[5], 10);
+  } else if (textValue === 5) {
+    const productId = parseInt(text.split('*')[4], 10);
     client.set('productID', productId);
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     // res.send(message);
   } else {
-    client.set('capacity', parseInt(text.split('*')[6], 10));
+    client.set('capacity', parseInt(text.split('*')[5], 10));
     const farmDetails = await retreiveCachedItems(client, [
       'farm_name',
       'farm_location',
@@ -124,6 +123,7 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
+    console.log('The response for adding farm', responseForAddingFarm);
 
     if (responseForAddingFarm === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
@@ -139,17 +139,17 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
 
 export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
   let message;
-  if (textValue === 2) {
+  if (textValue === 1) {
     const farmerMetrics = await getFarmerMetricSections();
     message = responsePrompt(farmerMetrics, 'sections');
-  } else if (textValue === 3) {
-    const sectionId = parseInt(text.split('*')[2], 10);
+  } else if (textValue === 2) {
+    const sectionId = parseInt(text.split('*')[1], 10);
 
     client.set('sectionId', sectionId);
     const questions = await getQuestionsPerSection(sectionId);
     message = responsePrompt(questions, 'questions');
-  } else if (textValue === 4) {
-    const questionId = parseInt(text.split('*')[3], 10);
+  } else if (textValue === 3) {
+    const questionId = parseInt(text.split('*')[2], 10);
     client.set('questionId', questionId);
     const answersPerQuestion = await getAnswersPerQuestion(questionId);
 
@@ -221,54 +221,58 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
   ]);
   const productID = parseInt(items[1], 10);
   const specificProduct = await getSpecificProduct(productID);
-  message += `CON What quantity of \n ${specificProduct}`;
-  if (textValue === 3) {
-    const units = parseInt(text.split('*')[2], 10);
-    client.set('units', units);
-    const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
-    message = menuPrompt;
-  } else if (textValue === 4) {
-    let grade;
-    const selection = text.split('*')[3];
-    if (selection === '1') {
-      grade = 'A';
-      client.set('grade', grade);
-    } else if (selection === '2') {
-      grade = 'B';
-      client.set('grade', grade);
-    } else if (selection === '3') {
-      grade = 'C';
-      client.set('grade', grade);
-    } else if (selection === '4') {
-      grade = 'D';
-      client.set('grade', grade);
-    } else if (selection === '5') {
-      grade = 'E';
-      client.set('grade', grade);
-    } else {
-      message = 'Invalid grade';
-      message += menus.footer;
-    }
-    const addProductDetails = await retreiveCachedItems(client, [
-      'farm_id',
-      'productID',
-      'units',
-      'grade',
-    ]);
+  if (specificProduct === false) {
+    message = 'CON There are no products found! Please add a farm';
+  } else {
+    if (textValue === 3) {
+      const units = parseInt(text.split('*')[2], 10);
+      client.set('units', units);
+      const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
+      message = menuPrompt;
+    } else if (textValue === 4) {
+      let grade;
+      const selection = text.split('*')[3];
+      if (selection === '1') {
+        grade = 'A';
+        client.set('grade', grade);
+      } else if (selection === '2') {
+        grade = 'B';
+        client.set('grade', grade);
+      } else if (selection === '3') {
+        grade = 'C';
+        client.set('grade', grade);
+      } else if (selection === '4') {
+        grade = 'D';
+        client.set('grade', grade);
+      } else if (selection === '5') {
+        grade = 'E';
+        client.set('grade', grade);
+      } else {
+        message = 'Invalid grade';
+        message += menus.footer;
+      }
+      const addProductDetails = await retreiveCachedItems(client, [
+        'farm_id',
+        'productID',
+        'units',
+        'grade',
+      ]);
 
-    const addProductResponse = await addProductDetails;
-    const postDetails = {
-      farm_id: addProductResponse[0],
-      product_id: addProductResponse[1],
-      units: addProductResponse[2],
-      grade: addProductResponse[3],
-    };
-    const addProductToDB = await addProduct(postDetails);
-    if (addProductToDB.status === 200) {
-      message = 'END Added successfully';
-    } else {
-      message = 'END Added failed';
+      const addProductResponse = await addProductDetails;
+      const postDetails = {
+        farm_id: addProductResponse[0],
+        product_id: addProductResponse[1],
+        units: addProductResponse[2],
+        grade: addProductResponse[3],
+      };
+      const addProductToDB = await addProduct(postDetails);
+      if (addProductToDB.status === 200) {
+        message = 'END Added successfully';
+      } else {
+        message = 'END Added failed';
+      }
     }
+    message += `CON What quantity of \n ${specificProduct}`;
   }
   return message;
 };

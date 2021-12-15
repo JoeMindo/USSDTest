@@ -52,6 +52,7 @@ const addLocation = async (locationData, id) => {
 
   try {
     const locationResponse = await postrequest(locationData, path);
+    console.log('The location result is', locationResponse);
     return locationResponse;
   } catch (error) {
     throw new Error(error);

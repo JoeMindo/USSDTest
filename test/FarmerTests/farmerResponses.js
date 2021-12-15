@@ -219,15 +219,22 @@ export const locations = {
 export const geoArea = {
   id: 1,
   countyID: 19,
-  subcountyID: '238',
+  subcountyID: 238,
   locationID: 1183,
   area: 'Mahiga Meru',
-  updated_at: '2021-12-06T09:13:11.000000Z',
-  created_at: '2021-12-06T09:13:11.000000Z',
+
 };
 
 export const locationError = {
   status: 'Error',
-  message: 'Location does not exist',
+  items: 'Location not found',
+};
+export const geoAreaError = {
+  message: 'Could not update location, try again later',
+
+};
+
+export const geoAreaSuccess = {
+  message: 'Location Updated',
 };
 export default regions;

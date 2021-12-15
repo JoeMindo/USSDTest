@@ -81,7 +81,7 @@ const getSpecificProduct = async (id) => {
     });
     return respose;
   } catch (err) {
-    throw new Error(err);
+    return false;
   }
 };
 

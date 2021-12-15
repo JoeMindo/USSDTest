@@ -1,9 +1,12 @@
 import { expect } from 'chai';
 import nock from 'nock';
-import { describe } from 'mocha';
-import { counties, regions, locationError } from './farmerResponses.js';
+import { describe, it } from 'mocha';
+import {
+  counties, regions, locationError, geoArea,
+} from './farmerResponses.js';
 import { BASEURL } from '../../src/core/urls.js';
-import { getLocations, getRegions } from '../../src/core/listlocations.js';
+import { getLocations, getRegions } from '../../src/users/farmer/listlocations.js';
+import { addLocation } from '../../src/core/usermanagement.js';
 
 describe('Locality details', () => {
   beforeEach(() => {
@@ -16,6 +19,9 @@ describe('Locality details', () => {
     nock(`${BASEURL}`)
       .get('/api/counties/99')
       .reply(404, locationError);
+    nock(`${BASEURL}`)
+      .post('/api/geoarea/')
+      .reply(201, geoArea);
   });
   it('should display the regions and track the region IDs', async () => {
     const response = await getRegions();
@@ -24,14 +30,25 @@ describe('Locality details', () => {
   });
   it('should render the relevant location data depending on administrative unit', async () => {
     const response = await getLocations('counties', 1, 'county_name');
-    expect(response.items).to.equal('0. NAIROBI\n');
+    expect(response.items).to.equal('1. NAIROBI\n');
     expect(response.ids[0]).to.equal(47);
   });
-    //TODO: Add a failure check
-
-//   it('should raise an error if location does not exist', async () => {
-//     const response = await getLocations('counties', 99, 'county_name');
-
-//     expect(response.status).to.equal(400);
-//   });
+  it('should raise an error if location does not exist', async () => {
+    const response = await getLocations('counties', 99, 'county_name');
+    expect(response.items).to.equal('Location not found');
+    expect(response.ids).to.equal(undefined);
+    // TODO:Add test for response code
+    // expect(response.status).to.equal(404);
+  });
+  it('should return status 201 if location has been saved successfully', async () => {
+    const areaData = {
+      sub_county_id: 123,
+      location_id: 58,
+      area: 'Here',
+    };
+    const userId = 1;
+    const response = await addLocation(areaData, userId);
+    // console.log('Add location is', response);
+    // expect(response.status).to.equal(201);
+  });
 });

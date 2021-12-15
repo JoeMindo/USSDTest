@@ -30,7 +30,6 @@ export const getLocations = async (type, id, identifier) => {
   const menuIDs = [];
   try {
     const locationResult = await axios.get(`${BASEURL}/api/${type}/${id}`);
-
     locationResult.data.data.forEach((location) => {
       locationType.push(location);
     });
@@ -46,7 +45,9 @@ export const getLocations = async (type, id, identifier) => {
       ids: menuIDs,
     };
   } catch (error) {
-    throw new Error(error);
+    return {
+      items: 'Location not found',
+    };
   }
 };
 
