@@ -1,16 +1,18 @@
 import axios from 'axios';
-import { fetchCategories, fetchProducts } from './productmanagement.js';
+import { fetchCategories, fetchProducts, confirmQuantityWithPrice } from './productmanagement.js';
 import { con, end } from '../menus/rendermenu.js';
 import { BASEURL } from '../core/urls.js';
 import { menus } from '../menus/menuoptions.js';
-import { cartOperations } from '../cart/cartoperations.js';
+import {
+  cartOperations, askForQuantity, priceToUse, addToCart,
+} from '../cart/cartoperations.js';
 
 let message;
 export const offersArray = [];
 export const cartItems = [];
 export const totalCost = {};
 export const itemSelection = {};
-const offeringStatus = [];
+export const offeringStatus = [];
 
 export const renderProducts = async (id) => {
   try {
@@ -135,55 +137,57 @@ export const renderOfferings = async (client, id) => {
 
 export const showAvailableProducts = async (client, textValue, text) => {
   // Added client
-  if (textValue === 2) {
+  if (textValue === 1) {
     message = await renderProductCategories();
+    console.log('The message at here', message);
+  } else if (textValue === 2) {
+    const selection = parseInt(text.split('*')[1], 10);
+    message = await renderProducts(selection);
   } else if (textValue === 3) {
     const selection = parseInt(text.split('*')[2], 10);
-    message = await renderProducts(selection);
-  } else if (textValue === 4) {
-    const selection = parseInt(text.split('*')[3], 10);
     const result = await renderOfferings(client, selection);
 
     offeringStatus.push(result.status);
 
     message = result.message;
-  } else if (textValue === 5) {
-    const selection = parseInt(text.split('*')[4], 10);
+  } else if (textValue === 4) {
+    const selection = parseInt(text.split('*')[3], 10);
     message = checkGroupAndIndividualPrice(
       offeringStatus[`${offeringStatus.length - 1}`][`${selection}`],
     );
-  } else if (textValue === 6) {
+  } else if (textValue === 5) {
     message = askForQuantity();
-  } else if (textValue === 7 && parseInt(text.split('*')[6], 10) > 0) {
-    const userQuantity = parseInt(text.split('*')[6], 10);
-    const id = text.split('*')[4];
+  } else if (textValue === 6 && parseInt(text.split('*')[5], 10) > 0) {
+    const userQuantity = parseInt(text.split('*')[5], 10);
+    const id = text.split('*')[3];
     const typeOfOffering = offeringStatus[offeringStatus.length - 1];
-    const selection = parseInt(text.split('*')[4], 10);
-    const purchasingOption = text.split('*')[5];
+    const selection = parseInt(text.split('*')[3], 10);
+    const purchasingOption = text.split('*')[4];
     const availablePrice = typeOfOffering[`${selection}`];
     const price = priceToUse(availablePrice, purchasingOption);
-    message = confirmQuantityWithPrice(userQuantity, id, price);
-  } else if (textValue === 8 && text.split('*')[7] === '1') {
+    message = await confirmQuantityWithPrice(userQuantity, id, price, client);
+    console.log('Message is', message);
+  } else if (textValue === 7 && text.split('*')[6] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
-  } else if (textValue === 9 && text.split('*')[8] === '1') {
+  } else if (textValue === 8 && text.split('*')[7] === '1') {
     message = await cartOperations(text, 'inner', 1);
-  } else if (textValue === 9 && text.split('*')[8] === '67') {
+  } else if (textValue === 8 && text.split('*')[7] === '67') {
     message = await cartOperations(text, 'inner', 0);
-  } else if (textValue === 10 && text.split('*')[9] === '1') {
+  } else if (textValue === 9 && text.split('*')[8] === '1') {
     message = await cartOperations(text, 'inner', 8);
-  } else if (textValue === 10 && text.split('*')[9] === '2') {
+  } else if (textValue === 9 && text.split('*')[8] === '2') {
     message = await cartOperations(text, 'inner', 1);
-  } else if (textValue === 11 && text.split('*')[10] === '1') {
+  } else if (textValue === 10 && text.split('*')[9] === '1') {
     message = await cartOperations(text, 'inner', 2);
-  } else if (textValue === 11 && text.split('*')[10] === '2') {
+  } else if (textValue === 10 && text.split('*')[9] === '2') {
     message = await cartOperations(text, 'inner', 3);
-  } else if (textValue === 12 && text.split('*')[10] === '1') {
+  } else if (textValue === 11 && text.split('*')[9] === '1') {
     // TODO: Convert to a string
-    const itemID = parseInt(text.split('*')[11], 10);
+    const itemID = parseInt(text.split('*')[10], 10);
     message = await cartOperations(text, 'inner', 4, itemID);
-  } else if (textValue === 12 && text.split('*')[10] === '2') {
+  } else if (textValue === 11 && text.split('*')[9] === '2') {
     // TODO: Convert to a string
-    const itemID = parseInt(text.split('*')[11], 10);
+    const itemID = parseInt(text.split('*')[10], 10);
     message = await cartOperations(text, 'inner', 5, itemID);
   } else if (textValue === 13 && text.split('*')[10] === '2') {
     const itemID = parseInt(text.split('*')[11], 10);
@@ -200,4 +204,5 @@ export const showAvailableProducts = async (client, textValue, text) => {
   }
   return message;
 };
+
 export default renderOffers;

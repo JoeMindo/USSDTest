@@ -1,55 +1,57 @@
-import * as buyermenus from './buyermenus.js';
+/* eslint-disable import/no-cycle */
 import { renderBuyerMenus, con } from '../../menus/rendermenu.js';
 import * as groupOrderMenus from '../../orders/groupOrder.js';
+import { showAvailableProducts } from '../../products/renderProducts.js';
 import { retreiveCachedItems } from '../../core/services.js';
 import client from '../../server.js';
+import { cartOperations } from '../../cart/cartoperations.js';
 import { menus } from '../../menus/menuoptions.js';
 
 let message;
 
 const checkBuyerSelection = async (textValue, text) => {
-  if (textValue === 1) {
+  if (textValue === 1 && text === '') {
     message = renderBuyerMenus();
   } else {
-    const selection = text.split('*')[1];
+    const selection = text.split('*')[0];
     if (selection === '1') {
-      message = await buyermenus.showAvailableProducts(textValue, text);
-    } else if (selection === '2') {
+      message = await showAvailableProducts(client, textValue, text);
+    } else if (selection === '2' && textValue === 1) {
       if (textValue === 2) {
-        message = await buyermenus.cartOperations(text, 'outer', 0);
+        message = await cartOperations(text, 'outer', 0);
       } else if (textValue === 3 && text.split('*')[2] === '1') {
-        message = await buyermenus.cartOperations(text, 'outer', 1);
+        message = await cartOperations(text, 'outer', 1);
       } else if (textValue === 3 && text.split('*')[2] === '2') {
-        message = await buyermenus.cartOperations(text, 'outer', 1);
+        message = await cartOperations(text, 'outer', 1);
       } else if (textValue === 4 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
-        message = await buyermenus.cartOperations(text, 'outer', 8);
+        message = await cartOperations(text, 'outer', 8);
       } else if (textValue === 4 && text.split('*')[3] === '1') {
-        message = await buyermenus.cartOperations(text, 'outer', 2);
+        message = await cartOperations(text, 'outer', 2);
       } else if (textValue === 4 && text.split('*')[3] === '2') {
-        message = await buyermenus.cartOperations(text, 'outer', 3);
+        message = await cartOperations(text, 'outer', 3);
       } else if (textValue === 5 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
         // TODO: Make payment
-        message = await buyermenus.cartOperations(text, 'outer', 9);
+        message = await cartOperations(text, 'outer', 9);
       } else if (textValue === 5 && text.split('*')[3] === '1') {
         const id = parseInt(text.split('*')[4], 10);
-        message = await buyermenus.cartOperations(text, 'outer', 4, id);
+        message = await cartOperations(text, 'outer', 4, id);
       } else if (textValue === 5 && text.split('*')[3] === '2') {
         const id = parseInt(text.split('*')[4], 10);
-        message = await buyermenus.cartOperations(text, 'outer', 5, id);
+        message = await cartOperations(text, 'outer', 5, id);
       } else if (textValue === 6 && text.split('*')[3] === '1' && text.split('*')[5] === '67') {
-        message = await buyermenus.cartOperations(text, 'outer', 0);
+        message = await cartOperations(text, 'outer', 0);
       } else if (textValue === 6 && text.split('*')[3] === '2') {
         const id = parseInt(text.split('*')[4], 10);
         const newQuantity = parseInt(text.split('*')[5], 10);
-        message = await buyermenus.cartOperations(text, 'outer', 6, id, newQuantity);
+        message = await cartOperations(text, 'outer', 6, id, newQuantity);
       } else if (textValue === 7 && text.split('*')[3] === '2') {
         const id = parseInt(text.split('*')[4], 10);
-        message = await buyermenus.cartOperations(text, 'outer', 6, id);
+        message = await cartOperations(text, 'outer', 6, id);
       }
     } else if (selection === '3') {
       let userId = await retreiveCachedItems(client, ['user_id']);
       userId = parseInt(userId[0], 10);
-      const result = await buyermenus.viewOrders(userId);
+      const result = await viewOrders(userId);
       message = `${con()} ${result}`;
       message += menus.footer;
     } else if (selection === '4') {
@@ -63,7 +65,7 @@ const checkBuyerSelection = async (textValue, text) => {
 
         userId = parseInt(userId[0], 10);
         const groupData = {
-          dean_id: 4,
+          dean_id: userId,
           group_name: text.split('*')[3],
           group_type: 2,
           status: 1,

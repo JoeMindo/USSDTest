@@ -17,6 +17,28 @@ export const askForNumber = () => {
   message = `${con()} Checkout using\n 1. This Number\n 2. Other number`;
   return message;
 };
+export const askForQuantity = () => {
+  message = `${con()} Enter quantity you want to buy\n`;
+  message += menus.footer;
+  return message;
+};
+export const priceToUse = (availablePriceType, choice) => {
+  let status;
+  if (
+    (availablePriceType === 'both' && choice === '1')
+    || availablePriceType === 'unit'
+  ) {
+    status = 'unit';
+  } else if (
+    (availablePriceType === 'both' && choice === '2')
+    || availablePriceType === 'group'
+  ) {
+    status = 'group';
+  }
+
+  return status;
+};
+
 export const showCartItems = async (client) => {
   let prompt = '';
   let fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
@@ -228,7 +250,7 @@ export const cartOperations = async (
 ) => {
   let selection;
   if (menuLevel === 'inner') {
-    selection = text.split('*')[9];
+    selection = text.split('*')[8];
   } else if (menuLevel === 'outer') {
     selection = text.split('*')[2];
   }
@@ -263,6 +285,7 @@ export const cartOperations = async (
     const cartItems = JSON.parse(details[1]);
     cartItems.forEach((item) => {
       const pickedFields = (({
+        // eslint-disable-next-line camelcase
         id, product_id, userQuantity, totalCost,
       }) => ({
         id,
