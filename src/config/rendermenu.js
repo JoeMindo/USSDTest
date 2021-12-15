@@ -84,6 +84,7 @@ export const renderBuyerMenus = () => {
 };
 
 export const checkBuyerSelection = async (textValue, text) => {
+  console.log('The text value is', textValue);
   if (textValue === 1) {
     message = renderBuyerMenus();
   } else {
