@@ -5,11 +5,11 @@ import { con, end } from '../menus/rendermenu.js';
 import { menus } from '../menus/menuoptions.js';
 import makebasicOrder from '../orders/unitOrder.js';
 import makePayment from '../payment/payment.js';
+import { itemSelection } from '../products/productmanagement.js';
 
 export const offersArray = [];
 export const cartItems = [];
 export const totalCost = {};
-export const itemSelection = {};
 
 let message;
 
@@ -159,6 +159,7 @@ export const findItemToChangeQuantity = async (client, id) => {
   let itemToUpdate;
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
+    console.log('Cart items', cartItems);
     cartItems = JSON.parse(cartItems);
     cartItems.forEach((item) => {
       if (item.id === id) {
@@ -173,7 +174,7 @@ export const findItemToChangeQuantity = async (client, id) => {
       itemToUpdate,
     };
   } catch (err) {
-    throw new Error(err);
+    console.error('Error is ', err);
   }
 };
 
@@ -271,12 +272,12 @@ export const cartOperations = async (
   } else if (level === 4) {
     message = await removeItemFromCart(itemId);
   } else if (level === 5) {
-    const response = await findItemToChangeQuantity(itemId);
+    const response = await findItemToChangeQuantity(client, itemId);
     message = response.message;
   } else if (level === 6) {
-    const response = await findItemToChangeQuantity(itemId);
+    const response = await findItemToChangeQuantity(client, itemId);
     const item = response.itemToUpdate;
-    message = changeQuantity(index, item, itemId);
+    message = changeQuantity(client, index, item, itemId);
   } else if (level === 7) {
     message = confirmNewQuantity(client, itemSelection, totalCost);
   } else if (level === 8) {

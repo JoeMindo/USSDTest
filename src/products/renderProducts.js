@@ -1,5 +1,8 @@
+/* eslint-disable import/no-cycle */
 import axios from 'axios';
-import { fetchCategories, fetchProducts, confirmQuantityWithPrice } from './productmanagement.js';
+import {
+  fetchCategories, fetchProducts, confirmQuantityWithPrice, itemSelection,
+} from './productmanagement.js';
 import { con, end } from '../menus/rendermenu.js';
 import { BASEURL } from '../core/urls.js';
 import { menus } from '../menus/menuoptions.js';
@@ -11,7 +14,7 @@ let message;
 export const offersArray = [];
 export const cartItems = [];
 export const totalCost = {};
-export const itemSelection = {};
+
 export const offeringStatus = [];
 
 export const renderProducts = async (id) => {
@@ -166,7 +169,6 @@ export const showAvailableProducts = async (client, textValue, text) => {
     const availablePrice = typeOfOffering[`${selection}`];
     const price = priceToUse(availablePrice, purchasingOption);
     message = await confirmQuantityWithPrice(userQuantity, id, price, client);
-    console.log('Message is', message);
   } else if (textValue === 7 && text.split('*')[6] === '1') {
     message = await addToCart(client, itemSelection, totalCost);
   } else if (textValue === 8 && text.split('*')[7] === '1') {
@@ -189,9 +191,10 @@ export const showAvailableProducts = async (client, textValue, text) => {
     // TODO: Convert to a string
     const itemID = parseInt(text.split('*')[10], 10);
     message = await cartOperations(text, 'inner', 5, itemID);
-  } else if (textValue === 13 && text.split('*')[10] === '2') {
-    const itemID = parseInt(text.split('*')[11], 10);
-    const index = parseInt(text.split('*')[12], 10);
+    console.log('Message at update is', message);
+  } else if (textValue === 12 && text.split('*')[10] === '2') {
+    const itemID = parseInt(text.split('*')[10], 10);
+    const index = parseInt(text.split('*')[11], 10);
     // Point A
 
     message = await cartOperations(text, 'inner', 6, itemID, index);
