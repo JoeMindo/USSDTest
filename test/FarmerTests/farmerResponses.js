@@ -237,4 +237,13 @@ export const geoAreaError = {
 export const geoAreaSuccess = {
   message: 'Location Updated',
 };
+
+export const farmSaveSuccess = {
+  status: 'success',
+};
+
+export const farmSaveFailure = {
+  status: 'error',
+  message: 'Some error message',
+};
 export default regions;

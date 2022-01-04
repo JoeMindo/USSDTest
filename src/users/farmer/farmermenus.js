@@ -22,6 +22,7 @@ import { promptToGive } from './farmerlocation.js';
 
 const con = () => 'CON';
 const end = () => 'END';
+const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
 
 const questionanswers = {};
 
@@ -79,12 +80,12 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 2) {
+  } else if (textValue === 2 && isTextOnly(text.split('*')[1]) === true) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     client.set('farm_name', text.split('*')[1]);
-  } else if (textValue === 3) {
+  } else if (textValue === 3 && isTextOnly(text.split('*')[2]) === true) {
     client.set('farm_location', text.split('*')[2]);
     const categories = await fetchCategories();
 
@@ -92,21 +93,21 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     menuPrompt += categories;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 4) {
+  } else if (textValue === 4 && isTextOnly(text.split('*')[3]) === true) {
     const category = parseInt(text.split('*')[3], 10);
     const product = await fetchProducts(category);
     let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
     menuPrompt += `${product}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 5) {
+  } else if (textValue === 5 && isTextOnly(text.split('*')[4]) === true) {
     const productId = parseInt(text.split('*')[4], 10);
     client.set('productID', productId);
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     // res.send(message);
-  } else {
+  } else if (textValue === 6) {
     client.set('capacity', parseInt(text.split('*')[5], 10));
     const farmDetails = await retreiveCachedItems(client, [
       'farm_name',
@@ -123,7 +124,6 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
-    console.log('The response for adding farm', responseForAddingFarm);
 
     if (responseForAddingFarm === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
@@ -133,6 +133,9 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       const menuPrompt = `${end()} ${responseForAddingFarm.data.response}`;
       message = menuPrompt;
     }
+  } else {
+    message = `${con()} Only letters are allowed`;
+    message += `${menus.footer}`;
   }
   return message;
 };

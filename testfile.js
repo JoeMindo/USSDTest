@@ -1,2 +1,2 @@
-const text = '1';
-console.log(text.split('*')[0]);
+const text = 'h2e';
+console.log(/^[a-zA-Z]+$/.test(text));
