@@ -22,7 +22,7 @@ import { promptToGive } from './farmerlocation.js';
 
 const con = () => 'CON';
 const end = () => 'END';
-const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
+export const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
 
 const questionanswers = {};
 
@@ -80,62 +80,68 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 2 && isTextOnly(text.split('*')[1]) === true) {
-    let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-    client.set('farm_name', text.split('*')[1]);
-  } else if (textValue === 3 && isTextOnly(text.split('*')[2]) === true) {
-    client.set('farm_location', text.split('*')[2]);
-    const categories = await fetchCategories();
-
-    let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
-    menuPrompt += categories;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (textValue === 4 && isTextOnly(text.split('*')[3]) === true) {
-    const category = parseInt(text.split('*')[3], 10);
-    const product = await fetchProducts(category);
-    let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
-    menuPrompt += `${product}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (textValue === 5 && isTextOnly(text.split('*')[4]) === true) {
-    const productId = parseInt(text.split('*')[4], 10);
-    client.set('productID', productId);
+  } else if (textValue === 2) {
+    if (isTextOnly(text.split('*')[1]) === true) {
+      let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+      client.set('farm_name', text.split('*')[1]);
+    } else {
+      message = 'CON Invalid input, try again';
+    }
+  // } else if (textValue === 3) {
+  //   if (isTextOnly(text.split('*')[2]) === true) {
+  //     client.set('farm_location', text.split('*')[2]);
+  //     const categories = await fetchCategories();
+  //     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
+  //     menuPrompt += categories;
+  //     menuPrompt += menus.footer;
+  //     message = menuPrompt;
+  //   } else {
+  //     message = 'CON Invalid input, try again';
+  //   }
+  // } else if (textValue === 4) {
+  //   const category = parseInt(text.split('*')[3], 10);
+  //   const product = await fetchProducts(category);
+  //   let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
+  //   menuPrompt += `${product}`;
+  //   menuPrompt += menus.footer;
+  //   message = menuPrompt;
+  } else if (textValue === 3) {
+    // const productId = parseInt(text.split('*')[4], 10);
+    // client.set('farm_description', productId);
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
     // res.send(message);
-  } else if (textValue === 6) {
-    client.set('capacity', parseInt(text.split('*')[5], 10));
+  } else if (textValue === 4) {
+    client.set('farm_size', parseInt(text.split('*')[5], 10));
     const farmDetails = await retreiveCachedItems(client, [
       'farm_name',
       'farm_location',
-      'productID',
-      'capacity',
+      'farm_description',
+      'farm_size',
       'user_id',
     ]);
     const postDetails = {
       farm_name: farmDetails[0],
       farm_location: farmDetails[1],
-      product_id: farmDetails[2],
-      capacity: farmDetails[3],
+      farm_description: 'Null',
+      farm_size: farmDetails[3],
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
+    console.log('error', responseForAddingFarm.status);
 
-    if (responseForAddingFarm === 200) {
+    if (responseForAddingFarm.status === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
       message = menuPrompt;
-      client.set('farm_id', responseForAddingFarm.data.success.id);
+      // DISABLED FOR TESTING
+      // client.set('farm_id', responseForAddingFarm.data.success.id);
     } else {
-      const menuPrompt = `${end()} ${responseForAddingFarm.data.response}`;
+      const menuPrompt = `${end()} ${menus.addfarmDetails.failure}`;
       message = menuPrompt;
     }
-  } else {
-    message = `${con()} Only letters are allowed`;
-    message += `${menus.footer}`;
   }
   return message;
 };

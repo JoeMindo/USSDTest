@@ -4,6 +4,7 @@ import { describe, it } from 'mocha';
 import { BASEURL } from '../../src/core/urls.js';
 import { farmSaveSuccess, farmSaveFailure } from './farmerResponses.js';
 import { addFarm } from '../../src/users/farmer/farmmanagement.js';
+import { isTextOnly } from '../../src/users/farmer/farmermenus.js';
 
 describe('Add farm', () => {
   beforeEach(() => {
@@ -47,5 +48,9 @@ describe('Add farm', () => {
     };
     const response = await addFarm(farmDetails);
     expect(response.response.status).to.equal(400);
+  });
+  it('should not accept digits in any of the names', () => {
+    const result = isTextOnly('TestFarm123');
+    expect(result).to.equal(false);
   });
 });
