@@ -38,17 +38,17 @@ describe('Add farm', () => {
     const response = await addFarm(farmDetails);
     expect(response.response.status).to.equal(400);
   });
-  it('should inform the user if they enter non letters', async () => {
-    const farmDetails = {
-      farm_name: 'TestFarm',
-      farm_location: 'Local',
-      product_id: 23,
-      capacity: 154,
-      user_id: 8,
-    };
-    const response = await addFarm(farmDetails);
-    expect(response.response.status).to.equal(400);
-  });
+  // it('should inform the user if they send duplicate data to the system', async () => {
+  //   const farmDetails = {
+  //     farm_name: 'TestFarm',
+  //     farm_location: 'Local',
+  //     product_id: 23,
+  //     capacity: 154,
+  //     user_id: 8,
+  //   };
+  //   const response = await addFarm(farmDetails);
+  //   expect(response.response.status).to.equal(400);
+  // });
   it('should not accept digits in any of the names', () => {
     const result = isTextOnly('TestFarm123');
     expect(result).to.equal(false);

@@ -54,3 +54,12 @@ export const getAnswersPerQuestion = async (questionId) => {
     throw new Error(err);
   }
 };
+
+export const getUserFarms = async (userId) => {
+  try {
+    const response = axios.get(`${BASEURL}/api/farm/${userId}`);
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

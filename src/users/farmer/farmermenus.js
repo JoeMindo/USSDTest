@@ -5,10 +5,10 @@ import client from '../../server.js';
 import { addLocation } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
-  fetchCategories,
-  fetchProducts,
   getSpecificProduct,
   addProduct,
+  fetchCategories,
+  fetchProducts,
 } from '../../products/productmanagement.js';
 import {
   addFarm,
@@ -16,6 +16,7 @@ import {
   getAnswersPerQuestion,
   getFarmerMetricSections,
   getQuestionsPerSection,
+  getUserFarms,
 } from './farmmanagement.js';
 import { responsePrompt } from '../../menus/prompts.js';
 import { promptToGive } from './farmerlocation.js';
@@ -224,64 +225,62 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
 export const renderFarmerAddProductMenu = async (textValue, text) => {
   let message = '';
   const items = await retreiveCachedItems(client, [
-    'farm_id',
-    'productID',
     'user_id',
   ]);
-  const productID = parseInt(items[1], 10);
-  const specificProduct = await getSpecificProduct(productID);
-  if (specificProduct === false) {
-    message = 'CON There are no products found! Please add a farm';
-  } else {
-    if (textValue === 3) {
-      const units = parseInt(text.split('*')[2], 10);
-      client.set('units', units);
-      const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
+  const userID = parseInt(items[0], 10);
+  const hasFarms = await getUserFarms(userID);
+  if (hasFarms.status === 404) {
+    message = 'CON Please register a farm first';
+  } else if (hasFarms.status === 200) {
+    /*
+    1. Select Farm -Done
+    2. Show the categories -Done
+    3. Show the products - Done
+    3. Add the quantity of the product - Done
+    4. Add the price of the product - Done
+    5. Availability of the product
+     */
+    let farmList = '';
+    hasFarms.data.message.data.forEach((farm) => {
+      farmList += `\n${farm.id}. ${farm.farm_name}`;
+    });
+    message = `CON Which farm do you want to add products to? ${farmList}`;
+    if (textValue === 2) {
+      client.set('farm_id', parseInt(text.split('*')[1], 10));
+      const menuPrompt = `CON Select a category of items you want to add to your farm ${await fetchCategories()}`;
+      message = menuPrompt;
+    } else if (textValue === 3) {
+      const categoryId = parseInt(text.split('*')[2], 10);
+      client.set('category_id', categoryId);
+      const products = await fetchProducts(categoryId);
+      const menuPrompt = `CON Select a product you want to add to your farm \n ${products}`;
       message = menuPrompt;
     } else if (textValue === 4) {
-      let grade;
-      const selection = text.split('*')[3];
-      if (selection === '1') {
-        grade = 'A';
-        client.set('grade', grade);
-      } else if (selection === '2') {
-        grade = 'B';
-        client.set('grade', grade);
-      } else if (selection === '3') {
-        grade = 'C';
-        client.set('grade', grade);
-      } else if (selection === '4') {
-        grade = 'D';
-        client.set('grade', grade);
-      } else if (selection === '5') {
-        grade = 'E';
-        client.set('grade', grade);
-      } else {
-        message = 'Invalid grade';
-        message += menus.footer;
-      }
-      const addProductDetails = await retreiveCachedItems(client, [
-        'farm_id',
-        'productID',
-        'units',
-        'grade',
-      ]);
-
-      const addProductResponse = await addProductDetails;
-      const postDetails = {
-        farm_id: addProductResponse[0],
-        product_id: addProductResponse[1],
-        units: addProductResponse[2],
-        grade: addProductResponse[3],
+      const productId = parseInt(text.split('*')[3], 10);
+      client.set('product_id', productId);
+      // TODO: This should be a dynamic prompt
+      const menuPrompt = 'CON How many of bags this product do you have available for sale?';
+      message = menuPrompt;
+    } else if (textValue === 5) {
+      const availableQuantity = parseInt(text.split('*')[4], 10);
+      client.set('available_quantity', availableQuantity);
+      const menuPrompt = 'CON For how much are you selling this item for per bag?';
+      message = menuPrompt;
+    } else if (textValue === 6) {
+      const requestPrice = parseInt(text.split('*')[5], 10);
+      client.set('price', requestPrice);
+      // const menuPrompt = 'CON Is this item available for sale?\n 1. Yes\n 2. No';
+      // message = menuPrompt;
+      // TODO: Add product
+      const productData = await retreiveCachedItems(client, ['farm_id', 'product_id', 'available_quantity']);
+      const postProductDetails = {
+        farm_id: productData[0],
+        product_id: productData[1],
+        capacity: productData[2],
       };
-      const addProductToDB = await addProduct(postDetails);
-      if (addProductToDB.status === 200) {
-        message = 'END Added successfully';
-      } else {
-        message = 'END Added failed';
-      }
+      message = 'CON Adding product to your farm';
     }
-    message += `CON What quantity of \n ${specificProduct}`;
   }
+  message += menus.footer;
   return message;
 };

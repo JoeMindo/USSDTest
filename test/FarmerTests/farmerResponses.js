@@ -246,4 +246,39 @@ export const farmSaveFailure = {
   status: 'error',
   message: 'Some error message',
 };
+
+export const getUserFarmsSuccess = {
+  status: 'success',
+  message: {
+    data: [
+      {
+        id: 4,
+        user_id: 31,
+        farm_name: 'This farm',
+        farm_description: '1',
+        farm_location: 'Kenya',
+        farm_size: '299',
+        created_at: '2022-01-05T04:43:00.000000Z',
+        updated_at: '2022-01-05T04:43:00.000000Z',
+      },
+      {
+        id: 6,
+        user_id: 31,
+        farm_name: 'here',
+        farm_description: '1',
+        farm_location: 'here',
+        farm_size: '200',
+        created_at: '2022-01-05T04:55:11.000000Z',
+        updated_at: '2022-01-05T04:55:11.000000Z',
+      },
+    ],
+  },
+
+};
+
+export const userFarmsAreNil = {
+  status: 'error',
+  message: 'User has no registered farms',
+
+};
 export default regions;
