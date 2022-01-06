@@ -134,7 +134,7 @@ export const renderOfferings = async (client, id) => {
       status,
     };
   } catch (err) {
-    throw new Error(err);
+    return err;
   }
 };
 

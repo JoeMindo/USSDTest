@@ -3,7 +3,7 @@ import nock from 'nock';
 import { describe, it } from 'mocha';
 import { BASEURL } from '../../src/core/urls.js';
 import { getUserFarmsSuccess, userFarmsAreNil } from './farmerResponses.js';
-import categoriesFound, { categoriesNotFound, categoriesServerError } from './productcallResponses.js';
+import categoriesFound, { categoriesServerError } from './productcallResponses.js';
 import { fetchCategories } from '../../src/products/productmanagement.js';
 import { getUserFarms } from '../../src/users/farmer/farmmanagement.js';
 
@@ -47,9 +47,7 @@ describe('Add product', () => {
   it('should inform the user of a server error', async () => {
     await fetchCategories().catch((error) => {
       expect(error.response.status).to.equal(500);
-      // expect(error.response.data.data.status).to.equal('error');
       expect(error.response.data.data.message).to.equal('Server error');
-      console.log('The error is', error.response);
     });
   });
 });
