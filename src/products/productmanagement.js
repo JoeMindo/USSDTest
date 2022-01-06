@@ -14,14 +14,13 @@ async function fetchCategories() {
   let results = '';
   try {
     const response = await axios.get(`${BASEURL}/api/prodcategories`);
-
     response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);
       results += `\n${category.id}. ${category.category_name}`;
     });
     return results;
   } catch (error) {
-    throw new Error(error);
+    return error;
   }
 }
 async function fetchProducts(id) {

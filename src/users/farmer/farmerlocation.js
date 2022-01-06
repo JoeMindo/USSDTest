@@ -8,6 +8,9 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
   let results;
   if (locality === 'region') {
     const regions = await getRegions();
+    if (regions.status === 500) {
+      results = 'CON Server error please try later';
+    }
     const list = await regions;
     results = list.items;
   } else if (locality === 'county') {

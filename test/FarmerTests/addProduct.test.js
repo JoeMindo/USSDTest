@@ -3,6 +3,8 @@ import nock from 'nock';
 import { describe, it } from 'mocha';
 import { BASEURL } from '../../src/core/urls.js';
 import { getUserFarmsSuccess, userFarmsAreNil } from './farmerResponses.js';
+import categoriesFound, { categoriesNotFound, categoriesServerError } from './productcallResponses.js';
+import { fetchCategories } from '../../src/products/productmanagement.js';
 import { getUserFarms } from '../../src/users/farmer/farmmanagement.js';
 
 describe('Add product', () => {
@@ -15,6 +17,12 @@ describe('Add product', () => {
     nock(`${BASEURL}`)
       .get('/api/farm/4')
       .reply(404, userFarmsAreNil);
+    nock(`${BASEURL}`)
+      .get('/api/prodcategories')
+      .reply(200, categoriesFound);
+    nock(`${BASEURL}`)
+      .get('/api/prodcategories')
+      .reply(500, categoriesServerError);
   });
 
   it('should fetch the farms belonging to a user based on the user ID', async () => {
@@ -30,6 +38,18 @@ describe('Add product', () => {
       expect(error.response.status).to.equal(404);
       expect(error.response.data.status).to.equal('error');
       expect(error.response.data.message).to.equal('User has no registered farms');
+    });
+  });
+  it('should get all the available categories', async () => {
+    const response = await fetchCategories();
+    expect(typeof (response)).to.equal('string');
+  });
+  it('should inform the user of a server error', async () => {
+    await fetchCategories().catch((error) => {
+      expect(error.response.status).to.equal(500);
+      // expect(error.response.data.data.status).to.equal('error');
+      expect(error.response.data.data.message).to.equal('Server error');
+      console.log('The error is', error.response);
     });
   });
 });
