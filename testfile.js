@@ -1,20 +1,21 @@
-import axios from "axios";
-import { BASEURL } from "./src/core/urls.js";
+// import axios from "axios";
+// import { BASEURL } from "./src/core/urls.js";
 
-const getUserFarms = async (userId) => {
-  try {
-    const response = axios.get(`${BASEURL}/api/farm/${userId}`);
-    return response;
-  } catch (error) {
-    if (error.response) {
-    }
-  }
-};
+// const getUserFarms = async (userId) => {
+//   try {
+//     const response = axios.get(`${BASEURL}/api/farm/${userId}`);
+//     return response;
+//   } catch (error) {
+//     if (error.response) {
+//     }
+//   }
+// };
 
 // if (textValue === 3) {if (textValue === 3) {
 //   const units = parseInt(text.split('*')[2], 10);
 //   client.set('units', units);
-//   const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
+//   const menuPrompt = 'CON How would you grade your produce?\n
+// 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
 //   message = menuPrompt;
 // } else if (textValue === 4) {
 //   let grade;
@@ -61,7 +62,8 @@ const getUserFarms = async (userId) => {
 // }
 //   const units = parseInt(text.split('*')[2], 10);
 //   client.set('units', units);
-//   const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
+//   const menuPrompt = 'CON How would you grade your produce?\n 1. Grade A \n
+// 2. Grade B \n 3. Grade C \n 4.Grade D\n 5. Grade E';
 //   message = menuPrompt;
 // } else if (textValue === 4) {
 //   let grade;

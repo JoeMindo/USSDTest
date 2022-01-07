@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe } from 'mocha';
 import nock from 'nock';
 import { BASEURL } from '../../src/core/urls.js';
 
@@ -7,7 +6,7 @@ describe('Buyer', () => {
   beforeEach(() => {
     nock(`${BASEURL}`)
       .get('/api/productsbyproductid')
-      .reply(200, farmOffers);
+      .reply(200, 'Success');
 
     nock(`${BASEURL}`);
 
