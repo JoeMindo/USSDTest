@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import express from 'express';
 import bodyParser from 'body-parser';
 import logger from 'morgan';
@@ -7,10 +8,7 @@ import redis from 'redis';
 import bluebird from 'bluebird';
 import { ussdRouter } from 'ussd-router';
 import * as menuItems from './menus/rendermenu.js';
-import {
-  registerUser,
-  checkIfUserExists,
-} from './core/usermanagement.js';
+import { registerUser, checkIfUserExists } from './core/usermanagement.js';
 import checkFarmerSelection from './users/farmer/farmerselection.js';
 import checkBuyerSelection from './users/buyer/buyerselection.js';
 
@@ -58,10 +56,6 @@ app.use((req, res, next) => {
 });
 
 app.post('/ussd', async (req, res) => {
-  const userLogin = {
-    phone_no: '',
-    password: '',
-  };
   const userGender = {
     1: 'Male',
     2: 'Female',
@@ -72,7 +66,6 @@ app.post('/ussd', async (req, res) => {
   // TODO: Migrate this to usermanagement
 
   const textValue = text.split('*').length;
-  console.log('The text value is', textValue);
 
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;

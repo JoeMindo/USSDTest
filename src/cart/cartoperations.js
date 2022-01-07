@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable prefer-destructuring */
 import { retreiveCachedItems } from '../core/services.js';
 import client from '../server.js';
@@ -69,8 +70,8 @@ export const addToCart = async (client, itemsObject, totalPriceObject) => {
           client.set('cartItems', JSON.stringify(existingItems));
         } else {
           const newTotal = existingItems[`${index}`].userQuantity
-              * existingItems[`${index}`].unitPrice;
-            // Increase quantity function
+            * existingItems[`${index}`].unitPrice;
+          // Increase quantity function
           existingItems[`${index}`].userQuantity += itemsObject.userQuantity;
           existingItems[`${index}`].totalCost = newTotal;
           client.set('cartItems', JSON.stringify(existingItems));
@@ -159,7 +160,7 @@ export const findItemToChangeQuantity = async (client, id) => {
   let itemToUpdate;
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
-    console.log('Cart items', cartItems);
+
     cartItems = JSON.parse(cartItems);
     cartItems.forEach((item) => {
       if (item.id === id) {
@@ -174,7 +175,7 @@ export const findItemToChangeQuantity = async (client, id) => {
       itemToUpdate,
     };
   } catch (err) {
-    console.error('Error is ', err);
+    return err;
   }
 };
 
@@ -260,7 +261,7 @@ export const cartOperations = async (
     message = await displayCartItems(client);
   } else if (
     (selection === '1' && level === 1)
-      || (text.split('*')[8] === '1' && level === 1)
+    || (text.split('*')[8] === '1' && level === 1)
   ) {
     message = askForNumber();
   } else if (selection === '2' && level === 1) {
@@ -286,8 +287,12 @@ export const cartOperations = async (
     const cartItems = JSON.parse(details[1]);
     cartItems.forEach((item) => {
       const pickedFields = (({
+
+        id,
         // eslint-disable-next-line camelcase
-        id, product_id, userQuantity, totalCost,
+        product_id,
+        userQuantity,
+        totalCost,
       }) => ({
         id,
         product_id,

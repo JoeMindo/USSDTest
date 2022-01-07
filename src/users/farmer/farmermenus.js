@@ -5,8 +5,7 @@ import client from '../../server.js';
 import { addLocation } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
-  getSpecificProduct,
-  addProduct,
+
   fetchCategories,
   fetchProducts,
 } from '../../products/productmanagement.js';
@@ -90,24 +89,24 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     } else {
       message = 'CON Invalid input, try again';
     }
-  // } else if (textValue === 3) {
-  //   if (isTextOnly(text.split('*')[2]) === true) {
-  //     client.set('farm_location', text.split('*')[2]);
-  //     const categories = await fetchCategories();
-  //     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
-  //     menuPrompt += categories;
-  //     menuPrompt += menus.footer;
-  //     message = menuPrompt;
-  //   } else {
-  //     message = 'CON Invalid input, try again';
-  //   }
-  // } else if (textValue === 4) {
-  //   const category = parseInt(text.split('*')[3], 10);
-  //   const product = await fetchProducts(category);
-  //   let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
-  //   menuPrompt += `${product}`;
-  //   menuPrompt += menus.footer;
-  //   message = menuPrompt;
+    // } else if (textValue === 3) {
+    //   if (isTextOnly(text.split('*')[2]) === true) {
+    //     client.set('farm_location', text.split('*')[2]);
+    //     const categories = await fetchCategories();
+    //     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
+    //     menuPrompt += categories;
+    //     menuPrompt += menus.footer;
+    //     message = menuPrompt;
+    //   } else {
+    //     message = 'CON Invalid input, try again';
+    //   }
+    // } else if (textValue === 4) {
+    //   const category = parseInt(text.split('*')[3], 10);
+    //   const product = await fetchProducts(category);
+    //   let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
+    //   menuPrompt += `${product}`;
+    //   menuPrompt += menus.footer;
+    //   message = menuPrompt;
   } else if (textValue === 3) {
     // const productId = parseInt(text.split('*')[4], 10);
     // client.set('farm_description', productId);
@@ -132,7 +131,6 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
-    console.log('error', responseForAddingFarm.status);
 
     if (responseForAddingFarm.status === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
@@ -224,9 +222,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
 
 export const renderFarmerAddProductMenu = async (textValue, text) => {
   let message = '';
-  const items = await retreiveCachedItems(client, [
-    'user_id',
-  ]);
+  const items = await retreiveCachedItems(client, ['user_id']);
   const userID = parseInt(items[0], 10);
   const hasFarms = await getUserFarms(userID);
   if (hasFarms.status === 404) {
@@ -272,12 +268,16 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
       // const menuPrompt = 'CON Is this item available for sale?\n 1. Yes\n 2. No';
       // message = menuPrompt;
       // TODO: Add product
-      const productData = await retreiveCachedItems(client, ['farm_id', 'product_id', 'available_quantity']);
-      const postProductDetails = {
-        farm_id: productData[0],
-        product_id: productData[1],
-        capacity: productData[2],
-      };
+      // const productData = await retreiveCachedItems(client, [
+      //   'farm_id',
+      //   'product_id',
+      //   'available_quantity',
+      // ]);
+      // const postProductDetails = {
+      //   farm_id: productData[0],
+      //   product_id: productData[1],
+      //   capacity: productData[2],
+      // };
       message = 'CON Adding product to your farm';
     }
   }

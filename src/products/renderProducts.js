@@ -1,13 +1,19 @@
 /* eslint-disable import/no-cycle */
 import axios from 'axios';
 import {
-  fetchCategories, fetchProducts, confirmQuantityWithPrice, itemSelection,
+  fetchCategories,
+  fetchProducts,
+  confirmQuantityWithPrice,
+  itemSelection,
 } from './productmanagement.js';
 import { con, end } from '../menus/rendermenu.js';
 import { BASEURL } from '../core/urls.js';
 import { menus } from '../menus/menuoptions.js';
 import {
-  cartOperations, askForQuantity, priceToUse, addToCart,
+  cartOperations,
+  askForQuantity,
+  priceToUse,
+  addToCart,
 } from '../cart/cartoperations.js';
 
 let message;
@@ -142,7 +148,6 @@ export const showAvailableProducts = async (client, textValue, text) => {
   // Added client
   if (textValue === 1) {
     message = await renderProductCategories();
-    console.log('The message at here', message);
   } else if (textValue === 2) {
     const selection = parseInt(text.split('*')[1], 10);
     message = await renderProducts(selection);
@@ -191,7 +196,6 @@ export const showAvailableProducts = async (client, textValue, text) => {
     // TODO: Convert to a string
     const itemID = parseInt(text.split('*')[10], 10);
     message = await cartOperations(text, 'inner', 5, itemID);
-    console.log('Message at update is', message);
   } else if (textValue === 12 && text.split('*')[10] === '2') {
     const itemID = parseInt(text.split('*')[10], 10);
     const index = parseInt(text.split('*')[11], 10);

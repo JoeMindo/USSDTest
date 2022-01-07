@@ -9,5 +9,3 @@ const generateKeys = (obj) => {
 };
 
 export default generateKeys;
-
-console.log(generateKeys([{ id: 4 }, { id: 12 }]));

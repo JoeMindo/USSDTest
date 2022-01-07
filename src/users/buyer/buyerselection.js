@@ -49,10 +49,11 @@ const checkBuyerSelection = async (textValue, text) => {
         message = await cartOperations(text, 'outer', 6, id);
       }
     } else if (selection === '3') {
-      let userId = await retreiveCachedItems(client, ['user_id']);
-      userId = parseInt(userId[0], 10);
-      const result = await viewOrders(userId);
-      message = `${con()} ${result}`;
+      // let userId = await retreiveCachedItems(client, ['user_id']);
+      // userId = parseInt(userId[0], 10);
+      // TODO: Waiting for implementation
+      // const result = await viewOrders(userId);
+      message = `${con()} Order result here`;
       message += menus.footer;
     } else if (selection === '4') {
       // const status = await groupOrderMenus.checkIfUserIsInGroup();

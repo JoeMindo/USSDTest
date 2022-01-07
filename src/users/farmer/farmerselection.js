@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import * as farmerMenus from './farmermenus.js';
 import { renderFarmerMenus } from '../../menus/rendermenu.js';
 
