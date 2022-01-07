@@ -22,7 +22,10 @@
   },
   "homepage": "https://github.com/Adalabsafricaltd/Mamlaka-USSD#readme",
   "devDependencies": {
+    "@babel/cli": "^7.16.7",
+    "@babel/core": "^7.16.7",
     "@babel/preset-env": "^7.16.7",
+    "@babel/register": "^7.16.7",
     "async-redis": "^2.0.0",
     "babel-eslint": "^10.1.0",
     "chai": "^4.3.4",
