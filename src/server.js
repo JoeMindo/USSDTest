@@ -66,6 +66,7 @@ app.post('/ussd', async (req, res) => {
   // TODO: Migrate this to usermanagement
 
   const textValue = text.split('*').length;
+  console.log('The text value is', textValue);
 
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;
@@ -88,22 +89,22 @@ app.post('/ussd', async (req, res) => {
         role_id: req.session.registration[6],
       };
 
-      const out = registerUser(userDetails, req.body.phoneNumber);
-      const result = out.then((response) => {
-        if (response.status === 'error') {
-          Object.keys(response.errors).forEach((key) => {
-            error += `${response.errors[`${key}`].toString()}`;
-          });
-          return error;
-        }
+      const response = await registerUser(userDetails, req.body.phoneNumber).catch((error) => {
+        message = `END ${error.response.data.message}`;
+      });
+      if (response === undefined) {
+        message = 'END Something went wrong try later';
         return message;
-      });
-      result.then((response) => {
-        res.send(response);
-      });
-    } else {
-      res.send(message);
+      }
+      if (response.status === 'error') {
+        Object.keys(response.errors).forEach((key) => {
+          error += `${response.errors[`${key}`].toString()}`;
+        });
+        return error;
+      }
+      return message;
     }
+    res.send(message);
   } else if (userStatus.exists === true) {
     client.set('user_id', userStatus.user_id);
     if (userStatus.role === 'FARMER') {

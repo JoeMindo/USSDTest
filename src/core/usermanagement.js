@@ -1,18 +1,18 @@
 /* eslint-disable consistent-return */
-import axios from "axios";
-import { postrequest } from "./services.js";
-import { BASEURL } from "./urls.js";
+import axios from 'axios';
+import { postrequest } from './services.js';
+import { BASEURL } from './urls.js';
 
 const clearData = (details) => {
-  details.name = "";
-  details.Id = "";
-  details.phone = "";
-  details.password = "";
-  details.role = "";
+  details.name = '';
+  details.Id = '';
+  details.phone = '';
+  details.password = '';
+  details.role = '';
   return details;
 };
 const registerUser = async (regdata, phone) => {
-  const path = `${BASEURL}/ussd/register`;
+  const path = `${BASEURL}/ussd/ussdRegister`;
   const postdata = {
     phone_no: phone,
     first_name: regdata.first_name,
@@ -26,9 +26,10 @@ const registerUser = async (regdata, phone) => {
   };
   try {
     const registrationresponse = await postrequest(postdata, path);
+    // console.log('The functional response', registrationresponse.response.data.message);
     return registrationresponse.data;
   } catch (error) {
-    throw new Error(error);
+    return error;
   }
 };
 
@@ -74,7 +75,7 @@ const checkIfUserExists = async (phone) => {
       phone_no: phone,
     };
     const response = await axios.post(`${BASEURL}/ussd/isuser`, details);
-    if (response.data.status === "success") {
+    if (response.data.status === 'success') {
       return {
         exists: response.data.message,
         role: response.data.role,
