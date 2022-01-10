@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { BASEURL } from '../core/urls.js';
-import { retreiveCachedItems } from '../core/services.js';
-import { menus } from '../menus/menuoptions.js';
-import { con } from '../menus/rendermenu.js';
+import axios from "axios";
+import { BASEURL } from "../core/urls.js";
+import { retreiveCachedItems } from "../core/services.js";
+import { menus } from "../menus/menuoptions.js";
+import { con } from "../menus/rendermenu.js";
 
 const optionProducts = [];
 export const offersArray = [];
@@ -11,9 +11,9 @@ export const totalCost = {};
 export const itemSelection = {};
 
 async function fetchCategories() {
-  let results = '';
+  let results = "";
   try {
-    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
     response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);
       results += `\n${category.id}. ${category.category_name}`;
@@ -24,9 +24,9 @@ async function fetchCategories() {
   }
 }
 async function fetchProducts(id) {
-  let results = '';
+  let results = "";
   try {
-    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
 
     response.data.data.data.forEach((item) => {
       item.products.forEach((description) => {
@@ -41,9 +41,9 @@ async function fetchProducts(id) {
   }
 }
 const fetchFarmOfferings = async (id) => {
-  let farmOfferings = '';
+  let farmOfferings = "";
   try {
-    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
     response.data.forEach((item) => {
       item.farm_products.forEach((farmItem) => {
         if (farmItem.product_id === id) {
@@ -60,8 +60,8 @@ const fetchFarmOfferings = async (id) => {
 const addProduct = async (productdata) => {
   try {
     const newProduct = axios.post(
-      `${BASEURL}/api/farmcatalog/save`,
-      productdata,
+      `${BASEURL}/ussd/farmcatalog/save`,
+      productdata
     );
 
     return newProduct;
@@ -72,9 +72,9 @@ const addProduct = async (productdata) => {
 
 const getSpecificProduct = async (id) => {
   try {
-    const specificProduct = await axios.get(`${BASEURL}/api/products/all`);
+    const specificProduct = await axios.get(`${BASEURL}/ussd/products/all`);
     const filteredItems = specificProduct.data.filter((item) => item.id === id);
-    let respose = '';
+    let respose = "";
     filteredItems.forEach((filteredItem) => {
       respose += `${filteredItem.id}. ${filteredItem.product_name}`;
     });
@@ -88,12 +88,12 @@ export const confirmQuantityWithPrice = async (
   userQuantity,
   productID,
   status,
-  client,
+  client
 ) => {
   let availableUnits = 0;
   let pricePoint;
   let message;
-  let offers = await retreiveCachedItems(client, ['offersArray']);
+  let offers = await retreiveCachedItems(client, ["offersArray"]);
   offers = JSON.parse(offers);
   const buyerSelection = offers.filter((item) => item.id === productID);
 
@@ -102,9 +102,9 @@ export const confirmQuantityWithPrice = async (
   if (userQuantity > availableUnits) {
     message = `${con()} The amount you set is higher than the available units go back and choose a smaller quantity`;
   } else {
-    if (status === 'unit') {
+    if (status === "unit") {
       pricePoint = parseInt(buyerSelection[0].unitPrice, 10);
-    } else if (status === 'group') {
+    } else if (status === "group") {
       pricePoint = parseInt(buyerSelection[0].groupPrice, 10);
     }
 

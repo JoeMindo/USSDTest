@@ -3,7 +3,7 @@
 
 // const getUserFarms = async (userId) => {
 //   try {
-//     const response = axios.get(`${BASEURL}/api/farm/${userId}`);
+//     const response = axios.get(`${BASEURL}/ussd/farm/${userId}`);
 //     return response;
 //   } catch (error) {
 //     if (error.response) {

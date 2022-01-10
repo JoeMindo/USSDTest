@@ -1,18 +1,18 @@
 /* eslint-disable consistent-return */
-import axios from 'axios';
-import { postrequest } from './services.js';
-import { BASEURL } from './urls.js';
+import axios from "axios";
+import { postrequest } from "./services.js";
+import { BASEURL } from "./urls.js";
 
 const clearData = (details) => {
-  details.name = '';
-  details.Id = '';
-  details.phone = '';
-  details.password = '';
-  details.role = '';
+  details.name = "";
+  details.Id = "";
+  details.phone = "";
+  details.password = "";
+  details.role = "";
   return details;
 };
 const registerUser = async (regdata, phone) => {
-  const path = `${BASEURL}/api/register`;
+  const path = `${BASEURL}/ussd/register`;
   const postdata = {
     phone_no: phone,
     first_name: regdata.first_name,
@@ -23,7 +23,6 @@ const registerUser = async (regdata, phone) => {
     password: regdata.password,
     password_confirmation: regdata.password_confirmation,
     gender: regdata.gender,
-
   };
   try {
     const registrationresponse = await postrequest(postdata, path);
@@ -34,7 +33,7 @@ const registerUser = async (regdata, phone) => {
 };
 
 const loginUser = async (loginData) => {
-  const path = `${BASEURL}/api/login`;
+  const path = `${BASEURL}/ussd/login`;
   const postdata = {
     phone_no: loginData.phone_no,
     password: loginData.password,
@@ -48,7 +47,7 @@ const loginUser = async (loginData) => {
 };
 
 const addLocation = async (locationData, id) => {
-  const path = `${BASEURL}/api/geoarea/${id}`;
+  const path = `${BASEURL}/ussd/geoarea/${id}`;
 
   try {
     const locationResponse = await postrequest(locationData, path);
@@ -59,7 +58,7 @@ const addLocation = async (locationData, id) => {
 };
 
 const checkFarmerVerification = async (id) => {
-  const path = `${BASEURL}/api/isverified/${id}`;
+  const path = `${BASEURL}/ussd/isverified/${id}`;
   try {
     const verificationresponse = await postrequest(path);
     return verificationresponse.status;
@@ -74,8 +73,8 @@ const checkIfUserExists = async (phone) => {
     const details = {
       phone_no: phone,
     };
-    const response = await axios.post(`${BASEURL}/api/isuser`, details);
-    if (response.data.status === 'success') {
+    const response = await axios.post(`${BASEURL}/ussd/isuser`, details);
+    if (response.data.status === "success") {
       return {
         exists: response.data.message,
         role: response.data.role,
@@ -88,6 +87,11 @@ const checkIfUserExists = async (phone) => {
 };
 
 export {
-  clearData, registerUser, loginUser, addLocation, checkFarmerVerification, checkVerification,
+  clearData,
+  registerUser,
+  loginUser,
+  addLocation,
+  checkFarmerVerification,
+  checkVerification,
   checkIfUserExists,
 };

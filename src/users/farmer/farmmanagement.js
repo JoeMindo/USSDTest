@@ -1,12 +1,12 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/prefer-default-export */
-import axios from 'axios';
-import { BASEURL } from '../../core/urls.js';
+import axios from "axios";
+import { BASEURL } from "../../core/urls.js";
 
 export const addFarm = async (farm) => {
   try {
     // TODO:Backend resolve this issue
-    const response = await axios.post(`${BASEURL}/api/farm/save`, farm);
+    const response = await axios.post(`${BASEURL}/ussd/farm/save`, farm);
     return response;
   } catch (err) {
     return err;
@@ -16,8 +16,8 @@ export const addFarm = async (farm) => {
 export const addFarmerKYC = async (farmerKYC, id) => {
   try {
     const response = await axios.post(
-      `${BASEURL}/api/kycsanswers/save/${id}`,
-      farmerKYC,
+      `${BASEURL}/ussd/kycsanswers/save/${id}`,
+      farmerKYC
     );
 
     return response;
@@ -28,7 +28,7 @@ export const addFarmerKYC = async (farmerKYC, id) => {
 
 export const getFarmerMetricSections = async () => {
   try {
-    const response = await axios.get(`${BASEURL}/api/kycmetricsections/1`);
+    const response = await axios.get(`${BASEURL}/ussd/kycmetricsections/1`);
     return response;
   } catch (err) {
     throw new Error(err);
@@ -37,7 +37,7 @@ export const getFarmerMetricSections = async () => {
 export const getQuestionsPerSection = async (sectionId) => {
   try {
     const response = await axios.get(
-      `${BASEURL}/api/kycquestions/${sectionId}`,
+      `${BASEURL}/ussd/kycquestions/${sectionId}`
     );
     return response;
   } catch (err) {
@@ -47,7 +47,7 @@ export const getQuestionsPerSection = async (sectionId) => {
 export const getAnswersPerQuestion = async (questionId) => {
   try {
     const response = await axios.get(
-      `${BASEURL}/api/kycpossibleanswers/${questionId}`,
+      `${BASEURL}/ussd/kycpossibleanswers/${questionId}`
     );
     return response;
   } catch (err) {
@@ -57,7 +57,7 @@ export const getAnswersPerQuestion = async (questionId) => {
 
 export const getUserFarms = async (userId) => {
   try {
-    const response = axios.get(`${BASEURL}/api/farm/${userId}`);
+    const response = axios.get(`${BASEURL}/ussd/farm/${userId}`);
     return response;
   } catch (error) {
     return error;
