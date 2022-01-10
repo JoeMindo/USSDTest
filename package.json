@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "mocha --require js:@babel/register test/**/*.js --timeout 10000",
+    "test": "mocha --require @babel/register test/**/*.js --timeout 10000",
     "start": "node --experimental-json-modules src/server.js",
     "dev": "nodemon src/server.js",
     "fix": "./node_modules/.bin/eslint src --fix"
