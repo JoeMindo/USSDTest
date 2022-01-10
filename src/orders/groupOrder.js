@@ -1,16 +1,20 @@
+/* eslint-disable import/no-cycle */
 import axios from 'axios';
 import { retreiveCachedItems } from '../core/services.js';
-import { client } from '../server.js';
-import { BASEURL } from './urls.js';
-import { menus } from './menuoptions.js';
-import { askForNumber, askForQuantity, renderProductCategories, renderProducts } from './buyermenus.js';
-import renderOffers from '../core/renderProducts.js';
+import { renderOffers, renderProducts } from '../products/renderProducts.js';
+import client from '../server.js';
+
+import { BASEURL } from '../core/urls.js';
+import { menus } from '../menus/menuoptions.js';
+import {
+  askForQuantity, renderProductCategories,
+} from '../users/buyer/buyermenus.js';
 
 export const checkIfUserIsInGroup = async () => {
   const user = await retreiveCachedItems(client, ['user_id']);
   const data = {
     // TODO: Custom ID
-    user_id: Math.floor(Math.random() * 100),
+    user_id: user,
   };
   const response = await axios.post(`${BASEURL}/api/isuseringroup`, data);
   if (response.data.status === 'success') {
@@ -50,7 +54,6 @@ export const renderGroupPricedItems = async (productId) => {
   try {
     let offers = await axios.get(`${BASEURL}/api/productsbyproductid/${productId}`);
     offers = offers.data.message.data;
-    // console.log('The offers for this are', offers.data.message.data);
     const message = renderOffers(offers, [], client);
     return message;
   } catch (err) {

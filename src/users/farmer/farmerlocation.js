@@ -1,7 +1,6 @@
-/* eslint-disable import/extensions */
-import { getLocations, getRegions } from '../core/listlocations.js';
-import { menus } from './menuoptions.js';
-import { retreiveCachedItems } from '../core/services.js';
+import { getLocations, getRegions } from './listlocations.js';
+import { menus } from '../../menus/menuoptions.js';
+import { retreiveCachedItems } from '../../core/services.js';
 
 const con = () => 'CON';
 
@@ -9,6 +8,9 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
   let results;
   if (locality === 'region') {
     const regions = await getRegions();
+    if (regions.status === 500) {
+      results = 'CON Server error please try later';
+    }
     const list = await regions;
     results = list.items;
   } else if (locality === 'county') {
@@ -19,22 +21,33 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
     results = list.items;
   } else if (locality === 'subcounty') {
     const countyIds = await retreiveCachedItems(client, ['usercountyIds']);
-    let userCountySelection = countyIds[0].split(',')[id];
+    let userCountySelection = countyIds[0].split(',')[`${(id -= 1)}`];
+
     userCountySelection = parseInt(userCountySelection, 10);
-    const subcounties = await getLocations('subcounties', userCountySelection, 'sub_county_name');
+    const subcounties = await getLocations(
+      'subcounties',
+      userCountySelection,
+      'sub_county_name',
+    );
     client.set('userSubcountyIds', subcounties.ids.toString());
     results = subcounties.items;
   } else if (locality === 'location') {
-    const subcountyIds = await retreiveCachedItems(client, ['userSubcountyIds']);
-    let userSubcountySelection = subcountyIds[0].split(',')[id];
+    const subcountyIds = await retreiveCachedItems(client, [
+      'userSubcountyIds',
+    ]);
+    let userSubcountySelection = subcountyIds[0].split(',')[`${(id -= 1)}`];
     userSubcountySelection = parseInt(userSubcountySelection, 10);
     client.set('userSubCountySelection', userSubcountySelection);
-    const locations = await getLocations('locations', userSubcountySelection, 'location_name');
+    const locations = await getLocations(
+      'locations',
+      userSubcountySelection,
+      'location_name',
+    );
     client.set('userLocationIds', locations.ids.toString());
     results = locations.items;
   } else if (locality === 'area') {
     const locationIds = await retreiveCachedItems(client, ['userLocationIds']);
-    let userLocationSelection = locationIds[0].split(',')[id];
+    let userLocationSelection = locationIds[0].split(',')[`${(id -= 1)}`];
     userLocationSelection = parseInt(userLocationSelection, 10);
     client.set('userLocationSelection', userLocationSelection);
   } else {

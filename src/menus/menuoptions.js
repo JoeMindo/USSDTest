@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 const grades = {
   1: 'Grade A',
   2: 'Grade B',
@@ -34,7 +33,7 @@ export const menus = {
     1: 'Enter farm location',
     2: 'Choose a category of foods that you grow\n',
     3: 'Choose a product that you grow\n',
-    4: 'What is a capacity per harvest in bags',
+    4: 'What is the farm size in acres',
     success: 'Farm registered successfully',
     failure: 'Farm registration failed',
 
@@ -88,3 +87,4 @@ export const menus = {
   },
 
 };
+export default menus;

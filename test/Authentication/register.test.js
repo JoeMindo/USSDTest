@@ -1,9 +1,11 @@
 import { expect } from 'chai';
 import nock from 'nock';
-import { BASEURL } from '../../src/config/urls.js';
+import { BASEURL } from '../../src/core/urls.js';
 import { registerUser } from '../../src/core/usermanagement.js';
 import {
-  registerResponse, registrationFailureMissingFields, registrationFailureDuplicateNumber, registrationFailurePasswordTooShort,
+  registerResponse,
+  registrationFailureMissingFields,
+  registrationFailureDuplicateNumber, registrationFailurePasswordTooShort,
 } from './responses.js';
 
 describe('Registration', () => {
