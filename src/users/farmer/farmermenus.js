@@ -2,7 +2,7 @@
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
 import { menus } from '../../menus/menuoptions.js';
 import client from '../../server.js';
-import { addLocation } from '../../core/usermanagement.js';
+import { addLocation, isLocationPresent } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
 
@@ -26,6 +26,9 @@ export const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
 
 const questionanswers = {};
 
+/**
+ * This function is used to update the user's location.
+ */
 export const renderUpdateLocationMenu = async (textValue, text) => {
   let message;
   if (textValue === 1) {
@@ -74,6 +77,9 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
   }
   return message;
 };
+/**
+ * This function is used to render the menu for adding farm details.
+ */
 export const renderAddFarmDetailsMenu = async (textValue, text) => {
   let message;
   if (textValue === 1) {
@@ -89,33 +95,26 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     } else {
       message = 'CON Invalid input, try again';
     }
-    // } else if (textValue === 3) {
-    //   if (isTextOnly(text.split('*')[2]) === true) {
-    //     client.set('farm_location', text.split('*')[2]);
-    //     const categories = await fetchCategories();
-    //     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
-    //     menuPrompt += categories;
-    //     menuPrompt += menus.footer;
-    //     message = menuPrompt;
-    //   } else {
-    //     message = 'CON Invalid input, try again';
-    //   }
-    // } else if (textValue === 4) {
-    //   const category = parseInt(text.split('*')[3], 10);
-    //   const product = await fetchProducts(category);
-    //   let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
-    //   menuPrompt += `${product}`;
-    //   menuPrompt += menus.footer;
-    //   message = menuPrompt;
-  } else if (textValue === 3) {
-    // const productId = parseInt(text.split('*')[4], 10);
-    // client.set('farm_description', productId);
+  } else if (textValue === 3 && text.split('*')[2] === '1') {
+    const userID = await retreiveCachedItems(client, ['user_id']);
+    const doesUserHaveLocation = await isLocationPresent(userID[0]);
+    if (doesUserHaveLocation !== null) {
+      client.set('farm_location', doesUserHaveLocation);
+    } else {
+      message = 'END Could not find your registered location';
+    }
+  } else if (textValue === 3 && text.split('*')[2] === '2') {
+    const newTextValue = textValue - 2;
+    const oldTextArray = text.split('*');
+    oldTextArray.splice(0, 3);
+    const newText = oldTextArray.join('*');
+    message = await renderUpdateLocationMenu(newTextValue - 2, newText);
+  } else if (textValue === 8) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-    // res.send(message);
-  } else if (textValue === 4) {
-    client.set('farm_size', parseInt(text.split('*')[5], 10));
+  } else if (textValue === 9) {
+    client.set('farm_size', parseInt(text.split('*')[8], 10));
     const farmDetails = await retreiveCachedItems(client, [
       'farm_name',
       'farm_location',
@@ -145,6 +144,10 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
   return message;
 };
 
+/**
+ * This function is used to update the user's details.(KYC)
+ * The above code is a function that takes in a text value and text and returns a message.
+ */
 export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
   let message;
   if (textValue === 1) {
@@ -220,6 +223,10 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
   return message;
 };
 
+/**
+ * This function is used to render the menu for adding a product to a farm
+ * We have a function that takes in a text value and a text value and returns a message.
+ */
 export const renderFarmerAddProductMenu = async (textValue, text) => {
   let message = '';
   const items = await retreiveCachedItems(client, ['user_id']);
@@ -228,14 +235,6 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
   if (hasFarms.status === 404) {
     message = 'CON Please register a farm first';
   } else if (hasFarms.status === 200) {
-    /*
-    1. Select Farm -Done
-    2. Show the categories -Done
-    3. Show the products - Done
-    3. Add the quantity of the product - Done
-    4. Add the price of the product - Done
-    5. Availability of the product
-     */
     let farmList = '';
     hasFarms.data.message.data.forEach((farm) => {
       farmList += `\n${farm.id}. ${farm.farm_name}`;

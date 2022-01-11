@@ -86,6 +86,15 @@ const checkIfUserExists = async (phone) => {
     return false;
   }
 };
+const isLocationPresent = async (id) => {
+  try {
+    const response = await axios.get(`${BASEURL}/ussd/showprofile/${id}`);
+    return response.data.location;
+  } catch (err) {
+    return false;
+  }
+};
+
 
 export {
   clearData,
@@ -95,4 +104,5 @@ export {
   checkFarmerVerification,
   checkVerification,
   checkIfUserExists,
+  isLocationPresent,
 };

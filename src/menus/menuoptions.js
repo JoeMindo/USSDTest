@@ -30,7 +30,7 @@ export const menus = {
   },
   addfarmDetails: {
     0: 'Enter farm name',
-    1: 'Enter farm location',
+    1: 'Where is your farm\n1. Current registered location\n2. Other location',
     2: 'Choose a category of foods that you grow\n',
     3: 'Choose a product that you grow\n',
     4: 'What is the farm size in acres',
