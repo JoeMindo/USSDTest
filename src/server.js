@@ -1,81 +1,81 @@
 /* eslint-disable import/no-cycle */
-import express from 'express';
-import bodyParser from 'body-parser';
-import logger from 'morgan';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import redis from 'redis';
-import bluebird from 'bluebird';
-import { ussdRouter } from 'ussd-router';
-import * as menuItems from './menus/rendermenu.js';
-import { registerUser, checkIfUserExists } from './core/usermanagement.js';
-import checkFarmerSelection from './users/farmer/farmerselection.js';
-import checkBuyerSelection from './users/buyer/buyerselection.js';
+import express from "express";
+import bodyParser from "body-parser";
+import logger from "morgan";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import redis from "redis";
+import bluebird from "bluebird";
+import { ussdRouter } from "ussd-router";
+import * as menuItems from "./menus/rendermenu.js";
+import { registerUser, checkIfUserExists } from "./core/usermanagement.js";
+import checkFarmerSelection from "./users/farmer/farmerselection.js";
+import checkBuyerSelection from "./users/buyer/buyerselection.js";
 
 const port = process.env.PORT || 3032;
 
 const app = express();
 
 const client = redis.createClient({
-  host: 'redis-19100.c251.east-us-mz.azure.cloud.redislabs.com',
+  host: "redis-19100.c251.east-us-mz.azure.cloud.redislabs.com",
   port: 19100,
-  password: 'T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH',
+  password: "T6SXoEq1tyztu6oLYGpSO2cbE2dE1gDH",
 });
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
-client.on('connect', () => {});
-client.on('error', (error) => {
+client.on("connect", () => {});
+client.on("error", (error) => {
   throw new Error(error);
 });
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 app.use(
   session({
     resave: true,
-    secret: '123456',
-    path: '/',
+    secret: "123456",
+    path: "/",
     saveUninitialized: true,
-  }),
+  })
 );
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
-    'Access-Control-Allow-Methods',
-    'OPTIONS, POST, GET, PATCH, DELETE',
+    "Access-Control-Allow-Methods",
+    "OPTIONS, POST, GET, PATCH, DELETE"
   );
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
 
-app.post('/ussd', async (req, res) => {
+app.post("/ussd", async (req, res) => {
   const userGender = {
-    1: 'Male',
-    2: 'Female',
+    1: "Male",
+    2: "Female",
   };
 
   const rawtext = req.body.text;
-  const text = ussdRouter(rawtext, '0', '00');
+  const text = ussdRouter(rawtext, "0", "00");
   // TODO: Migrate this to usermanagement
 
-  const textValue = text.split('*').length;
+  const textValue = text.split("*").length;
 
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;
 
   if (userStatus === false) {
-    let error = 'END ';
+    let error = "END ";
     const menus = menuItems.renderRegisterMenu(textValue, text);
     let { message } = menus;
     if (menus.completedStatus === true) {
-      req.session.registration = text.split('*');
+      req.session.registration = text.split("*");
 
       const userDetails = {
         first_name: req.session.registration[0],
@@ -87,15 +87,18 @@ app.post('/ussd', async (req, res) => {
         role_id: req.session.registration[6],
       };
 
-      const response = await registerUser(userDetails, req.body.phoneNumber).catch((error) => {
-        message = 'END Something went wrong. Please try again.';
+      const response = await registerUser(
+        userDetails,
+        req.body.phoneNumber
+      ).catch((error) => {
+        message = "END Something went wrong. Please try again.";
         res.send(message);
       });
-      // console.log('The response is here', response);
+      //
       if (response.status === 200) {
-        message = 'END Success';
+        message = "END Success";
         res.send(message);
-      } else if (response.status === 200 && response.data.status === 'error') {
+      } else if (response.status === 200 && response.data.status === "error") {
         Object.keys(response.errors).forEach((key) => {
           error += `${response.errors[`${key}`].toString()}`;
         });
@@ -105,18 +108,18 @@ app.post('/ussd', async (req, res) => {
     }
     res.send(message);
   } else if (userStatus.exists === true) {
-    client.set('user_id', userStatus.user_id);
-    if (userStatus.role === 'FARMER') {
-      client.set('role', 'farmer');
+    client.set("user_id", userStatus.user_id);
+    if (userStatus.role === "FARMER") {
+      client.set("role", "farmer");
       message = await checkFarmerSelection(text, textValue);
-    } else if (userStatus.role === 'BUYER') {
-      client.set('role', 'buyer');
+    } else if (userStatus.role === "BUYER") {
+      client.set("role", "buyer");
       message = await checkBuyerSelection(textValue, text);
     } else if (userStatus.message === false) {
-      message = 'CON User not found';
+      message = "CON User not found";
     }
   } else {
-    message = 'END Something went wrong on our end, try again later';
+    message = "END Something went wrong on our end, try again later";
   }
   res.send(message);
 });
