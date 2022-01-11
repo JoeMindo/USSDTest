@@ -24,22 +24,23 @@ describe('Registration', () => {
   };
   beforeEach(() => {
     // Success
-    nock(`${BASEURL}`).post('/ussd/register').reply(200, registerResponse);
+    nock(`${BASEURL}`).post('/ussd/ussdRegister').reply(200, registerResponse);
     // Missing Fields
     nock(`${BASEURL}`)
-      .post('/ussd/register')
+      .post('/ussd/ussdRegister')
       .reply(200, registrationFailureMissingFields);
     nock(`${BASEURL}`)
-      .post('/ussd/register')
+      .post('/ussd/ussdRegister')
       .reply(200, registrationFailureDuplicateNumber);
     nock(`${BASEURL}`)
-      .post('/ussd/register')
+      .post('/ussd/ussdRegister')
       .reply(200, registrationFailurePasswordTooShort);
   });
   it('should return successfull if data is valid', async () => {
     const registerResponse = await registerUser(registrationData);
-    expect(registerResponse.status).to.equal('success');
-    expect(registerResponse.data.first_name).to.equal('Test');
+    console.log('Data is', registerResponse);
+    expect(registerResponse.data.status).to.equal('success');
+    expect(registerResponse.data.data.first_name).to.equal('Test');
   });
   it('should return error if fields are missing', async () => {
     const registrationData = {
@@ -55,10 +56,10 @@ describe('Registration', () => {
       role_id: ['The role id must be a string.'],
     };
 
-    expect(response.status).to.equal('error');
-    expect(response.errors.phone_no[0]).to.equal(errorsDisplayed.phone_no[0]);
-    expect(response.errors.password[0]).to.equal(errorsDisplayed.password[0]);
-    expect(response.errors.role_id[0]).to.equal(errorsDisplayed.role_id[0]);
+    expect(response.data.status).to.equal('error');
+    expect(response.data.errors.phone_no[0]).to.equal(errorsDisplayed.phone_no[0]);
+    expect(response.data.errors.password[0]).to.equal(errorsDisplayed.password[0]);
+    expect(response.data.errors.role_id[0]).to.equal(errorsDisplayed.role_id[0]);
   });
   it('should return error if number exists', async () => {
     const data = {
@@ -72,8 +73,8 @@ describe('Registration', () => {
       phone_no: ['The phone no has already been taken.'],
     };
 
-    expect(response.status).to.equal('error');
-    expect(response.errors.phone_no[0]).to.equal(errorsDisplayed.phone_no[0]);
+    expect(response.data.status).to.equal('error');
+    expect(response.data.errors.phone_no[0]).to.equal(errorsDisplayed.phone_no[0]);
   });
   it('should return error if password is too short', async () => {
     const data = {
@@ -86,8 +87,8 @@ describe('Registration', () => {
     const errorsDisplayed = {
       password: ['The password must be at least 8 characters.'],
     };
-    expect(response.status).to.equal('error');
-    expect(response.errors.password[0]).to.equal(errorsDisplayed.password[0]);
+    expect(response.data.status).to.equal('error');
+    expect(response.data.errors.password[0]).to.equal(errorsDisplayed.password[0]);
   });
   it('first menu level should be to ask the first name', () => {
     const text = '';

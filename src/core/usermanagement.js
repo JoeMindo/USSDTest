@@ -13,6 +13,7 @@ const clearData = (details) => {
 };
 const registerUser = async (regdata, phone) => {
   const path = `${BASEURL}/ussd/ussdRegister`;
+  let response;
   const postdata = {
     phone_no: phone,
     first_name: regdata.first_name,
@@ -25,11 +26,10 @@ const registerUser = async (regdata, phone) => {
     gender: regdata.gender,
   };
   try {
-    const registrationresponse = await postrequest(postdata, path);
-    // console.log('The functional response', registrationresponse.response.data.message);
-    return registrationresponse.data;
+    response = await axios.post(path, postdata);
+    return response;
   } catch (error) {
-    return error;
+    throw new Error(error);
   }
 };
 

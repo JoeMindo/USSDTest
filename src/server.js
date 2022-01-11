@@ -66,7 +66,6 @@ app.post('/ussd', async (req, res) => {
   // TODO: Migrate this to usermanagement
 
   const textValue = text.split('*').length;
-  console.log('The text value is', textValue);
 
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;
@@ -76,7 +75,6 @@ app.post('/ussd', async (req, res) => {
     const menus = menuItems.renderRegisterMenu(textValue, text);
     let { message } = menus;
     if (menus.completedStatus === true) {
-      message = 'END Success';
       req.session.registration = text.split('*');
 
       const userDetails = {
@@ -90,19 +88,20 @@ app.post('/ussd', async (req, res) => {
       };
 
       const response = await registerUser(userDetails, req.body.phoneNumber).catch((error) => {
-        message = `END ${error.response.data.message}`;
+        message = 'END Something went wrong. Please try again.';
+        res.send(message);
       });
-      if (response === undefined) {
-        message = 'END Something went wrong try later';
-        return message;
-      }
-      if (response.status === 'error') {
+      // console.log('The response is here', response);
+      if (response.status === 200) {
+        message = 'END Success';
+        res.send(message);
+      } else if (response.status === 200 && response.data.status === 'error') {
         Object.keys(response.errors).forEach((key) => {
           error += `${response.errors[`${key}`].toString()}`;
         });
-        return error;
+        message = error;
+        res.send(message);
       }
-      return message;
     }
     res.send(message);
   } else if (userStatus.exists === true) {
