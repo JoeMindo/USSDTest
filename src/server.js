@@ -98,7 +98,7 @@ app.post('/ussd', async (req, res) => {
       if (response.status === 200) {
         message = 'END Success';
         res.send(message);
-      } else if (response.status === 200 && response.data.status === 'error') {
+      } else if (response.data.status === 'error') {
         Object.keys(response.errors).forEach((key) => {
           error += `${response.errors[`${key}`].toString()}`;
         });

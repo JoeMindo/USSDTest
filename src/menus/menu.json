@@ -12,9 +12,7 @@
     },
     "login": {
         "phone_no": "Enter your phone number",
-        "password":"Enter your password",
-
-
+        "password":"Enter your password"
     },
     "farmer": {
         "updateLocation": "Update Location",
