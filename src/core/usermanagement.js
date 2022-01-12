@@ -95,7 +95,6 @@ const isLocationPresent = async (id) => {
   }
 };
 
-
 export {
   clearData,
   registerUser,

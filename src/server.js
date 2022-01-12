@@ -26,7 +26,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 
 client.on('connect', () => {});
 client.on('error', (error) => {
-throw new Error(error);
+  throw new Error(error);
 });
 
 app.use(logger('dev'));
@@ -90,7 +90,7 @@ app.post('/ussd', async (req, res) => {
       const response = await registerUser(
         userDetails,
         req.body.phoneNumber,
-      ).catch((error) => {
+      ).catch(() => {
         message = 'END Something went wrong. Please try again.';
         res.send(message);
       });

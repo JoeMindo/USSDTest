@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/prefer-default-export */
-import axios from "axios";
-import { BASEURL } from "../../core/urls.js";
+import axios from 'axios';
+import { BASEURL } from '../../core/urls.js';
 
 export const addFarm = async (farm) => {
   try {
@@ -17,7 +17,7 @@ export const addFarmerKYC = async (farmerKYC, id) => {
   try {
     const response = await axios.post(
       `${BASEURL}/ussd/kycsanswers/save/${id}`,
-      farmerKYC
+      farmerKYC,
     );
 
     return response;
@@ -37,7 +37,7 @@ export const getFarmerMetricSections = async () => {
 export const getQuestionsPerSection = async (sectionId) => {
   try {
     const response = await axios.get(
-      `${BASEURL}/ussd/kycquestions/${sectionId}`
+      `${BASEURL}/ussd/kycquestions/${sectionId}`,
     );
     return response;
   } catch (err) {
@@ -47,7 +47,7 @@ export const getQuestionsPerSection = async (sectionId) => {
 export const getAnswersPerQuestion = async (questionId) => {
   try {
     const response = await axios.get(
-      `${BASEURL}/ussd/kycpossibleanswers/${questionId}`
+      `${BASEURL}/ussd/kycpossibleanswers/${questionId}`,
     );
     return response;
   } catch (err) {

@@ -1,13 +1,13 @@
-import axios from "axios";
-import { BASEURL } from "../core/urls.js";
+import axios from 'axios';
+import { BASEURL } from '../core/urls.js';
 
 export const getOrders = async (id) => {
   let result;
   try {
     const viewOrdersRequest = await axios.get(
-      `${BASEURL}/ussd/showmyorders/${id}`
+      `${BASEURL}/ussd/showmyorders/${id}`,
     );
-    if (viewOrdersRequest.data.status === "error") {
+    if (viewOrdersRequest.data.status === 'error') {
       result = viewOrdersRequest.data.message;
     } else {
       result = viewOrdersRequest.data.message.data;
@@ -19,15 +19,15 @@ export const getOrders = async (id) => {
 };
 export const viewOrders = async (id) => {
   let message;
-  let prompt = "";
+  let prompt = '';
   const orders = await getOrders(id);
-  if (typeof orders === "string") {
+  if (typeof orders === 'string') {
     message = orders;
-  } else if (typeof orders === "object") {
-    let paymentStatus = "";
+  } else if (typeof orders === 'object') {
+    let paymentStatus = '';
     orders.forEach((order, index) => {
       if (order.payment_status === null) {
-        paymentStatus = "Not paid";
+        paymentStatus = 'Not paid';
       }
       prompt += `${index}. ${order.order_id} KES${order.amount} Payment-Status:${paymentStatus} \n`;
     });

@@ -1,9 +1,9 @@
-import axios from "axios";
-import { BASEURL } from "../../core/urls.js";
+import axios from 'axios';
+import { BASEURL } from '../../core/urls.js';
 
 export const getRegions = async () => {
   const regions = [];
-  let menuItems = "";
+  let menuItems = '';
   const menuIDs = [];
   try {
     const regionsResult = await axios.get(`${BASEURL}/ussd/regions/`);
@@ -26,7 +26,7 @@ export const getRegions = async () => {
 
 export const getLocations = async (type, id, identifier) => {
   const locationType = [];
-  let menuItems = "";
+  let menuItems = '';
   const menuIDs = [];
   try {
     const locationResult = await axios.get(`${BASEURL}/ussd/${type}/${id}`);
@@ -46,9 +46,9 @@ export const getLocations = async (type, id, identifier) => {
     };
   } catch (error) {
     return {
-      items: "Location not found",
+      items: 'Location not found',
     };
   }
 };
 
-export const splitText = (text, index) => text.split("*")[`${index}`];
+export const splitText = (text, index) => text.split('*')[`${index}`];

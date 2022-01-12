@@ -1,11 +1,11 @@
-import axios from "axios";
-import { BASEURL } from "../core/urls.js";
+import axios from 'axios';
+import { BASEURL } from '../core/urls.js';
 
 const makebasicOrder = async (cartSelections) => {
   try {
     const makeOrderRequest = await axios.post(
       `${BASEURL}/ussd/savebasicorder`,
-      cartSelections
+      cartSelections,
     );
 
     if (makeOrderRequest.status === 200) {
@@ -13,7 +13,7 @@ const makebasicOrder = async (cartSelections) => {
     }
     return false;
   } catch (err) {
-    return "Error";
+    return 'Error';
   }
 };
 

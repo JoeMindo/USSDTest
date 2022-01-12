@@ -2,7 +2,7 @@
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
 import { menus } from '../../menus/menuoptions.js';
 import client from '../../server.js';
-import { addLocation, isLocationPresent } from '../../core/usermanagement.js';
+import { addLocation } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
 
