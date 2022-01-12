@@ -95,26 +95,12 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     } else {
       message = 'CON Invalid input, try again';
     }
-  } else if (textValue === 3 && text.split('*')[2] === '1') {
-    const userID = await retreiveCachedItems(client, ['user_id']);
-    const doesUserHaveLocation = await isLocationPresent(userID[0]);
-    if (doesUserHaveLocation !== null) {
-      client.set('farm_location', doesUserHaveLocation);
-    } else {
-      message = 'END Could not find your registered location';
-    }
-  } else if (textValue === 3 && text.split('*')[2] === '2') {
-    const newTextValue = textValue - 2;
-    const oldTextArray = text.split('*');
-    oldTextArray.splice(0, 3);
-    const newText = oldTextArray.join('*');
-    message = await renderUpdateLocationMenu(newTextValue - 2, newText);
-  } else if (textValue === 8) {
+  } else if (textValue === 3) {
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else if (textValue === 9) {
-    client.set('farm_size', parseInt(text.split('*')[8], 10));
+  } else if (textValue === 4) {
+    client.set('farm_size', parseInt(text.split('*')[2], 10));
     const farmDetails = await retreiveCachedItems(client, [
       'farm_name',
       'farm_location',
