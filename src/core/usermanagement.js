@@ -1,8 +1,7 @@
 /* eslint-disable consistent-return */
-/* eslint-disable import/extensions */
 import axios from 'axios';
 import { postrequest } from './services.js';
-import { BASEURL } from '../config/urls.js';
+import { BASEURL } from './urls.js';
 
 const clearData = (details) => {
   details.name = '';
@@ -13,7 +12,8 @@ const clearData = (details) => {
   return details;
 };
 const registerUser = async (regdata, phone) => {
-  const path = `${BASEURL}/api/register`;
+  const path = `${BASEURL}/ussd/ussdRegister`;
+  let response;
   const postdata = {
     phone_no: phone,
     first_name: regdata.first_name,
@@ -24,18 +24,17 @@ const registerUser = async (regdata, phone) => {
     password: regdata.password,
     password_confirmation: regdata.password_confirmation,
     gender: regdata.gender,
-
   };
   try {
-    const registrationresponse = await postrequest(postdata, path);
-    return registrationresponse.data;
+    response = await axios.post(path, postdata);
+    return response;
   } catch (error) {
     throw new Error(error);
   }
 };
 
 const loginUser = async (loginData) => {
-  const path = `${BASEURL}/api/login`;
+  const path = `${BASEURL}/ussd/login`;
   const postdata = {
     phone_no: loginData.phone_no,
     password: loginData.password,
@@ -49,7 +48,7 @@ const loginUser = async (loginData) => {
 };
 
 const addLocation = async (locationData, id) => {
-  const path = `${BASEURL}/api/geoarea/${id}`;
+  const path = `${BASEURL}/ussd/geoarea/${id}`;
 
   try {
     const locationResponse = await postrequest(locationData, path);
@@ -60,7 +59,7 @@ const addLocation = async (locationData, id) => {
 };
 
 const checkFarmerVerification = async (id) => {
-  const path = `${BASEURL}/api/isverified/${id}`;
+  const path = `${BASEURL}/ussd/isverified/${id}`;
   try {
     const verificationresponse = await postrequest(path);
     return verificationresponse.status;
@@ -70,37 +69,39 @@ const checkFarmerVerification = async (id) => {
 };
 const checkVerification = () => true;
 
-const getUsers = async (pageNumber = 1) => {
-  const actualUrl = `${BASEURL}/api/user/details/?page=${pageNumber}`;
-  console.log('Actual url', actualUrl);
+const checkIfUserExists = async (phone) => {
   try {
-    const users = await axios.get(actualUrl);
-    return users.data.data;
-  } catch (error) {
-    throw new Error(error);
+    const details = {
+      phone_no: phone,
+    };
+    const response = await axios.post(`${BASEURL}/ussd/isuser`, details);
+    if (response.data.status === 'success') {
+      return {
+        exists: response.data.message,
+        role: response.data.role,
+        user_id: response.data.userid,
+      };
+    }
+  } catch (err) {
+    return false;
+  }
+};
+const isLocationPresent = async (id) => {
+  try {
+    const response = await axios.get(`${BASEURL}/ussd/showprofile/${id}`);
+    return response.data.location;
+  } catch (err) {
+    return false;
   }
 };
 
-const getEntireUserList = async (pageNumber = 1) => {
-  const userresponse = await getUsers(pageNumber);
-  if (userresponse.length > 0) {
-    return userresponse.concat(await getEntireUserList(pageNumber + 1));
-  }
-  return userresponse;
-};
-const checkIfUserExists = async (phone) => {
-  try {
-    const userresponse = await getEntireUserList();
-    const found = userresponse.some((profile) => profile.phone_no === phone);
-    if (!found) {
-      return false;
-    }
-    return true;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 export {
-  clearData, registerUser, loginUser, addLocation, checkFarmerVerification, checkVerification,
+  clearData,
+  registerUser,
+  loginUser,
+  addLocation,
+  checkFarmerVerification,
+  checkVerification,
   checkIfUserExists,
+  isLocationPresent,
 };

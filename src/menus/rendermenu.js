@@ -1,16 +1,9 @@
-/* eslint-disable import/extensions */
-/* eslint-disable import/no-cycle */
-/* eslint-disable import/prefer-default-export */
-
 import { menus } from './menuoptions.js';
-import * as farmerMenus from './farmermenus.js';
-import * as buyermenus from './buyermenus.js';
 
 export const con = () => 'CON';
 export const end = () => 'END';
 let message = '';
 
-// Register Menus
 let completedStatus = false;
 export const renderRegisterMenu = (textValue, text) => {
   if (textValue === 1 && text.length === 0) {
@@ -41,11 +34,14 @@ export const renderRegisterMenu = (textValue, text) => {
     let menuPrompt = `${con()} ${menus.register.role}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else {
+  } else if (textValue === 7) {
     let menuPrompt = `${con()} ${menus.submitDetails}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
+  } else if (textValue === 8 && text.split('*')[7] === '1') {
     completedStatus = true;
+  } else {
+    message = 'CON Invalid choice';
   }
   return {
     message,
@@ -70,39 +66,13 @@ export const renderFarmerMenus = () => {
   message = menuPrompt;
   return message;
 };
+
 export const renderBuyerMenus = () => {
-  let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}`;
+  let menuPrompt = `${con()} ${menus.buyermenu.viewProducts}\n`;
+  menuPrompt += `${menus.buyermenu.myCart}\n`;
+  menuPrompt += `${menus.buyermenu.myOrders}\n`;
+  menuPrompt += `${menus.buyermenu.groupOrder}\n`;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;
-};
-
-export const checkBuyerSelection = async (textValue, text) => {
-  if (textValue === 1) {
-    message = renderBuyerMenus();
-  } else if (textValue === 2) {
-    message = await buyermenus.renderProductCategories();
-  } else if (textValue === 3) {
-    const selection = parseInt(text.split('*')[2], 10);
-    console.log('Selection is', selection);
-    message = await buyermenus.renderProducts(selection);
-  } else if (textValue === 4) {
-    // const selection = parseInt(text.split('*')[3], 10);
-    message = await buyermenus.renderOfferings();
-  }
-  return message;
-};
-export const checkFarmerSelection = (text, res, textValue) => {
-  const selection = text.split('*')[1];
-  if (selection === '1') {
-    farmerMenus.renderUpdateLocationMenu(res, textValue, text);
-  } else if (selection === '2') {
-    farmerMenus.renderAddFarmDetailsMenu(res, textValue, text);
-  } else if (selection === '3') {
-    farmerMenus.renderFarmerAddProductMenu(res, textValue, text);
-  } else if (selection === '4') {
-    farmerMenus.renderFarmerUpdateDetailsMenu(res, textValue, text);
-  } else {
-    res.send('CON Invalid Choice');
-  }
 };

@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
@@ -42,7 +41,12 @@ export const retreiveCachedItems = (client, fields = []) => {
   return Promise.all(resultFields);
 };
 
+export const retreiveHashItems = async (client, key) => {
+  const fields = await client.getAsync(key);
+  return fields;
+};
+
 export const setToCache = (text, index, client, key) => {
-  const customAnswer = text.split('*')[index];
+  const customAnswer = text.split('*')[`${index}`];
   client.set(key, customAnswer);
 };

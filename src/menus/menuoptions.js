@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 const grades = {
   1: 'Grade A',
   2: 'Grade B',
@@ -17,7 +16,7 @@ export const menus = {
     gender: 'What is the gender\n1. Male\n2. Female',
     password: 'Enter your password',
     confirmPassword: 'Confirm your password',
-    role: 'Who are you?\n1. Farmer\n2. Buyer\n3. DEAN',
+    role: 'Who are you?\n1. Farmer\n2. Buyer',
   },
   login: {
     password: 'Enter your password',
@@ -31,10 +30,10 @@ export const menus = {
   },
   addfarmDetails: {
     0: 'Enter farm name',
-    1: 'Enter farm location',
+    1: 'Where is your farm\n',
     2: 'Choose a category of foods that you grow\n',
     3: 'Choose a product that you grow\n',
-    4: 'What is a capacity per harvest in bags',
+    4: 'What is the farm size in acres',
     success: 'Farm registered successfully',
     failure: 'Farm registration failed',
 
@@ -71,12 +70,21 @@ export const menus = {
 
   },
   errorMessage: 'Error!',
-  footer: '\n 98. Back 99.Home',
+  footer: '\n 00. Back 0.Home',
+  viewCart: '\n67. View cart',
 
   submitDetails: 'Submit details?\n 1.Yes',
 
   buyermenu: {
     viewProducts: '1. View available products',
+    myCart: '2. My cart',
+    myOrders: '3. My orders',
+    groupOrder: '4. Group order\n',
+    createGroup: '1. Create Group\n',
+    groupToJoin: '1. What group would you like to buy from?\n',
+    groupName: '1. What is the name of your group?\n',
+
   },
 
 };
+export default menus;

@@ -36,19 +36,17 @@ export const promptToShow = (response, textToShow) => {
 export const responsePrompt = (response, section) => {
   let message = '';
   let menuPrompt = 'CON ';
-  console.log('Sections written here', response);
+
   if (response.status === 200 && section === 'sections') {
     response.data.forEach((item) => {
       menuPrompt += `${item.id}. ${item.section_name}\n`;
     });
     message = promptToShow(menuPrompt, 'kycsections');
-    console.log('Message at sections', message);
   } else if (response.status === 200 && section === 'questions') {
     response.data.forEach((item) => {
       menuPrompt += `${item.id}. ${item.metric_name}\n`;
     });
     message = promptToShow(menuPrompt, 'kycmetrics');
-    console.log('Message at metrics', message);
   } else {
     message = `${end()} Something went wrong, try again later`;
   }
