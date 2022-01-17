@@ -58,16 +58,11 @@ const fetchFarmOfferings = async (id) => {
 };
 
 const addProduct = async (productdata) => {
-  try {
-    const newProduct = axios.post(
-      `${BASEURL}/ussd/farmcatalog/save`,
-      productdata,
-    );
-
-    return newProduct;
-  } catch (err) {
-    throw new Error(err);
-  }
+  const newProduct = axios.post(
+    `${BASEURL}/ussd/farmproduct/save`,
+    productdata,
+  ).catch((err) => err.response);
+  return newProduct;
 };
 
 const getSpecificProduct = async (id) => {

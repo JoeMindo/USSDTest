@@ -8,6 +8,7 @@ import {
 
   fetchCategories,
   fetchProducts,
+  addProduct,
 } from '../../products/productmanagement.js';
 import {
   addFarm,
@@ -253,17 +254,22 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
       // const menuPrompt = 'CON Is this item available for sale?\n 1. Yes\n 2. No';
       // message = menuPrompt;
       // TODO: Add product
-      // const productData = await retreiveCachedItems(client, [
-      //   'farm_id',
-      //   'product_id',
-      //   'available_quantity',
-      // ]);
-      // const postProductDetails = {
-      //   farm_id: productData[0],
-      //   product_id: productData[1],
-      //   capacity: productData[2],
-      // };
-      message = 'CON Adding product to your farm';
+      const productData = await retreiveCachedItems(client, [
+        'farm_id',
+        'product_id',
+        'available_quantity',
+      ]);
+      const postProductDetails = {
+        farm_id: productData[0],
+        product_id: productData[1],
+        capacity: productData[2],
+      };
+      const addingProduct = await addProduct(postProductDetails);
+      if (addingProduct.status === 200) {
+        message = `${end()} Produce added successfully`;
+      } else {
+        message = `${end()} ${addingProduct.data.message}`;
+      }
     }
   }
   message += menus.footer;
