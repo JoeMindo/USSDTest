@@ -7,8 +7,9 @@ export const getRegions = async () => {
   const menuIDs = [];
   try {
     const regionsResult = await axios.get(`${BASEURL}/ussd/regions/`);
+    console.log('The regions are', regionsResult.data.message.data);
 
-    regionsResult.data.data.forEach((location) => {
+    regionsResult.data.message.data.forEach((location) => {
       regions.push(location);
     });
     regions.forEach((value, index) => {

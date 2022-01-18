@@ -119,12 +119,12 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
+    console.log('Respinse', responseForAddingFarm);
 
     if (responseForAddingFarm.status === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
       message = menuPrompt;
-      // DISABLED FOR TESTING
-      // client.set('farm_id', responseForAddingFarm.data.success.id);
+      client.set('farm_id', responseForAddingFarm.data.farm_id);
     } else {
       const menuPrompt = `${end()} ${menus.addfarmDetails.failure}`;
       message = menuPrompt;

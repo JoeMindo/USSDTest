@@ -4,13 +4,9 @@ import axios from 'axios';
 import { BASEURL } from '../../core/urls.js';
 
 export const addFarm = async (farm) => {
-  try {
-    // TODO:Backend resolve this issue
-    const response = await axios.post(`${BASEURL}/ussd/farm/save`, farm);
-    return response;
-  } catch (err) {
-    return err;
-  }
+  // TODO:Backend resolve this issue
+  const response = await axios.post(`${BASEURL}/ussd/farm/save`, farm).catch((err) => err.response);
+  return response;
 };
 
 export const addFarmerKYC = async (farmerKYC, id) => {

@@ -17,6 +17,7 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
     const regionId = id;
     const counties = await getLocations('counties', regionId, 'county_name');
     const list = await counties;
+    console.log('The counties are', list);
     client.set('usercountyIds', list.ids.toString());
     results = list.items;
   } else if (locality === 'subcounty') {
