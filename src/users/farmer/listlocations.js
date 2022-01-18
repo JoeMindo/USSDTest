@@ -6,13 +6,14 @@ export const getRegions = async () => {
   let menuItems = '';
   const menuIDs = [];
   try {
-    const regionsResult = await axios.get(`${BASEURL}/api/regions/`);
+    const regionsResult = await axios.get(`${BASEURL}/ussd/regions/`);
+    console.log('The regions are', regionsResult.data.message.data);
 
-    regionsResult.data.data.forEach((location) => {
+    regionsResult.data.message.data.forEach((location) => {
       regions.push(location);
     });
     regions.forEach((value, index) => {
-      menuItems += `${index += 1}. ${value.region_name}\n`;
+      menuItems += `${(index += 1)}. ${value.region_name}\n`;
       menuIDs.push(value.id_regions);
     });
     return {
@@ -29,14 +30,14 @@ export const getLocations = async (type, id, identifier) => {
   let menuItems = '';
   const menuIDs = [];
   try {
-    const locationResult = await axios.get(`${BASEURL}/api/${type}/${id}`);
+    const locationResult = await axios.get(`${BASEURL}/ussd/${type}/${id}`);
     locationResult.data.data.forEach((location) => {
       locationType.push(location);
     });
 
     locationType.forEach((value, index) => {
       const name = value[`${identifier}`];
-      menuItems += `${index += 1}. ${name}\n`;
+      menuItems += `${(index += 1)}. ${name}\n`;
       menuIDs.push(value.id);
     });
 

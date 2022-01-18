@@ -34,11 +34,14 @@ export const renderRegisterMenu = (textValue, text) => {
     let menuPrompt = `${con()} ${menus.register.role}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-  } else {
+  } else if (textValue === 7) {
     let menuPrompt = `${con()} ${menus.submitDetails}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
+  } else if (textValue === 8 && text.split('*')[7] === '1') {
     completedStatus = true;
+  } else {
+    message = 'CON Invalid choice';
   }
   return {
     message,
@@ -59,6 +62,7 @@ export const renderFarmerMenus = () => {
   menuPrompt += menus.farmer.addFarmDetails;
   menuPrompt += menus.farmer.addProduct;
   menuPrompt += menus.farmer.updateDetails;
+  menuPrompt += menus.farmer.updateListedProduce;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;

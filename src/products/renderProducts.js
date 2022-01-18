@@ -89,7 +89,7 @@ export const checkGroupAndIndividualPrice = (status) => {
 export const renderOfferings = async (client, id) => {
   const status = {};
   try {
-    const endpointUrl = `${BASEURL}/api/productsbyproductid`;
+    const endpointUrl = `${BASEURL}/ussd/productsbyproductid`;
     const productOffering = await axios.get(`${endpointUrl}/${id}`);
     client.set('viewedProductID', id);
 

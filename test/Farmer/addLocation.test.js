@@ -16,10 +16,10 @@ import {
 
 describe('Locality details', () => {
   beforeEach(() => {
-    nock(`${BASEURL}`).get('/api/regions/').reply(200, regions);
-    nock(`${BASEURL}`).get('/api/counties/1').reply(200, counties);
-    nock(`${BASEURL}`).get('/api/counties/99').reply(404, locationError);
-    nock(`${BASEURL}`).post('/api/geoarea/').reply(201, geoArea);
+    nock(`${BASEURL}`).get('/ussd/regions/').reply(200, regions);
+    nock(`${BASEURL}`).get('/ussd/counties/1').reply(200, counties);
+    nock(`${BASEURL}`).get('/ussd/counties/99').reply(404, locationError);
+    nock(`${BASEURL}`).post('/ussd/geoarea/').reply(201, geoArea);
   });
   it('should display the regions and track the region IDs', async () => {
     const response = await getRegions();

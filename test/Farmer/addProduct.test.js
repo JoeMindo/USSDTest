@@ -3,7 +3,9 @@ import nock from 'nock';
 import { describe, it } from 'mocha';
 import { BASEURL } from '../../src/core/urls.js';
 import { getUserFarmsSuccess, userFarmsAreNil } from './farmerResponses.js';
-import categoriesFound, { categoriesServerError } from './productcallResponses.js';
+import categoriesFound, {
+  categoriesServerError,
+} from './productcallResponses.js';
 import { fetchCategories } from '../../src/products/productmanagement.js';
 import { getUserFarms } from '../../src/users/farmer/farmmanagement.js';
 
@@ -11,17 +13,13 @@ describe('Add product', () => {
   beforeEach(() => {
     nock(`${BASEURL}`)
       // TODO:Backend resolve this issue
-      .get('/api/farm/31')
+      .get('/ussd/farm/31')
       .reply(200, getUserFarmsSuccess);
 
+    nock(`${BASEURL}`).get('/ussd/farm/4').reply(404, userFarmsAreNil);
+    nock(`${BASEURL}`).get('/ussd/prodcategories').reply(200, categoriesFound);
     nock(`${BASEURL}`)
-      .get('/api/farm/4')
-      .reply(404, userFarmsAreNil);
-    nock(`${BASEURL}`)
-      .get('/api/prodcategories')
-      .reply(200, categoriesFound);
-    nock(`${BASEURL}`)
-      .get('/api/prodcategories')
+      .get('/ussd/prodcategories')
       .reply(500, categoriesServerError);
   });
 
@@ -37,12 +35,14 @@ describe('Add product', () => {
     await getUserFarms(4).catch((error) => {
       expect(error.response.status).to.equal(404);
       expect(error.response.data.status).to.equal('error');
-      expect(error.response.data.message).to.equal('User has no registered farms');
+      expect(error.response.data.message).to.equal(
+        'User has no registered farms',
+      );
     });
   });
   it('should get all the available categories', async () => {
     const response = await fetchCategories();
-    expect(typeof (response)).to.equal('string');
+    expect(typeof response).to.equal('string');
   });
   it('should inform the user of a server error', async () => {
     await fetchCategories().catch((error) => {

@@ -13,7 +13,7 @@ export const itemSelection = {};
 async function fetchCategories() {
   let results = '';
   try {
-    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
     response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);
       results += `\n${category.id}. ${category.category_name}`;
@@ -26,7 +26,7 @@ async function fetchCategories() {
 async function fetchProducts(id) {
   let results = '';
   try {
-    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
 
     response.data.data.data.forEach((item) => {
       item.products.forEach((description) => {
@@ -43,7 +43,7 @@ async function fetchProducts(id) {
 const fetchFarmOfferings = async (id) => {
   let farmOfferings = '';
   try {
-    const response = await axios.get(`${BASEURL}/api/prodcategories`);
+    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
     response.data.forEach((item) => {
       item.farm_products.forEach((farmItem) => {
         if (farmItem.product_id === id) {
@@ -58,21 +58,26 @@ const fetchFarmOfferings = async (id) => {
 };
 
 const addProduct = async (productdata) => {
-  try {
-    const newProduct = axios.post(
-      `${BASEURL}/api/farmcatalog/save`,
-      productdata,
-    );
-
-    return newProduct;
-  } catch (err) {
-    throw new Error(err);
-  }
+  const newProduct = axios.post(
+    `${BASEURL}/ussd/farmproduct/save`,
+    productdata,
+  ).catch((err) => err.response);
+  return newProduct;
 };
-
+const productsInFarm = async (farmID) => {
+  const products = axios.get(`${BASEURL}/ussd/farmproducts/farm/${farmID}`).catch((err) => err.response);
+  return products;
+};
+const updateListedProduct = async (id, data) => {
+  const updatedProduce = axios.post(
+    `${BASEURL}/ussd/farmproduct/update/${id}`, data,
+  )
+    .catch((err) => err.response);
+  return updatedProduce;
+};
 const getSpecificProduct = async (id) => {
   try {
-    const specificProduct = await axios.get(`${BASEURL}/api/products/all`);
+    const specificProduct = await axios.get(`${BASEURL}/ussd/products/all`);
     const filteredItems = specificProduct.data.filter((item) => item.id === id);
     let respose = '';
     filteredItems.forEach((filteredItem) => {
@@ -133,4 +138,6 @@ export {
   addProduct,
   getSpecificProduct,
   fetchFarmOfferings,
+  updateListedProduct,
+  productsInFarm,
 };

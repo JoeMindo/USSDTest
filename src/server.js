@@ -66,7 +66,7 @@ app.post('/ussd', async (req, res) => {
   // TODO: Migrate this to usermanagement
 
   const textValue = text.split('*').length;
-
+  console.log('The text value', textValue);
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;
 
@@ -75,7 +75,6 @@ app.post('/ussd', async (req, res) => {
     const menus = menuItems.renderRegisterMenu(textValue, text);
     let { message } = menus;
     if (menus.completedStatus === true) {
-      message = 'END Success';
       req.session.registration = text.split('*');
 
       const userDetails = {
@@ -88,22 +87,26 @@ app.post('/ussd', async (req, res) => {
         role_id: req.session.registration[6],
       };
 
-      const out = registerUser(userDetails, req.body.phoneNumber);
-      const result = out.then((response) => {
-        if (response.status === 'error') {
-          Object.keys(response.errors).forEach((key) => {
-            error += `${response.errors[`${key}`].toString()}`;
-          });
-          return error;
-        }
-        return message;
+      const response = await registerUser(
+        userDetails,
+        req.body.phoneNumber,
+      ).catch(() => {
+        message = 'END Something went wrong. Please try again.';
+        res.send(message);
       });
-      result.then((response) => {
-        res.send(response);
-      });
-    } else {
-      res.send(message);
+      //
+      if (response.status === 200) {
+        message = 'END Success';
+        res.send(message);
+      } else if (response.data.status === 'error') {
+        Object.keys(response.errors).forEach((key) => {
+          error += `${response.errors[`${key}`].toString()}`;
+        });
+        message = error;
+        res.send(message);
+      }
     }
+    res.send(message);
   } else if (userStatus.exists === true) {
     client.set('user_id', userStatus.user_id);
     if (userStatus.role === 'FARMER') {

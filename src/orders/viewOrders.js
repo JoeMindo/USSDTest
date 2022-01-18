@@ -5,7 +5,7 @@ export const getOrders = async (id) => {
   let result;
   try {
     const viewOrdersRequest = await axios.get(
-      `${BASEURL}/api/showmyorders/${id}`,
+      `${BASEURL}/ussd/showmyorders/${id}`,
     );
     if (viewOrdersRequest.data.status === 'error') {
       result = viewOrdersRequest.data.message;

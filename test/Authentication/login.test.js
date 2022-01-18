@@ -4,27 +4,25 @@ import { describe } from 'mocha';
 import { BASEURL } from '../../src/core/urls.js';
 import { checkIfUserExists, loginUser } from '../../src/core/usermanagement.js';
 import {
-  loginResponseSuccess, loginResponseFailure, isUserSuccess, isUserFailure,
+  loginResponseSuccess,
+  loginResponseFailure,
+  isUserSuccess,
+  isUserFailure,
 } from './responses.js';
 
 describe('Login', () => {
   beforeEach(() => {
-    nock(`${BASEURL}`)
-      .post('/api/login')
-      .reply(200, loginResponseSuccess);
-    nock(`${BASEURL}`)
-      .post('/api/login')
-      .reply(400, loginResponseFailure);
+    nock(`${BASEURL}`).post('/ussd/login').reply(200, loginResponseSuccess);
+    nock(`${BASEURL}`).post('/ussd/login').reply(400, loginResponseFailure);
   });
   it('should return success if credential is valid', async () => {
     const mockLoginData = {
       phone_no: '+254700000001',
       password: '123456789',
-
     };
     const loginResponse = await loginUser(mockLoginData);
     expect(loginResponse.status).to.equal(200);
-    expect(typeof (loginResponse.data)).to.equal('object');
+    expect(typeof loginResponse.data).to.equal('object');
     expect(loginResponse.data.login).to.equal('true');
   });
 
@@ -50,12 +48,8 @@ describe('Login', () => {
 
 describe('User', () => {
   beforeEach(() => {
-    nock(`${BASEURL}`)
-      .post('/api/isuser')
-      .reply(200, isUserSuccess);
-    nock(`${BASEURL}`)
-      .post('/api/isuser')
-      .reply(400, isUserFailure);
+    nock(`${BASEURL}`).post('/ussd/isuser').reply(200, isUserSuccess);
+    nock(`${BASEURL}`).post('/ussd/isuser').reply(400, isUserFailure);
   });
   it('if exists returns true', async () => {
     const details = {

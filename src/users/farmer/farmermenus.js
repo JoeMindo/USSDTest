@@ -8,6 +8,9 @@ import {
 
   fetchCategories,
   fetchProducts,
+  addProduct,
+  productsInFarm,
+  updateListedProduct,
 } from '../../products/productmanagement.js';
 import {
   addFarm,
@@ -26,6 +29,9 @@ export const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
 
 const questionanswers = {};
 
+/**
+ * This function is used to update the user's location.
+ */
 export const renderUpdateLocationMenu = async (textValue, text) => {
   let message;
   if (textValue === 1) {
@@ -74,6 +80,9 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
   }
   return message;
 };
+/**
+ * This function is used to render the menu for adding farm details.
+ */
 export const renderAddFarmDetailsMenu = async (textValue, text) => {
   let message;
   if (textValue === 1) {
@@ -89,33 +98,12 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
     } else {
       message = 'CON Invalid input, try again';
     }
-    // } else if (textValue === 3) {
-    //   if (isTextOnly(text.split('*')[2]) === true) {
-    //     client.set('farm_location', text.split('*')[2]);
-    //     const categories = await fetchCategories();
-    //     let menuPrompt = `${con()} ${menus.addfarmDetails[2]}`;
-    //     menuPrompt += categories;
-    //     menuPrompt += menus.footer;
-    //     message = menuPrompt;
-    //   } else {
-    //     message = 'CON Invalid input, try again';
-    //   }
-    // } else if (textValue === 4) {
-    //   const category = parseInt(text.split('*')[3], 10);
-    //   const product = await fetchProducts(category);
-    //   let menuPrompt = `${con()} ${menus.addfarmDetails[3]}`;
-    //   menuPrompt += `${product}`;
-    //   menuPrompt += menus.footer;
-    //   message = menuPrompt;
   } else if (textValue === 3) {
-    // const productId = parseInt(text.split('*')[4], 10);
-    // client.set('farm_description', productId);
     let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
     menuPrompt += menus.footer;
     message = menuPrompt;
-    // res.send(message);
   } else if (textValue === 4) {
-    client.set('farm_size', parseInt(text.split('*')[5], 10));
+    client.set('farm_size', parseInt(text.split('*')[2], 10));
     const farmDetails = await retreiveCachedItems(client, [
       'farm_name',
       'farm_location',
@@ -131,12 +119,12 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
+    console.log('Respinse', responseForAddingFarm);
 
     if (responseForAddingFarm.status === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
       message = menuPrompt;
-      // DISABLED FOR TESTING
-      // client.set('farm_id', responseForAddingFarm.data.success.id);
+      client.set('farm_id', responseForAddingFarm.data.farm_id);
     } else {
       const menuPrompt = `${end()} ${menus.addfarmDetails.failure}`;
       message = menuPrompt;
@@ -145,6 +133,10 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
   return message;
 };
 
+/**
+ * This function is used to update the user's details.(KYC)
+ * The above code is a function that takes in a text value and text and returns a message.
+ */
 export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
   let message;
   if (textValue === 1) {
@@ -220,6 +212,10 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
   return message;
 };
 
+/**
+ * This function is used to render the menu for adding a product to a farm
+ * We have a function that takes in a text value and a text value and returns a message.
+ */
 export const renderFarmerAddProductMenu = async (textValue, text) => {
   let message = '';
   const items = await retreiveCachedItems(client, ['user_id']);
@@ -228,14 +224,6 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
   if (hasFarms.status === 404) {
     message = 'CON Please register a farm first';
   } else if (hasFarms.status === 200) {
-    /*
-    1. Select Farm -Done
-    2. Show the categories -Done
-    3. Show the products - Done
-    3. Add the quantity of the product - Done
-    4. Add the price of the product - Done
-    5. Availability of the product
-     */
     let farmList = '';
     hasFarms.data.message.data.forEach((farm) => {
       farmList += `\n${farm.id}. ${farm.farm_name}`;
@@ -268,19 +256,85 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
       // const menuPrompt = 'CON Is this item available for sale?\n 1. Yes\n 2. No';
       // message = menuPrompt;
       // TODO: Add product
-      // const productData = await retreiveCachedItems(client, [
-      //   'farm_id',
-      //   'product_id',
-      //   'available_quantity',
-      // ]);
-      // const postProductDetails = {
-      //   farm_id: productData[0],
-      //   product_id: productData[1],
-      //   capacity: productData[2],
-      // };
-      message = 'CON Adding product to your farm';
+      const productData = await retreiveCachedItems(client, [
+        'farm_id',
+        'product_id',
+        'available_quantity',
+      ]);
+      const postProductDetails = {
+        farm_id: productData[0],
+        product_id: productData[1],
+        capacity: productData[2],
+      };
+      const addingProduct = await addProduct(postProductDetails);
+      if (addingProduct.status === 200) {
+        message = `${end()} Produce added successfully`;
+      } else {
+        message = `${end()} ${addingProduct.data.message}`;
+      }
     }
   }
   message += menus.footer;
+  return message;
+};
+
+/**
+ * This function renders the update listed produce menu.
+ * @param userID - the user's ID
+ * @returns None
+ */
+export const renderUpdateListedProduceMenu = async (textvalue, text) => {
+  let userID = await retreiveCachedItems(client, ['user_id']);
+  userID = parseInt(userID, 10);
+  const hasFarms = await getUserFarms(userID);
+  const userFarms = [];
+  const productIDs = [];
+  let message = '';
+  if (hasFarms.status === 404) {
+    message = 'CON Please register a farm first';
+  } else if (hasFarms.status === 200) {
+    let farmList = '';
+    hasFarms.data.message.data.forEach((farm) => {
+      userFarms.push(farm.id);
+      farmList += `\n${farm.id}. ${farm.farm_name}`;
+    });
+    message = `CON Which farm do you want to update? ${farmList}`;
+  }
+  const farmID = parseInt(text.split('*')[1], 10);
+
+  if (textvalue === 2 && userFarms.includes(farmID)) {
+    const products = await productsInFarm(farmID);
+    let productList = '';
+    products.data.message.forEach((product) => {
+      const combination = {
+        id: product.id,
+        prodID: product.product_id,
+      };
+      productIDs.push(combination);
+      client.set('productIDs', JSON.stringify(productIDs));
+      productList += `\n${product.id}. ${product.product_name}`;
+    });
+    message = `${con()} What product do you want to update the quantity ${productList}`;
+  } else if (textvalue === 3) {
+    message = `${con()} Enter the new quantity`;
+  } else if (textvalue === 4) {
+    const updatedQuantity = text.split('*')[3];
+    const productID = parseInt(text.split('*')[2], 10);
+    let retreivedIDs = await retreiveCachedItems(client, ['productIDs']);
+    retreivedIDs = JSON.parse(retreivedIDs[0]);
+    const productIdentity = retreivedIDs.find((product) => product.id === productID);
+    const data = {
+      farm_id: farmID,
+      product_id: productIdentity.prodID,
+      capacity: updatedQuantity,
+    };
+
+    const updatedProduce = await updateListedProduct(productID, data);
+    if (updatedProduce.status === 200) {
+      message = `${end()} Updated successfully`;
+    } else {
+      message = `${end()}${updatedProduce}`;
+    }
+  }
   return message;
 };

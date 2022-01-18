@@ -7,7 +7,8 @@ import client from '../server.js';
 import { BASEURL } from '../core/urls.js';
 import { menus } from '../menus/menuoptions.js';
 import {
-  askForQuantity, renderProductCategories,
+  askForQuantity,
+  renderProductCategories,
 } from '../users/buyer/buyermenus.js';
 
 export const checkIfUserIsInGroup = async () => {
@@ -16,7 +17,7 @@ export const checkIfUserIsInGroup = async () => {
     // TODO: Custom ID
     user_id: user,
   };
-  const response = await axios.post(`${BASEURL}/api/isuseringroup`, data);
+  const response = await axios.post(`${BASEURL}/ussd/isuseringroup`, data);
   if (response.data.status === 'success') {
     return response.data.group_ID;
   }
@@ -35,7 +36,7 @@ export const actionToTake = async (state) => {
 };
 
 export const createGroup = async (groupdata) => {
-  const response = await axios.post(`${BASEURL}/api/saveusergroup`, groupdata);
+  const response = await axios.post(`${BASEURL}/ussd/saveusergroup`, groupdata);
   return response.data.status;
 };
 export const requestGroupName = () => 'CON What is the name of your group?\n';
@@ -52,7 +53,9 @@ export const groupCreationMessage = (status) => {
 
 export const renderGroupPricedItems = async (productId) => {
   try {
-    let offers = await axios.get(`${BASEURL}/api/productsbyproductid/${productId}`);
+    let offers = await axios.get(
+      `${BASEURL}/ussd/productsbyproductid/${productId}`,
+    );
     offers = offers.data.message.data;
     const message = renderOffers(offers, [], client);
     return message;
