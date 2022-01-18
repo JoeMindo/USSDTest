@@ -9,6 +9,8 @@ import {
   fetchCategories,
   fetchProducts,
   addProduct,
+  productsInFarm,
+  updateListedProduct,
 } from '../../products/productmanagement.js';
 import {
   addFarm,
@@ -273,5 +275,66 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
     }
   }
   message += menus.footer;
+  return message;
+};
+
+/**
+ * This function renders the update listed produce menu.
+ * @param userID - the user's ID
+ * @returns None
+ */
+export const renderUpdateListedProduceMenu = async (textvalue, text) => {
+  let userID = await retreiveCachedItems(client, ['user_id']);
+  userID = parseInt(userID, 10);
+  const hasFarms = await getUserFarms(userID);
+  const userFarms = [];
+  const productIDs = [];
+  let message = '';
+  if (hasFarms.status === 404) {
+    message = 'CON Please register a farm first';
+  } else if (hasFarms.status === 200) {
+    let farmList = '';
+    hasFarms.data.message.data.forEach((farm) => {
+      userFarms.push(farm.id);
+      farmList += `\n${farm.id}. ${farm.farm_name}`;
+    });
+    message = `CON Which farm do you want to update? ${farmList}`;
+  }
+  const farmID = parseInt(text.split('*')[1], 10);
+
+  if (textvalue === 2 && userFarms.includes(farmID)) {
+    const products = await productsInFarm(farmID);
+    let productList = '';
+    products.data.message.forEach((product) => {
+      const combination = {
+        id: product.id,
+        prodID: product.product_id,
+      };
+      productIDs.push(combination);
+      client.set('productIDs', JSON.stringify(productIDs));
+      productList += `\n${product.id}. ${product.product_name}`;
+    });
+    message = `${con()} What product do you want to update the quantity ${productList}`;
+  } else if (textvalue === 3) {
+    message = `${con()} Enter the new quantity`;
+  } else if (textvalue === 4) {
+    const updatedQuantity = text.split('*')[3];
+    const productID = parseInt(text.split('*')[2], 10);
+    let retreivedIDs = await retreiveCachedItems(client, ['productIDs']);
+    retreivedIDs = JSON.parse(retreivedIDs[0]);
+    const productIdentity = retreivedIDs.find((product) => product.id === productID);
+    const data = {
+      farm_id: farmID,
+      product_id: productIdentity.prodID,
+      capacity: updatedQuantity,
+    };
+
+    const updatedProduce = await updateListedProduct(productID, data);
+    if (updatedProduce.status === 200) {
+      message = `${end()} Updated successfully`;
+    } else {
+      message = `${end()}${updatedProduce}`;
+    }
+  }
   return message;
 };

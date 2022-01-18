@@ -27,6 +27,7 @@ export const menus = {
     addFarmDetails: '2. Add Farm Details\n',
     addProduct: '3. Add product\n',
     updateDetails: '4. Update farmer details\n',
+    updateListedProduce: '5. Update listed produce',
   },
   addfarmDetails: {
     0: 'Enter farm name',

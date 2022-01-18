@@ -62,6 +62,7 @@ export const renderFarmerMenus = () => {
   menuPrompt += menus.farmer.addFarmDetails;
   menuPrompt += menus.farmer.addProduct;
   menuPrompt += menus.farmer.updateDetails;
+  menuPrompt += menus.farmer.updateListedProduce;
   menuPrompt += menus.footer;
   message = menuPrompt;
   return message;

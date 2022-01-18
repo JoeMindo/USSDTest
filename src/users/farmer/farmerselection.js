@@ -16,6 +16,8 @@ const checkFarmerSelection = async (text, textValue) => {
       message = farmerMenus.renderFarmerAddProductMenu(textValue, text);
     } else if (selection === '4') {
       message = farmerMenus.renderFarmerUpdateDetailsMenu(textValue, text);
+    } else if (selection === '5') {
+      message = farmerMenus.renderUpdateListedProduceMenu(textValue, text);
     } else {
       message = 'CON Invalid choice, try again';
     }

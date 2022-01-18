@@ -64,7 +64,17 @@ const addProduct = async (productdata) => {
   ).catch((err) => err.response);
   return newProduct;
 };
-
+const productsInFarm = async (farmID) => {
+  const products = axios.get(`${BASEURL}/ussd/farmproducts/farm/${farmID}`).catch((err) => err.response);
+  return products;
+};
+const updateListedProduct = async (id, data) => {
+  const updatedProduce = axios.post(
+    `${BASEURL}/ussd/farmproduct/update/${id}`, data,
+  )
+    .catch((err) => err.response);
+  return updatedProduce;
+};
 const getSpecificProduct = async (id) => {
   try {
     const specificProduct = await axios.get(`${BASEURL}/ussd/products/all`);
@@ -128,4 +138,6 @@ export {
   addProduct,
   getSpecificProduct,
   fetchFarmOfferings,
+  updateListedProduct,
+  productsInFarm,
 };
