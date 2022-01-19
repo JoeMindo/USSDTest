@@ -28,6 +28,7 @@ export const menus = {
     addProduct: '3. Add product\n',
     updateDetails: '4. Update farmer details\n',
     updateListedProduce: '5. Update listed produce',
+    joinGroup: '6. Join Group',
   },
   addfarmDetails: {
     0: 'Enter farm name',
@@ -73,6 +74,7 @@ export const menus = {
   errorMessage: 'Error!',
   footer: '\n 00. Back 0.Home',
   viewCart: '\n67. View cart',
+  more: '\n98.More',
 
   submitDetails: 'Submit details?\n 1.Yes',
 

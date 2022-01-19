@@ -63,7 +63,13 @@ export const renderFarmerMenus = () => {
   menuPrompt += menus.farmer.addProduct;
   menuPrompt += menus.farmer.updateDetails;
   menuPrompt += menus.farmer.updateListedProduce;
-  menuPrompt += menus.footer;
+  menuPrompt += menus.more;
+  message = menuPrompt;
+  return message;
+};
+
+export const renderFarmerMenusLevelTwo = () => {
+  const menuPrompt = `${con()} ${menus.farmer.joinGroup}`;
   message = menuPrompt;
   return message;
 };

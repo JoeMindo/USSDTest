@@ -19,9 +19,12 @@ import {
   getFarmerMetricSections,
   getQuestionsPerSection,
   getUserFarms,
+  showGroups,
+  joinGroup,
 } from './farmmanagement.js';
 import { responsePrompt } from '../../menus/prompts.js';
 import { promptToGive } from './farmerlocation.js';
+import { renderFarmerMenusLevelTwo } from '../../menus/rendermenu.js';
 
 const con = () => 'CON';
 const end = () => 'END';
@@ -337,5 +340,19 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
       message = `${end()}${updatedProduce}`;
     }
   }
+  return message;
+};
+
+export const secondLevelMenu = async (textValue, text) => {
+  let message;
+  if (textValue === 1) {
+    message = renderFarmerMenusLevelTwo();
+  } else if (textValue === 2) {
+    message = await showGroups(client);
+  } else if (textValue === 3) {
+    const selectedGroup = parseInt(text.split('*')[2], 10);
+    message = await joinGroup(selectedGroup);
+  }
+  message += menus.footer;
   return message;
 };
