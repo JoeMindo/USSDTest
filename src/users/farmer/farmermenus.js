@@ -5,7 +5,6 @@ import client from '../../server.js';
 import { addLocation } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
-
   fetchCategories,
   fetchProducts,
   addProduct,
@@ -72,13 +71,14 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
 
     const userId = parseInt(postLocationDetails[3], 10);
     const response = await addLocation(postDetails, userId);
-    console.log('The add location response is', response);
 
     if (response.status === 201) {
       const menuPrompt = `${end()} ${menus.updateLocation.success}`;
       message = menuPrompt;
     } else {
-      message = `${con()} Could not update location, ${response.response.data.message}`;
+      message = `${con()} Could not update location, ${
+        response.response.data.message
+      }`;
       message += menus.footer;
     }
   }
@@ -123,7 +123,6 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
       user_id: farmDetails[4],
     };
     const responseForAddingFarm = await addFarm(postDetails);
-    console.log('Respinse', responseForAddingFarm);
 
     if (responseForAddingFarm.status === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
@@ -262,7 +261,7 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
         capacity: availableQuantity,
       };
       const addingProduct = await addProduct(postProductDetails);
-      console.log('Adding product', addingProduct);
+
       if (addingProduct.status === 200) {
         message = `${end()} Produce added successfully`;
       } else {
@@ -318,7 +317,9 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
     const productID = parseInt(text.split('*')[2], 10);
     let retreivedIDs = await retreiveCachedItems(client, ['productIDs']);
     retreivedIDs = JSON.parse(retreivedIDs[0]);
-    const productIdentity = retreivedIDs.find((product) => product.id === productID);
+    const productIdentity = retreivedIDs.find(
+      (product) => product.id === productID,
+    );
     const data = {
       farm_id: farmID,
       product_id: productIdentity.prodID,

@@ -11,7 +11,9 @@ import { menus } from '../../menus/menuoptions.js';
  * @returns The response object.
  */
 export const addFarm = async (farm) => {
-  const response = await axios.post(`${BASEURL}/ussd/farm/save`, farm).catch((err) => err.response);
+  const response = await axios
+    .post(`${BASEURL}/ussd/farm/save`, farm)
+    .catch((err) => err.response);
   return response;
 };
 
@@ -98,7 +100,9 @@ export const getUserFarms = async (userId) => {
  */
 export const fetchAvailableGroups = async (locationID) => {
   try {
-    const response = await axios.get(`${BASEURL}/ussd/group/${locationID}`).catch((err) => err.response);
+    const response = await axios
+      .get(`${BASEURL}/ussd/group/${locationID}`)
+      .catch((err) => err.response);
     return response;
   } catch (err) {
     throw new Error(err);
@@ -111,7 +115,9 @@ export const fetchAvailableGroups = async (locationID) => {
  * @returns The location ID
  */
 export const getLocationID = async (userId) => {
-  const response = await axios.get(`${BASEURL}/ussd/user/location/${userId}`).catch((err) => err.response);
+  const response = await axios
+    .get(`${BASEURL}/ussd/user/location/${userId}`)
+    .catch((err) => err.response);
   return response;
 };
 
@@ -124,9 +130,9 @@ export const showGroups = async (client) => {
   let message;
   const userID = await retreiveCachedItems(client, ['user_id']);
   const locationID = await getLocationID(userID[0]);
-  console.log('The locationID is', locationID);
+
   const availableGroups = await fetchAvailableGroups(locationID);
-  console.log('The groups are', availableGroups);
+
   let menuPrompt = 'CON Choose a group you want to join\n';
   availableGroups.forEach((group) => {
     menuPrompt += `${group.id}. ${group.name}`;
@@ -149,7 +155,9 @@ export const joinGroup = async (groupID, userId) => {
     group_id: groupID,
     user_id: userId,
   };
-  const response = await axios.post(`${BASEURL}/ussd/saveuserundergroup/${groupID}`, data).catch((err) => err.response);
+  const response = await axios
+    .post(`${BASEURL}/ussd/saveuserundergroup/${groupID}`, data)
+    .catch((err) => err.response);
   if (response.status === 200) {
     message = 'END Successfully joined group';
   } else {

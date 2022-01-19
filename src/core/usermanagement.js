@@ -11,6 +11,12 @@ const clearData = (details) => {
   details.role = '';
   return details;
 };
+/**
+ * It takes in a user's registration data, and sends it to the server.
+ * @param regdata - The data that the user has entered in the registration form.
+ * @param phone - The phone number of the user
+ * @returns The response object.
+ */
 const registerUser = async (regdata, phone) => {
   const path = `${BASEURL}/ussd/ussdRegister`;
   let response;
@@ -33,6 +39,11 @@ const registerUser = async (regdata, phone) => {
   }
 };
 
+/**
+ * It takes in a loginData object and sends a post request to the login endpoint.
+ * @param loginData - {
+ * @returns A JSON object containing the user's details.
+ */
 const loginUser = async (loginData) => {
   const path = `${BASEURL}/ussd/login`;
   const postdata = {
@@ -47,12 +58,24 @@ const loginUser = async (loginData) => {
   }
 };
 
+/**
+ * It takes in a locationData object and an id and sends a POST request to the API with the
+locationData object as the body and the id as the path.
+ * @param locationData - The data to be sent to the API
+ * @param id - The id of the geo area you want to add locations to.
+ * @returns The response object.
+ */
 const addLocation = async (locationData, id) => {
   const path = `${BASEURL}/ussd/geoarea/${id}`;
   const locationResponse = await postrequest(locationData, path).catch((err) => err.response);
   return locationResponse;
 };
 
+/**
+ * This function checks if a farmer has been verified by the admin.
+ * @param id - The farmer's id
+ * @returns The status of the farmer verification
+ */
 const checkFarmerVerification = async (id) => {
   const path = `${BASEURL}/ussd/isverified/${id}`;
   try {
@@ -64,6 +87,15 @@ const checkFarmerVerification = async (id) => {
 };
 const checkVerification = () => true;
 
+/**
+ * It checks if a user exists in the database.
+ * @param phone - The phone number of the user
+ * @returns {
+ *   exists: true/false,
+ *   role: 'farmer/buyer',
+ *   user_id: 'user_id'
+ * }
+ */
 const checkIfUserExists = async (phone) => {
   try {
     const details = {
@@ -81,6 +113,11 @@ const checkIfUserExists = async (phone) => {
     return false;
   }
 };
+/**
+ * Checks if location data is availble for user
+ * @param id - The id of the user
+ * @returns The location of the user.
+ */
 const isLocationPresent = async (id) => {
   try {
     const response = await axios.get(`${BASEURL}/ussd/showprofile/${id}`);

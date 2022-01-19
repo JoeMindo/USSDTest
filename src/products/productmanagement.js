@@ -10,6 +10,10 @@ export const cartItems = [];
 export const totalCost = {};
 export const itemSelection = {};
 
+/**
+ * It fetches the categories from the server and returns them as a string.
+ * @returns The categories are being returned as a string.
+ */
 async function fetchCategories() {
   let results = '';
   try {
