@@ -250,27 +250,19 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
       const menuPrompt = 'CON How many of bags this product do you have available for sale?';
       message = menuPrompt;
     } else if (textValue === 5) {
-      const availableQuantity = parseInt(text.split('*')[4], 10);
-      client.set('available_quantity', availableQuantity);
-      const menuPrompt = 'CON For how much are you selling this item for per bag?';
-      message = menuPrompt;
-    } else if (textValue === 6) {
-      const requestPrice = parseInt(text.split('*')[5], 10);
-      client.set('price', requestPrice);
-      // const menuPrompt = 'CON Is this item available for sale?\n 1. Yes\n 2. No';
-      // message = menuPrompt;
+      const availableQuantity = text.split('*')[4];
       // TODO: Add product
       const productData = await retreiveCachedItems(client, [
         'farm_id',
         'product_id',
-        'available_quantity',
       ]);
       const postProductDetails = {
         farm_id: productData[0],
         product_id: productData[1],
-        capacity: productData[2],
+        capacity: availableQuantity,
       };
       const addingProduct = await addProduct(postProductDetails);
+      console.log('Adding product', addingProduct);
       if (addingProduct.status === 200) {
         message = `${end()} Produce added successfully`;
       } else {
