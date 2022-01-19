@@ -116,7 +116,7 @@ export const fetchAvailableGroups = async (locationID) => {
  */
 export const getLocationID = async (userId) => {
   const response = await axios
-    .get(`${BASEURL}/ussd/user/location/${userId}`)
+    .get(`${BASEURL}/ussd/checklocationdetails/${userId}`)
     .catch((err) => err.response);
   return response;
 };
@@ -129,9 +129,10 @@ export const getLocationID = async (userId) => {
 export const showGroups = async (client) => {
   let message;
   const userID = await retreiveCachedItems(client, ['user_id']);
-  const locationID = await getLocationID(userID[0]);
-
+  let locationID = await getLocationID(userID[0]);
+  locationID = locationID.data.locationID;
   const availableGroups = await fetchAvailableGroups(locationID);
+  console.log('The groups are', availableGroups);
 
   let menuPrompt = 'CON Choose a group you want to join\n';
   availableGroups.forEach((group) => {
