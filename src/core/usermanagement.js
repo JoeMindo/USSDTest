@@ -49,13 +49,8 @@ const loginUser = async (loginData) => {
 
 const addLocation = async (locationData, id) => {
   const path = `${BASEURL}/ussd/geoarea/${id}`;
-
-  try {
-    const locationResponse = await postrequest(locationData, path);
-    return locationResponse;
-  } catch (error) {
-    throw new Error(error);
-  }
+  const locationResponse = await postrequest(locationData, path).catch((err) => err.response);
+  return locationResponse;
 };
 
 const checkFarmerVerification = async (id) => {

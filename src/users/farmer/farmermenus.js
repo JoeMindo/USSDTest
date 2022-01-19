@@ -69,12 +69,13 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
 
     const userId = parseInt(postLocationDetails[3], 10);
     const response = await addLocation(postDetails, userId);
+    console.log('The add location response is', response);
 
     if (response.status === 201) {
       const menuPrompt = `${end()} ${menus.updateLocation.success}`;
       message = menuPrompt;
     } else {
-      message = 'CON Could not update location, try again later';
+      message = `${con()} Could not update location, ${response.response.data.message}`;
       message += menus.footer;
     }
   }
