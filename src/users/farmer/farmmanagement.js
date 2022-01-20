@@ -99,14 +99,10 @@ export const getUserFarms = async (userId) => {
  * @returns The response object.
  */
 export const fetchAvailableGroups = async (locationID) => {
-  try {
-    const response = await axios
-      .get(`${BASEURL}/ussd/group/${locationID}`)
-      .catch((err) => err.response);
-    return response;
-  } catch (err) {
-    throw new Error(err);
-  }
+  const response = await axios
+    .get(`${BASEURL}/ussd/getgroupbylocationid/${locationID}`)
+    .catch((err) => err.response);
+  return response;
 };
 
 /**
@@ -132,15 +128,17 @@ export const showGroups = async (client) => {
   let locationID = await getLocationID(userID[0]);
   locationID = locationID.data.locationID;
   const availableGroups = await fetchAvailableGroups(locationID);
-  console.log('The groups are', availableGroups);
 
-  let menuPrompt = 'CON Choose a group you want to join\n';
-  availableGroups.forEach((group) => {
-    menuPrompt += `${group.id}. ${group.name}`;
-  });
+  if (availableGroups.status === 200) {
+    let menuPrompt = 'CON Choose a group you want to join\n';
+    availableGroups.data.message.forEach((group) => {
+      menuPrompt += `${group.id}. ${group.group_name}`;
+    });
+    message = menuPrompt;
+  } else {
+    message = 'CON Sorry, there are no groups available at the moment.';
+  }
 
-  message = menuPrompt;
-  message += menus.footer;
   return message;
 };
 

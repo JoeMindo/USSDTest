@@ -344,7 +344,8 @@ export const secondLevelMenu = async (textValue, text) => {
     message = await showGroups(client);
   } else if (textValue === 3) {
     const selectedGroup = parseInt(text.split('*')[2], 10);
-    message = await joinGroup(selectedGroup);
+    const userID = await retreiveCachedItems(client, ['user_id']);
+    message = await joinGroup(selectedGroup, userID[0]);
   }
   message += menus.footer;
   return message;
