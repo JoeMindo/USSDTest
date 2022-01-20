@@ -28,7 +28,9 @@ export const menus = {
     addProduct: '3. Add product\n',
     updateDetails: '4. Update farmer details\n',
     updateListedProduce: '5. Update listed produce',
-    joinGroup: '6. Join Group',
+    joinGroup: '6. Join Group\n',
+    cropCalendar: '7. Crop Calendar',
+    cropCalendarMenus: '\n1. Option 1\n. Option 2. \n Option 3.',
   },
   addfarmDetails: {
     0: 'Enter farm name',

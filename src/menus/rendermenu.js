@@ -91,11 +91,17 @@ export const renderFarmerMenus = () => {
  * @returns A string that is the message that is being displayed to the user.
  */
 export const renderFarmerMenusLevelTwo = () => {
-  const menuPrompt = `${con()} ${menus.farmer.joinGroup}`;
+  let menuPrompt = `${con()} ${menus.farmer.joinGroup}`;
+  menuPrompt += `${menus.farmer.cropCalendar}`;
   message = menuPrompt;
   return message;
 };
 
+export const renderCropCalendarMenus = () => {
+  const menuPrompt = `${con()} ${menus.farmer.cropCalendarMenus}`;
+  message = menuPrompt;
+  return message;
+};
 /**
  * This function renders the buyer menu.
  * @returns A string that is the message that is to be sent to the user.

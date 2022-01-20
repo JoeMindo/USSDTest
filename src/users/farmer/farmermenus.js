@@ -2,7 +2,7 @@
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
 import { menus } from '../../menus/menuoptions.js';
 import client from '../../server.js';
-import { addLocation } from '../../core/usermanagement.js';
+import { addLocation, isLocationPresent } from '../../core/usermanagement.js';
 import { retreiveCachedItems, setToCache } from '../../core/services.js';
 import {
   fetchCategories,
@@ -21,6 +21,7 @@ import {
   showGroups,
   joinGroup,
 } from './farmmanagement.js';
+
 import { responsePrompt } from '../../menus/prompts.js';
 import { promptToGive } from './farmerlocation.js';
 import { renderFarmerMenusLevelTwo } from '../../menus/rendermenu.js';
@@ -89,50 +90,58 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
  */
 export const renderAddFarmDetailsMenu = async (textValue, text) => {
   let message;
-  if (textValue === 1) {
-    let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (textValue === 2) {
-    if (isTextOnly(text.split('*')[1]) === true) {
-      let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
+  const userID = await retreiveCachedItems(client, ['user_id']);
+  const locationDetailsPresent = await isLocationPresent(userID[0]);
+
+  if (locationDetailsPresent === true) {
+    if (textValue === 1) {
+      let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
       menuPrompt += menus.footer;
       message = menuPrompt;
-      client.set('farm_name', text.split('*')[1]);
-    } else {
-      message = 'CON Invalid input, try again';
-    }
-  } else if (textValue === 3) {
-    let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
-  } else if (textValue === 4) {
-    client.set('farm_size', parseInt(text.split('*')[2], 10));
-    const farmDetails = await retreiveCachedItems(client, [
-      'farm_name',
-      'farm_location',
-      'farm_description',
-      'farm_size',
-      'user_id',
-    ]);
-    const postDetails = {
-      farm_name: farmDetails[0],
-      farm_location: farmDetails[1],
-      farm_description: 'Null',
-      farm_size: farmDetails[3],
-      user_id: farmDetails[4],
-    };
-    const responseForAddingFarm = await addFarm(postDetails);
+    } else if (textValue === 2) {
+      if (isTextOnly(text.split('*')[1]) === true) {
+        let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
+        menuPrompt += menus.footer;
+        message = menuPrompt;
+        client.set('farm_name', text.split('*')[1]);
+      } else {
+        message = 'CON Invalid input, try again';
+      }
+    } else if (textValue === 3) {
+      let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+    } else if (textValue === 4) {
+      client.set('farm_size', parseInt(text.split('*')[2], 10));
+      const farmDetails = await retreiveCachedItems(client, [
+        'farm_name',
+        'farm_location',
+        'farm_description',
+        'farm_size',
+        'user_id',
+      ]);
+      const postDetails = {
+        farm_name: farmDetails[0],
+        farm_location: farmDetails[1],
+        farm_description: 'Null',
+        farm_size: farmDetails[3],
+        user_id: farmDetails[4],
+      };
+      const responseForAddingFarm = await addFarm(postDetails);
 
-    if (responseForAddingFarm.status === 200) {
-      const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
-      message = menuPrompt;
-      client.set('farm_id', responseForAddingFarm.data.farm_id);
-    } else {
-      const menuPrompt = `${end()} ${menus.addfarmDetails.failure}`;
-      message = menuPrompt;
+      if (responseForAddingFarm.status === 200) {
+        const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
+        message = menuPrompt;
+        client.set('farm_id', responseForAddingFarm.data.farm_id);
+      } else {
+        const menuPrompt = `${end()} ${responseForAddingFarm.data.message}`;
+        message = menuPrompt;
+      }
     }
+  } else {
+    message = 'CON Update your location first';
   }
+
   return message;
 };
 
@@ -147,7 +156,6 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     message = responsePrompt(farmerMetrics, 'sections');
   } else if (textValue === 2) {
     const sectionId = parseInt(text.split('*')[1], 10);
-
     client.set('sectionId', sectionId);
     const questions = await getQuestionsPerSection(sectionId);
     message = responsePrompt(questions, 'questions');
@@ -173,8 +181,8 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     } else {
       message = `${end()} Could not fetch answers at the moment, try later`;
     }
-  } else if (textValue === 5) {
-    const userAnswers = text.split('*')[4];
+  } else if (textValue === 4) {
+    const userAnswers = text.split('*')[3];
     if (userAnswers === '0') {
       message = `${con()} Type in your answer`;
       // res.send(message);
@@ -190,8 +198,8 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
 
       message = `${con()} Proceed?\n 1. Yes`;
     }
-  } else if (textValue === 6) {
-    if (text.split('*')[4] === '0') {
+  } else if (textValue === 5) {
+    if (text.split('*')[3] === '0') {
       setToCache(text, 4, client, 'answers');
     }
 
@@ -209,7 +217,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
     if (updateKYC.status === 200) {
       message = `${end()} Thank you for your submission`;
     } else {
-      message = 'CON Something went wrong!!!';
+      message = 'END Something went wrong!!!';
     }
   }
   return message;
@@ -338,14 +346,22 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
 
 export const secondLevelMenu = async (textValue, text) => {
   let message;
+  const selection = text.split('*')[1];
   if (textValue === 1) {
     message = renderFarmerMenusLevelTwo();
-  } else if (textValue === 2) {
-    message = await showGroups(client);
-  } else if (textValue === 3) {
-    const selectedGroup = parseInt(text.split('*')[2], 10);
-    const userID = await retreiveCachedItems(client, ['user_id']);
-    message = await joinGroup(selectedGroup, userID[0]);
+  }
+  if (selection === '6') {
+    if (textValue === 2) {
+      message = await showGroups(client);
+    } else if (textValue === 3) {
+      const selectedGroup = parseInt(text.split('*')[2], 10);
+      const userID = await retreiveCachedItems(client, ['user_id']);
+      message = await joinGroup(selectedGroup, userID[0]);
+    }
+  } else if (selection === '7') {
+    if (textValue === 2) {
+      // message = renderCropCalendarMenus();
+    }
   }
   message += menus.footer;
   return message;

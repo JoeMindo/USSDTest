@@ -119,12 +119,11 @@ const checkIfUserExists = async (phone) => {
  * @returns The location of the user.
  */
 const isLocationPresent = async (id) => {
-  try {
-    const response = await axios.get(`${BASEURL}/ussd/showprofile/${id}`);
-    return response.data.location;
-  } catch (err) {
-    return false;
+  const response = await axios.get(`${BASEURL}/ussd/checklocationdetails/${id}`).catch((err) => err.response);
+  if (response.status === 200) {
+    return true;
   }
+  return false;
 };
 
 export {

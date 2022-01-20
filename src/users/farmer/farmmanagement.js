@@ -3,7 +3,6 @@
 import axios from 'axios';
 import { retreiveCachedItems } from '../../core/services.js';
 import { BASEURL } from '../../core/urls.js';
-import { menus } from '../../menus/menuoptions.js';
 
 /**
  * It takes a farm object and sends it to the server.
@@ -41,12 +40,10 @@ export const addFarmerKYC = async (farmerKYC, id) => {
  * @returns The response is an object with the following properties:
  */
 export const getFarmerMetricSections = async () => {
-  try {
-    const response = await axios.get(`${BASEURL}/ussd/kycmetricsections/1`);
-    return response;
-  } catch (err) {
-    throw new Error(err);
-  }
+  const response = await axios
+    .get(`${BASEURL}/ussd/kycmetricsections/1`)
+    .catch((err) => err.response);
+  return response;
 };
 /**
  * It gets the questions for a specific section.
@@ -54,14 +51,10 @@ export const getFarmerMetricSections = async () => {
  * @returns The question and the answer.
  */
 export const getQuestionsPerSection = async (sectionId) => {
-  try {
-    const response = await axios.get(
-      `${BASEURL}/ussd/kycquestions/${sectionId}`,
-    );
-    return response;
-  } catch (err) {
-    throw new Error(err);
-  }
+  const response = await axios
+    .get(`${BASEURL}/ussd/kycquestions/${sectionId}`)
+    .catch((err) => err.response);
+  return response;
 };
 /**
  * Get all possible answers for a question.
@@ -69,14 +62,10 @@ export const getQuestionsPerSection = async (sectionId) => {
  * @returns The possible answers for the question.
  */
 export const getAnswersPerQuestion = async (questionId) => {
-  try {
-    const response = await axios.get(
-      `${BASEURL}/ussd/kycpossibleanswers/${questionId}`,
-    );
-    return response;
-  } catch (err) {
-    throw new Error(err);
-  }
+  const response = await axios
+    .get(`${BASEURL}/ussd/kycpossibleanswers/${questionId}`)
+    .catch((err) => err.response);
+  return response;
 };
 
 /**
@@ -85,12 +74,10 @@ export const getAnswersPerQuestion = async (questionId) => {
  * @returns The response object.
  */
 export const getUserFarms = async (userId) => {
-  try {
-    const response = axios.get(`${BASEURL}/ussd/farm/${userId}`);
-    return response;
-  } catch (error) {
-    return error;
-  }
+  const response = axios
+    .get(`${BASEURL}/ussd/farm/${userId}`)
+    .catch((err) => err.response);
+  return response;
 };
 
 /**
@@ -157,6 +144,7 @@ export const joinGroup = async (groupID, userId) => {
   const response = await axios
     .post(`${BASEURL}/ussd/saveuserundergroup/${groupID}`, data)
     .catch((err) => err.response);
+
   if (response.status === 200) {
     message = 'END Successfully joined group';
   } else {

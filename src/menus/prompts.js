@@ -55,12 +55,12 @@ export const responsePrompt = (response, section) => {
   let menuPrompt = 'CON ';
 
   if (response.status === 200 && section === 'sections') {
-    response.data.forEach((item) => {
+    response.data.message.forEach((item) => {
       menuPrompt += `${item.id}. ${item.section_name}\n`;
     });
     message = promptToShow(menuPrompt, 'kycsections');
   } else if (response.status === 200 && section === 'questions') {
-    response.data.forEach((item) => {
+    response.data.message.forEach((item) => {
       menuPrompt += `${item.id}. ${item.metric_name}\n`;
     });
     message = promptToShow(menuPrompt, 'kycmetrics');
