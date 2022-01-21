@@ -25,7 +25,7 @@ describe('Add farm', () => {
   });
   it('should raise error if not able to save ', async () => {
     const response = await addFarm(farmDetails);
-    expect(response.response.status).to.equal(400);
+    expect(response.status).to.equal(400);
   });
   it('should not accept digits in any of the names', () => {
     const result = isTextOnly('TestFarm123');

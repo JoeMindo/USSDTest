@@ -46,6 +46,7 @@ describe('Add product', () => {
   });
   it('should inform the user of a server error', async () => {
     await fetchCategories().catch((error) => {
+      console.error('This is the error', error);
       expect(error.response.status).to.equal(500);
       expect(error.response.data.data.message).to.equal('Server error');
     });

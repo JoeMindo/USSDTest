@@ -33,10 +33,8 @@ describe('Locality details', () => {
   });
   it('should raise an error if location does not exist', async () => {
     const response = await getLocations('counties', 99, 'county_name');
-    expect(response.items).to.equal('Location not found');
-    expect(response.ids).to.equal(undefined);
-    // TODO:Add test for response code
-    // expect(response.status).to.equal(404);
+    expect(response.status).to.equal(404);
+    expect(response.data.message.data.items).to.equal('Location not found');
   });
   it('should return status 201 if location has been saved successfully', async () => {
     // const areaData = {
