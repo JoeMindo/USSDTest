@@ -1,6 +1,16 @@
 import axios from 'axios';
 import { BASEURL } from '../core/urls.js';
 
+/**
+ * It gets the orders of a user.
+ * @param id - The id of the user
+ * @returns The orders
+ */
+/**
+ * It gets the orders of a user.
+ * @param id - The id of the user
+ * @returns The orders
+ */
 export const getOrders = async (id) => {
   let result;
   try {
@@ -17,6 +27,11 @@ export const getOrders = async (id) => {
     throw new Error(error);
   }
 };
+/**
+ * It returns a list of orders for a particular user.
+ * @param id - The id of the user
+ * @returns An array of objects
+ */
 export const viewOrders = async (id) => {
   let message;
   let prompt = '';

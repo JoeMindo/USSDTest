@@ -10,36 +10,35 @@ export const cartItems = [];
 export const totalCost = {};
 export const itemSelection = {};
 
+/**
+ * It fetches the categories from the server and returns them as a string.
+ * @returns The categories are being returned as a string.
+ */
 async function fetchCategories() {
   let results = '';
-  try {
-    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
+  const response = await axios.get(`${BASEURL}/ussd/prodcategories`).catch((err) => err.response);
+  if (response.status === 200) {
     response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);
       results += `\n${category.id}. ${category.category_name}`;
     });
-    return results;
-  } catch (error) {
-    return error;
   }
+  return results;
 }
+
 async function fetchProducts(id) {
   let results = '';
-  try {
-    const response = await axios.get(`${BASEURL}/ussd/prodcategories`);
-
-    response.data.data.data.forEach((item) => {
-      item.products.forEach((description) => {
-        if (description.category_id === id) {
-          results += `${description.id}. ${description.product_name}\n `;
-        }
-      });
+  const response = await axios.get(`${BASEURL}/ussd/prodcategories`).catch((err) => err.response);
+  response.data.data.data.forEach((item) => {
+    item.products.forEach((description) => {
+      if (description.category_id === id) {
+        results += `${description.id}. ${description.product_name}\n `;
+      }
     });
-    return results;
-  } catch (error) {
-    throw new Error(error);
-  }
+  });
+  return results;
 }
+
 const fetchFarmOfferings = async (id) => {
   let farmOfferings = '';
   try {
@@ -65,11 +64,11 @@ const addProduct = async (productdata) => {
   return newProduct;
 };
 const productsInFarm = async (farmID) => {
-  const products = axios.get(`${BASEURL}/ussd/farmproducts/farm/${farmID}`).catch((err) => err.response);
+  const products = await axios.get(`${BASEURL}/ussd/farmproducts/farm/${farmID}`).catch((err) => err.response);
   return products;
 };
 const updateListedProduct = async (id, data) => {
-  const updatedProduce = axios.post(
+  const updatedProduce = await axios.post(
     `${BASEURL}/ussd/farmproduct/update/${id}`, data,
   )
     .catch((err) => err.response);

@@ -14,15 +14,31 @@ export const totalCost = {};
 
 let message;
 
+/**
+ * Ask the user for a number.
+ * @returns The message variable.
+ */
 export const askForNumber = () => {
   message = `${con()} Checkout using\n 1. This Number\n 2. Other number`;
   return message;
 };
+/**
+ * Ask the user for the quantity they want to buy.
+ * @returns A string
+ */
 export const askForQuantity = () => {
   message = `${con()} Enter quantity you want to buy\n`;
   message += menus.footer;
   return message;
 };
+/**
+ * If the price type is both, and the user chooses unit, then the status is unit. If the price type
+is both, and the user chooses group, then the status is group. If the price type is unit, then the
+status is unit. If the price type is group, then the status is group.
+ * @param availablePriceType - the type of price that is available for the user to use
+ * @param choice - the user's choice of price type
+ * @returns The price type that is being used.
+ */
 export const priceToUse = (availablePriceType, choice) => {
   let status;
   if (
@@ -40,6 +56,11 @@ export const priceToUse = (availablePriceType, choice) => {
   return status;
 };
 
+/**
+ * Show the cart items
+ * @param client - The client object that is used to interact with the database.
+ * @returns An array of objects.
+ */
 export const showCartItems = async (client) => {
   let prompt = '';
   let fetchCartItems = await retreiveCachedItems(client, ['cartItems']);
@@ -49,6 +70,16 @@ export const showCartItems = async (client) => {
   });
   return prompt;
 };
+
+/**
+ * If the cartItems key exists in the cache, then the function will retrieve the cartItems from the
+cache and add the new item to the cartItems array. If the cartItems key does not exist in the cache,
+then the function will create a new cartItems array and add the new item to the cartItems array.
+ * @param client - The redis client object
+ * @param itemsObject - {
+ * @param totalPriceObject - {
+ * @returns The message that is being returned
+ */
 export const addToCart = async (client, itemsObject, totalPriceObject) => {
   if (itemsObject && totalPriceObject) {
     let existingItems = await retreiveCachedItems(client, ['cartItems']);
@@ -88,6 +119,13 @@ export const addToCart = async (client, itemsObject, totalPriceObject) => {
   return message;
 };
 
+/**
+ * It takes in the client, itemsObject and totalPriceObject and adds them to the cartItems array.
+ * @param client - The client object that is used to interact with the database.
+ * @param itemsObject - The object that contains the item name, quantity, price, and total price
+ * @param totalPriceObject - {
+ * @returns The message that is being returned.
+ */
 export const confirmNewQuantity = (client, itemsObject, totalPriceObject) => {
   if (itemsObject && totalPriceObject) {
     cartItems.push(itemsObject);
@@ -101,6 +139,11 @@ export const confirmNewQuantity = (client, itemsObject, totalPriceObject) => {
   return message;
 };
 
+/**
+ * This function is used to update the cart.
+ * @param type - The type of update to perform. Can be 'add' or 'remove'.
+ * @returns The message that is being returned.
+ */
 export const updateType = async (type) => {
   if (type === 'remove') {
     message = `${con()} Select an item to remove\n`;
@@ -113,6 +156,11 @@ export const updateType = async (type) => {
   message += menus.footer;
   return message;
 };
+/**
+ * Removing Item from cart
+ * @param id - The id of the item to be removed from the cart
+ * @returns The cart items
+ */
 export const removeItemFromCart = async (id) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
@@ -136,6 +184,14 @@ export const removeItemFromCart = async (id) => {
   }
 };
 
+/**
+ * This function will remove an item from the cart and update the total cost of the cart.
+ * @param client - The redis client
+ * @param amount - The amount of the item to be added to the cart
+ * @param object - The object that is being updated
+ * @param id - The id of the item to be updated
+ * @returns A string
+ */
 export const changeQuantity = async (client, amount, object, id) => {
   try {
     let cartItems = await retreiveCachedItems(client, ['cartItems']);
@@ -156,6 +212,21 @@ export const changeQuantity = async (client, amount, object, id) => {
     throw new Error(err);
   }
 };
+
+/**
+ * Find the item in the cart that matches the id provided and return the item.
+ * @param client - The client object that you can use to interact with the cache.
+ * @param id - The id of the item you want to update
+ * @returns {
+ *   message: '',
+ *   itemToUpdate: {
+ *     id: '',
+ *     name: '',
+ *     price: '',
+ *     quantity: '',
+ *   },
+ * }
+ */
 export const findItemToChangeQuantity = async (client, id) => {
   let itemToUpdate;
   try {
@@ -179,6 +250,11 @@ export const findItemToChangeQuantity = async (client, id) => {
   }
 };
 
+/**
+ * It retrieves the total cost of the items in the cart and displays it to the user.
+ * @param client - The client object that is used to interact with the user
+ * @returns The total cost of the items in the cart
+ */
 export const displayTotalCost = async (client) => {
   try {
     const chargeToUser = await retreiveCachedItems(client, ['totalCost']);
@@ -190,6 +266,11 @@ export const displayTotalCost = async (client) => {
   return message;
 };
 
+/**
+ * Cannot generate summary
+ * @param request - the request object
+ * @returns The request object.
+ */
 export const updateRequest = (request) => {
   const array = request.body.text.split('*');
   array.splice(2, array.length);

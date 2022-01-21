@@ -11,6 +11,10 @@ import {
   renderProductCategories,
 } from '../users/buyer/buyermenus.js';
 
+/**
+ * Checks if a user is in a group
+ * @returns The group ID
+ */
 export const checkIfUserIsInGroup = async () => {
   const user = await retreiveCachedItems(client, ['user_id']);
   const data = {
@@ -24,6 +28,12 @@ export const checkIfUserIsInGroup = async () => {
   return false;
 };
 
+/**
+ * If the state is false, then the message is "CON Create Group". If the state is a number, then the
+message is "CON Group To Join". The message is then concatenated with the footer.
+ * @param state - The state of the user.
+ * @returns The message to be sent to the user.
+ */
 export const actionToTake = async (state) => {
   let message = '';
   if (state === false) {
@@ -35,11 +45,21 @@ export const actionToTake = async (state) => {
   return message;
 };
 
+/**
+ * It creates a group.
+ * @param groupdata - {
+ * @returns The status of the request.
+ */
 export const createGroup = async (groupdata) => {
   const response = await axios.post(`${BASEURL}/ussd/saveusergroup`, groupdata);
   return response.data.status;
 };
 export const requestGroupName = () => 'CON What is the name of your group?\n';
+/**
+ * This function is used to create a CON group.
+ * @param status - The status of the group creation.
+ * @returns The message that is being returned.
+ */
 export const groupCreationMessage = (status) => {
   let message;
   if (status === 'success') {
@@ -51,6 +71,11 @@ export const groupCreationMessage = (status) => {
   return message;
 };
 
+/**
+ * It takes in a productId and returns a message that contains the product's offers.
+ * @param productId - The productId of the product you want to render
+ * @returns The message that is being sent to the user.
+ */
 export const renderGroupPricedItems = async (productId) => {
   try {
     let offers = await axios.get(
@@ -63,6 +88,12 @@ export const renderGroupPricedItems = async (productId) => {
     throw new Error(err);
   }
 };
+/**
+ * It renders the product categories, products, and group priced items.
+ * @param textValue - The value of the text message received.
+ * @param text - The text that the user sent.
+ * @returns The message to be sent to the user.
+ */
 export const groupPricedItems = async (textValue, text) => {
   let message;
   if (textValue === 5) {

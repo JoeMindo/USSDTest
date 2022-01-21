@@ -1,14 +1,17 @@
 import axios from 'axios';
 import { BASEURL } from '../../core/urls.js';
 
+/**
+ * It gets the regions from the database and returns them as a menu.
+ * @returns The response object is an object with the following properties:
+ */
 export const getRegions = async () => {
   const regions = [];
   let menuItems = '';
   const menuIDs = [];
-  try {
-    const regionsResult = await axios.get(`${BASEURL}/ussd/regions/`);
-    console.log('The regions are', regionsResult.data.message.data);
 
+  const regionsResult = await axios.get(`${BASEURL}/ussd/regions/`).catch((err) => err.response);
+  if (regionsResult.status === 200) {
     regionsResult.data.message.data.forEach((location) => {
       regions.push(location);
     });
@@ -20,21 +23,29 @@ export const getRegions = async () => {
       items: menuItems,
       ids: menuIDs,
     };
-  } catch (error) {
-    throw new Error(error);
   }
+  return regionsResult;
 };
 
+/**
+ * It takes in a type, id and identifier and returns a menuItems and menuIDs.
+ * @param type - The type of location you want to get.
+ * @param id - The id of the location
+ * @param identifier - The identifier of the location type
+ * @returns The menu items and the ids of the locations.
+ */
 export const getLocations = async (type, id, identifier) => {
   const locationType = [];
+
   let menuItems = '';
   const menuIDs = [];
-  try {
-    const locationResult = await axios.get(`${BASEURL}/ussd/${type}/${id}`);
-    locationResult.data.data.forEach((location) => {
+  const locationResult = await axios
+    .get(`${BASEURL}/ussd/${type}/${id}`)
+    .catch((error) => error.response);
+  if (locationResult.status === 200) {
+    locationResult.data.message.data.forEach((location) => {
       locationType.push(location);
     });
-
     locationType.forEach((value, index) => {
       const name = value[`${identifier}`];
       menuItems += `${(index += 1)}. ${name}\n`;
@@ -45,11 +56,16 @@ export const getLocations = async (type, id, identifier) => {
       items: menuItems,
       ids: menuIDs,
     };
-  } catch (error) {
-    return {
-      items: 'Location not found',
-    };
   }
+  return locationResult;
 };
 
+/**
+ * Given a string and an index, split the string into
+ * an array of strings and return the element at the
+ * index.
+ * @param text - The text to split
+ * @param index - The index of the text to return.
+ * @returns None
+ */
 export const splitText = (text, index) => text.split('*')[`${index}`];
