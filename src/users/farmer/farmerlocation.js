@@ -52,11 +52,18 @@ export const fetchLocalityDetails = async (client, locality, id = null) => {
     userLocationSelection = parseInt(userLocationSelection, 10);
     client.set('userLocationSelection', userLocationSelection);
   } else {
-    results = 'CON Data not found';
+    results = 'END Data not found';
   }
   return results;
 };
 
+/**
+ * It prompts the user to select a region, county, subcounty, location or area.
+ * @param client - The client object that is used to interact with the database.
+ * @param locality - The type of locality to fetch.
+ * @param [id=null] - The id of the locality to be updated.
+ * @returns The prompt is returned.
+ */
 export const promptToGive = async (client, locality, id = null) => {
   let prompt;
   if (locality === 'region') {

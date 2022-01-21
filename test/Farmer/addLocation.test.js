@@ -7,19 +7,19 @@ import {
   locationError,
   geoArea,
 } from './farmerResponses.js';
+import { addLocation } from '../../src/core/usermanagement.js';
 import { BASEURL } from '../../src/core/urls.js';
 import {
   getLocations,
   getRegions,
 } from '../../src/users/farmer/listlocations.js';
-// import { addLocation } from '../../src/core/usermanagement.js';
 
 describe('Locality details', () => {
   beforeEach(() => {
     nock(`${BASEURL}`).get('/ussd/regions/').reply(200, regions);
     nock(`${BASEURL}`).get('/ussd/counties/1').reply(200, counties);
     nock(`${BASEURL}`).get('/ussd/counties/99').reply(404, locationError);
-    nock(`${BASEURL}`).post('/ussd/geoarea/').reply(201, geoArea);
+    nock(`${BASEURL}`).post('/ussd/geoarea/1').reply(201, geoArea);
   });
   it('should display the regions and track the region IDs', async () => {
     const response = await getRegions();
@@ -37,14 +37,14 @@ describe('Locality details', () => {
     expect(response.data.message.data.items).to.equal('Location not found');
   });
   it('should return status 201 if location has been saved successfully', async () => {
-    // const areaData = {
-    //   sub_county_id: 123,
-    //   location_id: 58,
-    //   area: 'Here',
-    // };
-    // const userId = 1;
-    // const response = await addLocation(areaData, userId);
-    //
-    // expect(response.status).to.equal(201);
+    const areaData = {
+      sub_county_id: 123,
+      location_id: 58,
+      area: 'Here',
+    };
+    const userId = 1;
+    const response = await addLocation(areaData, userId);
+
+    expect(response.status).to.equal(201);
   });
 });
