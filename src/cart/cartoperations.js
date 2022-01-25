@@ -335,7 +335,7 @@ export const cartOperations = async (
   if (menuLevel === 'inner') {
     selection = text.split('*')[8];
   } else if (menuLevel === 'outer') {
-    selection = text.split('*')[2];
+    selection = text.split('*')[1];
   }
 
   if (level === 0) {

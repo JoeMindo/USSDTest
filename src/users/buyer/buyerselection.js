@@ -16,36 +16,36 @@ const checkBuyerSelection = async (textValue, text) => {
     const selection = text.split('*')[0];
     if (selection === '1') {
       message = await showAvailableProducts(client, textValue, text);
-    } else if (selection === '2' && textValue === 1) {
-      if (textValue === 2) {
+    } else if (selection === '2') {
+      if (textValue === 1) {
         message = await cartOperations(text, 'outer', 0);
-      } else if (textValue === 3 && text.split('*')[2] === '1') {
+      } else if (textValue === 2 && text.split('*')[1] === '1') {
         message = await cartOperations(text, 'outer', 1);
-      } else if (textValue === 3 && text.split('*')[2] === '2') {
+      } else if (textValue === 2 && text.split('*')[1] === '2') {
         message = await cartOperations(text, 'outer', 1);
-      } else if (textValue === 4 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
+      } else if (textValue === 3 && text.split('*')[1] === '1' && text.split('*')[2] === '1') {
         message = await cartOperations(text, 'outer', 8);
-      } else if (textValue === 4 && text.split('*')[3] === '1') {
+      } else if (textValue === 3 && text.split('*')[2] === '1') {
         message = await cartOperations(text, 'outer', 2);
-      } else if (textValue === 4 && text.split('*')[3] === '2') {
+      } else if (textValue === 3 && text.split('*')[2] === '2') {
         message = await cartOperations(text, 'outer', 3);
-      } else if (textValue === 5 && text.split('*')[2] === '1' && text.split('*')[3] === '1') {
+      } else if (textValue === 4 && text.split('*')[1] === '1' && text.split('*')[2] === '1') {
         // TODO: Make payment
         message = await cartOperations(text, 'outer', 9);
-      } else if (textValue === 5 && text.split('*')[3] === '1') {
-        const id = parseInt(text.split('*')[4], 10);
+      } else if (textValue === 4 && text.split('*')[2] === '1') {
+        const id = parseInt(text.split('*')[3], 10);
         message = await cartOperations(text, 'outer', 4, id);
-      } else if (textValue === 5 && text.split('*')[3] === '2') {
-        const id = parseInt(text.split('*')[4], 10);
+      } else if (textValue === 4 && text.split('*')[2] === '2') {
+        const id = parseInt(text.split('*')[3], 10);
         message = await cartOperations(text, 'outer', 5, id);
-      } else if (textValue === 6 && text.split('*')[3] === '1' && text.split('*')[5] === '67') {
+      } else if (textValue === 5 && text.split('*')[2] === '1' && text.split('*')[4] === '67') {
         message = await cartOperations(text, 'outer', 0);
-      } else if (textValue === 6 && text.split('*')[3] === '2') {
-        const id = parseInt(text.split('*')[4], 10);
+      } else if (textValue === 5 && text.split('*')[2] === '2') {
+        const id = parseInt(text.split('*')[3], 10);
         const newQuantity = parseInt(text.split('*')[5], 10);
         message = await cartOperations(text, 'outer', 6, id, newQuantity);
-      } else if (textValue === 7 && text.split('*')[3] === '2') {
-        const id = parseInt(text.split('*')[4], 10);
+      } else if (textValue === 6 && text.split('*')[2] === '2') {
+        const id = parseInt(text.split('*')[3], 10);
         message = await cartOperations(text, 'outer', 6, id);
       }
     } else if (selection === '3') {
