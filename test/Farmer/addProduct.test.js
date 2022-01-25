@@ -12,7 +12,6 @@ import { getUserFarms } from '../../src/users/farmer/farmmanagement.js';
 describe('Add product', () => {
   beforeEach(() => {
     nock(`${BASEURL}`)
-      // TODO:Backend resolve this issue
       .get('/ussd/farm/31')
       .reply(200, getUserFarmsSuccess);
 

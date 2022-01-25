@@ -176,7 +176,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
       );
       message = `${con()} Select any of the following separated by a space`;
       message += menuPrompt;
-      message += '\n0. Other';
+      message += '\n#. Other';
       message += menus.footer;
     } else {
       message = `${end()} Could not fetch answers at the moment, try later`;
@@ -352,7 +352,8 @@ export const secondLevelMenu = async (textValue, text) => {
   }
   if (selection === '6') {
     if (textValue === 2) {
-      message = await showGroups(client);
+      const userID = await retreiveCachedItems(client, ['user_id']);
+      message = await showGroups(userID[0]);
     } else if (textValue === 3) {
       const selectedGroup = parseInt(text.split('*')[2], 10);
       const userID = await retreiveCachedItems(client, ['user_id']);
