@@ -295,4 +295,44 @@ export const userFarmsAreNil = {
   message: 'User has no registered farms',
 
 };
+
+export const availableGroups = {
+  status: 'success',
+  message: [
+    {
+      id: 1,
+      dean_id: 2,
+      locationID: 995,
+      group_name: 'XYZ Farmers Group',
+      group_type: '1',
+    },
+  ],
+};
+
+export const location = {
+  status: 'success',
+  message: 'location id available',
+  locationID: 995,
+};
+
+export const locationNotFound = {
+  status: 'error',
+  message: 'no groups in that location',
+};
+
+export const joinGroupOk = {
+  status: 'success',
+  message: 'group member saved successfully',
+};
+
+export const joinGroupError = {
+  status: 'error',
+  message: 'group member not saved',
+};
+
+export const userAlreadyInGroup = {
+  status: 'error',
+  message: 'user is already a member in that group',
+};
+
 export default regions;

@@ -352,7 +352,8 @@ export const secondLevelMenu = async (textValue, text) => {
   }
   if (selection === '6') {
     if (textValue === 2) {
-      message = await showGroups(client);
+      const userID = await retreiveCachedItems(client, ['user_id']);
+      message = await showGroups(userID[0]);
     } else if (textValue === 3) {
       const selectedGroup = parseInt(text.split('*')[2], 10);
       const userID = await retreiveCachedItems(client, ['user_id']);

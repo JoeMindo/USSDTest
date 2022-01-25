@@ -1,7 +1,6 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/prefer-default-export */
 import axios from 'axios';
-import { retreiveCachedItems } from '../../core/services.js';
 import { BASEURL } from '../../core/urls.js';
 
 /**
@@ -105,17 +104,13 @@ export const getLocationID = async (userId) => {
 };
 
 /**
- * This function will show the user a list of groups that they can join.
- * @param client - the client object
- * @returns The group ID
+ * It fetches the available groups for the user and returns a menu prompt with the group names.
+ * @param locationID - The location ID of the location where the user is trying to join a group.
+ * @returns The message that is being returned is a string.
  */
-export const showGroups = async (client) => {
+export const showGroups = async (locationID) => {
   let message;
-  const userID = await retreiveCachedItems(client, ['user_id']);
-  let locationID = await getLocationID(userID[0]);
-  locationID = locationID.data.locationID;
   const availableGroups = await fetchAvailableGroups(locationID);
-
   if (availableGroups.status === 200) {
     let menuPrompt = 'CON Choose a group you want to join\n';
     availableGroups.data.message.forEach((group) => {
@@ -142,13 +137,13 @@ export const joinGroup = async (groupID, userId) => {
     user_id: userId,
   };
   const response = await axios
-    .post(`${BASEURL}/ussd/saveuserundergroup/${groupID}`, data)
+    .post(`${BASEURL}/ussd/saveuserundergroup/`, data)
     .catch((err) => err.response);
 
   if (response.status === 200) {
     message = 'END Successfully joined group';
   } else {
-    message = `END ${response.data.message} `;
+    message = 'END You are already in this group';
   }
   return message;
 };
