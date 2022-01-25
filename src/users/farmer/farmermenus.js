@@ -176,7 +176,7 @@ export const renderFarmerUpdateDetailsMenu = async (textValue, text) => {
       );
       message = `${con()} Select any of the following separated by a space`;
       message += menuPrompt;
-      message += '\n0. Other';
+      message += '\n#. Other';
       message += menus.footer;
     } else {
       message = `${end()} Could not fetch answers at the moment, try later`;
