@@ -87,7 +87,10 @@ const getSpecificProduct = async (id) => {
     return false;
   }
 };
-
+const listProductForSale = async (data) => {
+  const response = await axios.post(`${BASEURL}/ussd/farmproductcatalog/save`, data).catch((err) => err.response);
+  return response;
+};
 export const confirmQuantityWithPrice = async (
   userQuantity,
   productID,
@@ -139,4 +142,5 @@ export {
   fetchFarmOfferings,
   updateListedProduct,
   productsInFarm,
+  listProductForSale,
 };

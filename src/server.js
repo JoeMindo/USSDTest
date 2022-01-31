@@ -56,24 +56,17 @@ app.use((req, res, next) => {
 });
 
 app.post('/ussd', async (req, res) => {
-  const userGender = {
-    1: 'Male',
-    2: 'Female',
-  };
-
   const rawtext = req.body.text;
   const text = ussdRouter(rawtext, '0', '00');
   // TODO: Migrate this to usermanagement
-
   const textValue = text.split('*').length;
-  console.log('The text value is: ', textValue);
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
   let message;
 
   if (userStatus === false) {
-    let error = 'END ';
+    const error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue, text);
-    let { message } = menus;
+    // let { message } = menus;
     if (menus.completedStatus === true) {
       req.session.registration = text.split('*');
 
@@ -81,7 +74,7 @@ app.post('/ussd', async (req, res) => {
         first_name: req.session.registration[0],
         last_name: req.session.registration[1],
         id_no: req.session.registration[2],
-        gender: userGender[parseInt(req.session.registration[3], 10)],
+        gender: req.session.registration[3],
         password: req.session.registration[4],
         password_confirmation: req.session.registration[5],
         role_id: req.session.registration[6],
@@ -90,20 +83,12 @@ app.post('/ussd', async (req, res) => {
       const response = await registerUser(
         userDetails,
         req.body.phoneNumber,
-      ).catch(() => {
-        message = 'END Something went wrong. Please try again.';
-        res.send(message);
-      });
-      //
+      );
+      console.log('The response', response);
       if (response.status === 200) {
         message = 'END Success';
-        res.send(message);
-      } else if (response.data.status === 'error') {
-        Object.keys(response.errors).forEach((key) => {
-          error += `${response.errors[`${key}`].toString()}`;
-        });
-        message = error;
-        res.send(message);
+      } else {
+        message = 'END Something went wrong try later!';
       }
     }
     res.send(message);

@@ -10,6 +10,7 @@ import {
   addProduct,
   productsInFarm,
   updateListedProduct,
+  listProductForSale,
 } from '../../products/productmanagement.js';
 import {
   addFarm,
@@ -31,6 +32,21 @@ const end = () => 'END';
 export const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
 
 const questionanswers = {};
+export const showProductsInFarm = async (farmID) => {
+  const products = await productsInFarm(farmID);
+  const productIDs = [];
+  let productList = '';
+  products.data.message.forEach((product) => {
+    const combination = {
+      id: product.id,
+      prodID: product.product_id,
+    };
+    productIDs.push(combination);
+    client.set('productIDs', JSON.stringify(productIDs));
+    productList += `\n${product.id}. ${product.product_name}`;
+  });
+  return productList;
+};
 
 /**
  * This function is used to update the user's location.
@@ -254,7 +270,7 @@ export const renderFarmerAddProductMenu = async (textValue, text) => {
       const productId = parseInt(text.split('*')[3], 10);
       client.set('product_id', productId);
       // TODO: This should be a dynamic prompt
-      const menuPrompt = 'CON How many of bags this product do you have available for sale?';
+      const menuPrompt = 'CON How many of bags do you expect to harvest?';
       message = menuPrompt;
     } else if (textValue === 5) {
       const availableQuantity = text.split('*')[4];
@@ -291,7 +307,7 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
   userID = parseInt(userID, 10);
   const hasFarms = await getUserFarms(userID);
   const userFarms = [];
-  const productIDs = [];
+
   let message = '';
   if (hasFarms.status === 404) {
     message = 'CON Please register a farm first';
@@ -306,23 +322,21 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
   const farmID = parseInt(text.split('*')[1], 10);
 
   if (textvalue === 2 && userFarms.includes(farmID)) {
-    const products = await productsInFarm(farmID);
-    let productList = '';
-    products.data.message.forEach((product) => {
-      const combination = {
-        id: product.id,
-        prodID: product.product_id,
-      };
-      productIDs.push(combination);
-      client.set('productIDs', JSON.stringify(productIDs));
-      productList += `\n${product.id}. ${product.product_name}`;
-    });
-    message = `${con()} What product do you want to update the quantity ${productList}`;
-  } else if (textvalue === 3) {
-    message = `${con()} Enter the new quantity`;
-  } else if (textvalue === 4) {
-    const updatedQuantity = text.split('*')[3];
-    const productID = parseInt(text.split('*')[2], 10);
+    // message = `${con()} What produce do you want to update the quantity ${productList}`;
+    message = `${con()} What would you like to do?\n 1. Update quantity\n 2. List for sale`;
+  } else if (textvalue === 3 && text.split('*')[2] === '1') {
+    const list = await showProductsInFarm(farmID);
+    message = `${con()} What produce do you want to update the quantity ${list}`;
+  } else if (textvalue === 3 && text.split('*')[2] === '2') {
+    const list = await showProductsInFarm(farmID);
+    message = `${con()} What produce do you sell ${list}`;
+  } else if (textvalue === 4 && text.split('*')[2] === '1') {
+    message = `${con()} What is the new quantity?`;
+  } else if (textvalue === 4 && text.split('*')[2] === '2') {
+    message = `${con()} How many bags do you have for sale?`;
+  } else if (textvalue === 5 && text.split('*')[2] === '1') {
+    const updatedQuantity = text.split('*')[4];
+    const productID = parseInt(text.split('*')[3], 10);
     let retreivedIDs = await retreiveCachedItems(client, ['productIDs']);
     retreivedIDs = JSON.parse(retreivedIDs[0]);
     const productIdentity = retreivedIDs.find(
@@ -340,7 +354,23 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
     } else {
       message = `${end()}${updatedProduce}`;
     }
+  } else if (textvalue === 5 && text.split('*')[2] === '2') {
+    const farmProductID = text.split('*')[3];
+    const quantity = text.split('*')[4];
+    const data = {
+      farm_product_id: farmProductID,
+      units: quantity,
+      grade: '3',
+    };
+    const response = await listProductForSale(data);
+    console.log('The response here is', response);
+    if (response.status === 200) {
+      message = `${end()} You have listed for sale`;
+    } else {
+      message = `${end()} Could not list item for sale, try later`;
+    }
   }
+
   return message;
 };
 

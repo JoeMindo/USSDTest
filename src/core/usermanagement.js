@@ -19,7 +19,6 @@ const clearData = (details) => {
  */
 const registerUser = async (regdata, phone) => {
   const path = `${BASEURL}/ussd/ussdRegister`;
-  let response;
   const postdata = {
     phone_no: phone,
     first_name: regdata.first_name,
@@ -31,12 +30,8 @@ const registerUser = async (regdata, phone) => {
     password_confirmation: regdata.password_confirmation,
     gender: regdata.gender,
   };
-  try {
-    response = await axios.post(path, postdata);
-    return response;
-  } catch (error) {
-    throw new Error(error);
-  }
+  const response = await axios.post(path, postdata).catch((err) => err.response);
+  return response;
 };
 
 /**

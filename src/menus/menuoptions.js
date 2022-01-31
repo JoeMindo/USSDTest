@@ -25,7 +25,7 @@ export const menus = {
   farmer: {
     updateLocation: '1. Update Location\n',
     addFarmDetails: '2. Add Farm Details\n',
-    addProduct: '3. Add product\n',
+    addProduct: '3. Add product to farm\n',
     updateDetails: '4. Update farmer details\n',
     updateListedProduce: '5. Update listed produce',
     joinGroup: '6. Join Group\n',

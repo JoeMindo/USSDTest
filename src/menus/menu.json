@@ -17,7 +17,7 @@
     "farmer": {
         "updateLocation": "Update Location",
         "addFarmDetails": "Add Farm Details",
-        "addProduct": "Add product",
+        "addProduct": "Add product to farm",
         "updateDetails": "Update farmer details"
     },
     "farmDetails": {
