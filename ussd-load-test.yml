@@ -1,0 +1,15 @@
+config:
+  target: "https://www.mamlakafoods.com:3032/ussd"
+  phases:
+   - duration: 60
+     arrivalRate: 5
+     name: "Phase 1"
+   - duration: 120
+     arrivalRate: 5
+     rampTo: 50
+     name: "Phase 2"
+   - duration: 600
+     arrivalRate: 50
+     name: "Phase 3"
+
+  

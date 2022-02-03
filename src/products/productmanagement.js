@@ -17,6 +17,7 @@ export const itemSelection = {};
 async function fetchCategories() {
   let results = '';
   const response = await axios.get(`${BASEURL}/ussd/prodcategories`).catch((err) => err.response);
+
   if (response.status === 200) {
     response.data.data.data.forEach((category) => {
       optionProducts.push(category.id);

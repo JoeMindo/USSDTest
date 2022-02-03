@@ -64,7 +64,6 @@ app.post('/ussd', async (req, res) => {
   let message;
 
   if (userStatus === false) {
-    const error = 'END ';
     const menus = menuItems.renderRegisterMenu(textValue, text);
     // let { message } = menus;
     if (menus.completedStatus === true) {

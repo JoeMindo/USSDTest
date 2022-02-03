@@ -31,22 +31,20 @@ describe('Add product', () => {
   });
 
   it('should return an error if the user has no registered farms', async () => {
-    await getUserFarms(4).catch((error) => {
-      expect(error.response.status).to.equal(404);
-      expect(error.response.data.status).to.equal('error');
-      expect(error.response.data.message).to.equal(
-        'User has no registered farms',
-      );
-    });
+    // await getUserFarms(4).catch((error) => {
+    //   expect(error.response.status).to.equal(404);
+    //   expect(error.response.data.status).to.equal('error');
+    //   expect(error.response.data.message).to.equal(
+    //     'User has no registered farms',
+    //   );
+    // });
+    const userFarms = await getUserFarms(4);
+    expect(userFarms.status).to.equal(404);
+    expect(userFarms.data.status).to.equal('error');
+    expect(userFarms.data.message).to.equal('User has no registered farms');
   });
   it('should get all the available categories', async () => {
     const response = await fetchCategories();
     expect(typeof response).to.equal('string');
-  });
-  it('should inform the user of a server error', async () => {
-    await fetchCategories().catch((error) => {
-      expect(error.response.status).to.equal(500);
-      expect(error.response.data.data.message).to.equal('Server error');
-    });
   });
 });

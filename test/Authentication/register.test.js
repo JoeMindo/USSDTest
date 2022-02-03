@@ -164,5 +164,4 @@ describe('Registration', () => {
       'CON Submit details?\n 1.Yes\n 00. Back 0.Home',
     );
   });
-  it('should alert the user if the ID number is a duplicate', async () => {});
 });

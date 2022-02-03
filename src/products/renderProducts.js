@@ -88,60 +88,41 @@ export const checkGroupAndIndividualPrice = (status) => {
 
 export const renderOfferings = async (client, id) => {
   const status = {};
-  try {
-    const endpointUrl = `${BASEURL}/ussd/productsbyproductid`;
-    const productOffering = await axios.get(`${endpointUrl}/${id}`);
-    client.set('viewedProductID', id);
 
-    let offeringText = '';
-    if (
-      productOffering.data.message.status !== '3'
-      && productOffering.data.status !== 'error'
-    ) {
-      const offers = productOffering.data.message.data;
+  const endpointUrl = `${BASEURL}/ussd/productwithprice/product`;
+  const productOffering = await axios.get(`${endpointUrl}/${id}`).catch((err) => err.response);
+  client.set('viewedProductID', id);
 
-      offers.forEach((offer) => {
-        const userViewOffers = {};
-        offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade} `;
-        userViewOffers.id = `${offer.id}`;
-        userViewOffers.product = `${offer.product_name}`;
-        userViewOffers.farmName = `${offer.farm_name}`;
-        userViewOffers.grade = `${offer.grade}`;
-        userViewOffers.product_id = `${offer.product_id}`;
-        userViewOffers.availableUnits = `${offer.available_units}`;
+  let offeringText = '';
+  if (
+    productOffering.status === 200
+  ) {
+    const offers = productOffering.data.message.data;
 
-        if (offer.status === '0') {
-          offeringText += `KES ${offer.unit_price}`;
-          userViewOffers.unitPrice = `${offer.unit_price}`;
-          status[offer.id] = 'unit';
-        } else if (offer.status === '1') {
-          offeringText += `KES ${offer.group_price}`;
-          status[offer.id] = 'group';
-          userViewOffers.groupPrice = `${offer.group_price}`;
-        } else {
-          offeringText += `Group price: ${offer.group_price}, Unit Price: ${offer.unit_price}`;
-          userViewOffers.unitPrice = `${offer.unit_price}`;
-          userViewOffers.groupPrice = `${offer.group_price}`;
-          status[offer.id] = 'both';
-        }
-        offersArray.push(userViewOffers);
+    offers.forEach((offer) => {
+      const userViewOffers = {};
+      offeringText += `\n${offer.id}. ${offer.product_name} from ${offer.farm_name} Grade: ${offer.grade}\nKES ${offer.unit_price} `;
+      userViewOffers.id = `${offer.id}`;
+      userViewOffers.product = `${offer.product_name}`;
+      userViewOffers.farmName = `${offer.farm_name}`;
+      userViewOffers.grade = `${offer.grade}`;
+      userViewOffers.product_id = `${offer.product_id}`;
+      userViewOffers.availableUnits = `${offer.available_units}`;
+      userViewOffers.unitPrice = `${offer.unit_price}`;
+      status[offer.id] = 'unit';
+      offersArray.push(userViewOffers);
+      client.set('offersArray', JSON.stringify(offersArray));
+    });
 
-        client.set('offersArray', JSON.stringify(offersArray));
-      });
-      // offeringText += menus.viewCart;
-
-      message = `${con()} Choose one of the available options to buy. ${offeringText}`;
-    } else {
-      message = `${con()} Product not available`;
-      message += menus.footer;
-    }
-    return {
-      message,
-      status,
-    };
-  } catch (err) {
-    return err;
+    message = `${con()} Choose one of the available options to buy. ${offeringText}`;
+  } else {
+    message = `${con()} Product not available`;
+    message += menus.footer;
   }
+  return {
+    message,
+    status,
+  };
 };
 
 export const showAvailableProducts = async (client, textValue, text) => {
@@ -154,7 +135,6 @@ export const showAvailableProducts = async (client, textValue, text) => {
   } else if (textValue === 3) {
     const selection = parseInt(text.split('*')[2], 10);
     const result = await renderOfferings(client, selection);
-
     offeringStatus.push(result.status);
 
     message = result.message;
