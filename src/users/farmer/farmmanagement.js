@@ -236,7 +236,6 @@ export const inputFarmLocation = async (textValue, text, client) => {
 
     };
     const responseForAddingFarm = await addFarm(postDetails);
-    console.log('The response for adding farm', responseForAddingFarm);
 
     if (responseForAddingFarm.status === 200) {
       const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;

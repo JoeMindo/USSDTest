@@ -116,7 +116,6 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
 
     const userId = parseInt(postLocationDetails[3], 10);
     const response = await addLocation(postDetails, userId);
-    console.log('The add location response is', response);
 
     if (response.status === 201) {
       const menuPrompt = `${end()} ${menus.updateLocation.success}`;
@@ -395,7 +394,6 @@ export const renderUpdateListedProduceMenu = async (textvalue, text) => {
       grade: '3',
     };
     const response = await listProductForSale(data);
-    console.log('The response here is', response);
     if (response.status === 200) {
       message = `${end()} You have listed for sale`;
     } else {

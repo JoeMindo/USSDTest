@@ -43,7 +43,7 @@ export const getLocations = async (type, id, identifier) => {
     .get(`${BASEURL}/ussd/${type}/${id}`)
     .catch((error) => error.response);
   if (locationResult.status === 200) {
-    locationResult.data.message.data.forEach((location) => {
+    locationResult.data.message.forEach((location) => {
       locationType.push(location);
     });
     locationType.forEach((value, index) => {

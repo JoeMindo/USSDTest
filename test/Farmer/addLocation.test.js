@@ -23,7 +23,6 @@ describe('Locality details', () => {
   });
   it('should display the regions and track the region IDs', async () => {
     const response = await getRegions();
-    console.log()
     expect(typeof response.items).to.equal('string');
     expect(typeof response.ids).to.equal('object');
   });
