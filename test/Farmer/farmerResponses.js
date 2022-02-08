@@ -5,50 +5,49 @@ Location Specific
 
 export const regions = {
 
-  message: {
-    data: [
-      {
-        id_regions: 1,
-        region_name: 'Nairobi',
-        created_at: '2017-06-01 15:00:00',
-      },
-      {
-        id_regions: 2,
-        region_name: 'Central',
-        created_at: '2017-06-01 15:00:00',
-      },
-      {
-        id_regions: 3,
-        region_name: 'Rift Valley',
-        created_at: '2017-06-01 15:00:00',
-      },
-      {
-        id_regions: 4,
-        region_name: 'Nyanza',
-        created_at: '2017-06-01 15:00:00',
-      },
-      {
-        id_regions: 5,
-        region_name: 'Western',
-        created_at: '2017-06-01 15:00:00',
-      },
-      {
-        id_regions: 6,
-        region_name: 'Eastern',
-        created_at: '2017-06-01 15:00:00',
-      },
-      {
-        id_regions: 7,
-        region_name: 'North Eastern',
-        created_at: null,
-      },
-      {
-        id_regions: 8,
-        region_name: 'Coast',
-        created_at: '2017-06-01 15:00:00',
-      },
-    ],
-  },
+  message:
+     [
+       {
+         id_regions: 1,
+         region_name: 'Nairobi',
+         created_at: '2017-06-01 15:00:00',
+       },
+       {
+         id_regions: 2,
+         region_name: 'Central',
+         created_at: '2017-06-01 15:00:00',
+       },
+       {
+         id_regions: 3,
+         region_name: 'Rift Valley',
+         created_at: '2017-06-01 15:00:00',
+       },
+       {
+         id_regions: 4,
+         region_name: 'Nyanza',
+         created_at: '2017-06-01 15:00:00',
+       },
+       {
+         id_regions: 5,
+         region_name: 'Western',
+         created_at: '2017-06-01 15:00:00',
+       },
+       {
+         id_regions: 6,
+         region_name: 'Eastern',
+         created_at: '2017-06-01 15:00:00',
+       },
+       {
+         id_regions: 7,
+         region_name: 'North Eastern',
+         created_at: null,
+       },
+       {
+         id_regions: 8,
+         region_name: 'Coast',
+         created_at: '2017-06-01 15:00:00',
+       },
+     ],
 
 };
 

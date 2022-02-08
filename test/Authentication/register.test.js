@@ -9,6 +9,7 @@ import {
   registrationFailureDuplicateNumber,
   registrationFailurePasswordTooShort,
 } from './responses.js';
+import { numberValidation } from '../../src/helpers.js';
 
 describe('Registration', () => {
   const registrationData = {
@@ -135,10 +136,17 @@ describe('Registration', () => {
   it('fifth menu level should be to ask the password', () => {
     const text = 'Joe*Mindo*54712356';
     const textValue = 4;
+    const validationResponse = numberValidation(text, 3);
     const response = renderRegisterMenu(textValue, text);
-    expect(response.message).to.equal(
-      'CON Enter your password\n 00. Back 0.Home',
-    );
+    if (validationResponse === 'valid') {
+      expect(response.message).to.equal(
+        'CON Enter your password\n 00. Back 0.Home',
+      );
+    } else {
+      expect(response.message).to.equal(
+        'END Choose option 1 or 2',
+      );
+    }
   });
   it('sixth menu level should be to ask the password confirmation', () => {
     const text = 'Joe*Mindo*54712356*12345678';
@@ -159,9 +167,16 @@ describe('Registration', () => {
   it('last menu level should prompt the user to submit their details', () => {
     const text = 'Joe*Mindo*54712356*12345678*12345678*1';
     const textValue = 7;
+    const validationResponse = numberValidation(text, 6);
     const response = renderRegisterMenu(textValue, text);
-    expect(response.message).to.equal(
-      'CON Submit details?\n 1.Yes\n 00. Back 0.Home',
-    );
+    if (validationResponse === 'valid') {
+      expect(response.message).to.equal(
+        'CON Submit details?\n 1.Yes\n 00. Back 0.Home',
+      );
+    } else {
+      expect(response.message).to.equal(
+        'END Choose option 1 or 2',
+      );
+    }
   });
 });
