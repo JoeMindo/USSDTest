@@ -12,7 +12,7 @@ export const getRegions = async () => {
 
   const regionsResult = await axios.get(`${BASEURL}/ussd/regions/`).catch((err) => err.response);
   if (regionsResult.status === 200) {
-    regionsResult.data.message.data.forEach((location) => {
+    regionsResult.data.message.forEach((location) => {
       regions.push(location);
     });
     regions.forEach((value, index) => {

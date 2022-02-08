@@ -1,7 +1,14 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable import/extensions */
 /* eslint-disable import/prefer-default-export */
 import axios from 'axios';
 import { BASEURL } from '../../core/urls.js';
+import { promptToGive } from './farmerlocation.js';
+import { numberWithinRange } from '../../helpers.js';
+import { end, con } from '../../menus/rendermenu.js';
+import { menus } from '../../menus/menuoptions.js';
+import { isTextOnly } from './farmermenus.js';
+import { retreiveCachedItems } from '../../core/services.js';
 
 /**
  * It takes a farm object and sends it to the server.
@@ -144,6 +151,101 @@ export const joinGroup = async (groupID, userId) => {
     message = 'END Successfully joined group';
   } else {
     message = 'END You are already in this group';
+  }
+  return message;
+};
+
+/**
+ * This function is used to add a farm located in a different location to the database.
+ * @param textValue - The value of the text input.
+ * @param text - The text that the user has entered.
+ * @param client - The client object
+ * @returns A string.
+ */
+export const inputFarmLocation = async (textValue, text, client) => {
+  let message;
+  if (textValue === 2) {
+    const menuPrompt = await promptToGive(client, 'region');
+    message = menuPrompt;
+  } else if (textValue === 3) {
+    const validRange = numberWithinRange(text, 1);
+    if (validRange === 'valid') {
+      const regionId = parseInt(text.split('*')[2], 10);
+      const menuPrompt = await promptToGive(client, 'county', regionId);
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
+  } else if (textValue === 4) {
+    const validRange = numberWithinRange(text, 1);
+    if (validRange === 'valid') {
+      const countyId = parseInt(text.split('*')[3], 10);
+      const menuPrompt = await promptToGive(client, 'subcounty', countyId);
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
+  } else if (textValue === 5) {
+    const validRange = numberWithinRange(text, 1);
+    if (validRange === 'valid') {
+      const subcountyId = parseInt(text.split('*')[4], 10);
+      const menuPrompt = await promptToGive(client, 'location', subcountyId);
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
+  } else if (textValue === 6) {
+    let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
+    menuPrompt += menus.footer;
+    message = menuPrompt;
+  } else if (textValue === 7) {
+    if (isTextOnly(text.split('*')[6]) === true) {
+      let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+      client.set('farm_name', text.split('*')[6]);
+    } else {
+      message = 'CON Invalid input, try again';
+    }
+  } else if (textValue === 8) {
+    if (isTextOnly(text.split('*')[7]) === true) {
+      let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+      client.set('farm_location', text.split('*')[7]);
+    } else {
+      message = 'CON Invalid input, try again';
+    }
+  } else if (textValue === 9) {
+    client.set('farm_size', parseInt(text.split('*')[8], 10));
+    const farmDetails = await retreiveCachedItems(client, [
+      'farm_name',
+      'farm_location',
+      'farm_description',
+      'farm_size',
+      'user_id',
+      'userLocationSelection',
+    ]);
+    const postDetails = {
+      farm_name: farmDetails[0],
+      farm_location: farmDetails[1],
+      farm_description: 'Null',
+      farm_size: farmDetails[3],
+      user_id: farmDetails[4],
+      locationID: farmDetails[5],
+
+    };
+    const responseForAddingFarm = await addFarm(postDetails);
+    console.log('The response for adding farm', responseForAddingFarm);
+
+    if (responseForAddingFarm.status === 200) {
+      const menuPrompt = `${end()} ${menus.addfarmDetails.success}`;
+      message = menuPrompt;
+      client.set('farm_id', responseForAddingFarm.data.farm_id);
+    } else {
+      const menuPrompt = `${end()} ${responseForAddingFarm.data.message}`;
+      message = menuPrompt;
+    }
   }
   return message;
 };

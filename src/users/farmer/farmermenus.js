@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable import/extensions */
 /* eslint import/no-cycle: [2, { maxDepth: 1 }] */
 import { menus } from '../../menus/menuoptions.js';
@@ -21,17 +22,24 @@ import {
   getUserFarms,
   showGroups,
   joinGroup,
+  inputFarmLocation,
 } from './farmmanagement.js';
 
 import { responsePrompt } from '../../menus/prompts.js';
 import { promptToGive } from './farmerlocation.js';
-import { renderFarmerMenusLevelTwo } from '../../menus/rendermenu.js';
+import { renderFarmerMenusLevelTwo, renderLocationOptions } from '../../menus/rendermenu.js';
+import { numberWithinRange } from '../../helpers.js';
 
 const con = () => 'CON';
 const end = () => 'END';
 export const isTextOnly = (str) => /^[a-zA-Z]+$/.test(str);
 
 const questionanswers = {};
+/**
+ * It takes in a farm ID and returns a list of products in that farm
+ * @param farmID - The ID of the farm that you want to see the products in.
+ * @returns A string of all the products in the farm.
+ */
 export const showProductsInFarm = async (farmID) => {
   const products = await productsInFarm(farmID);
   const productIDs = [];
@@ -57,20 +65,40 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
     const menuPrompt = await promptToGive(client, 'region');
     message = menuPrompt;
   } else if (textValue === 2) {
-    const regionId = parseInt(text.split('*')[1], 10);
-    const menuPrompt = await promptToGive(client, 'county', regionId);
-    message = menuPrompt;
+    const validRange = numberWithinRange(text, 1);
+    if (validRange === 'valid') {
+      const regionId = parseInt(text.split('*')[1], 10);
+      const menuPrompt = await promptToGive(client, 'county', regionId);
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
   } else if (textValue === 3) {
-    const countyId = parseInt(text.split('*')[2], 10);
-    const menuPrompt = await promptToGive(client, 'subcounty', countyId);
-    message = menuPrompt;
+    const validRange = numberWithinRange(text, 2);
+    if (validRange === 'valid') {
+      const countyId = parseInt(text.split('*')[2], 10);
+      const menuPrompt = await promptToGive(client, 'subcounty', countyId);
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
   } else if (textValue === 4) {
-    const subcountyId = parseInt(text.split('*')[3], 10);
-    const menuPrompt = await promptToGive(client, 'location', subcountyId);
-    message = menuPrompt;
+    const validRange = numberWithinRange(text, 3);
+    if (validRange === 'valid') {
+      const subcountyId = parseInt(text.split('*')[3], 10);
+      const menuPrompt = await promptToGive(client, 'location', subcountyId);
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
   } else if (textValue === 5) {
-    const menuPrompt = await promptToGive(client, 'area');
-    message = menuPrompt;
+    const validRange = numberWithinRange(text, 4);
+    if (validRange === 'valid') {
+      const menuPrompt = await promptToGive(client, 'area');
+      message = menuPrompt;
+    } else {
+      message = `${end()} Invalid input. Please enter a number within the range.`;
+    }
   } else {
     client.set('userArea', text.split('*')[5]);
 
@@ -88,19 +116,19 @@ export const renderUpdateLocationMenu = async (textValue, text) => {
 
     const userId = parseInt(postLocationDetails[3], 10);
     const response = await addLocation(postDetails, userId);
+    console.log('The add location response is', response);
 
     if (response.status === 201) {
       const menuPrompt = `${end()} ${menus.updateLocation.success}`;
       message = menuPrompt;
     } else {
-      message = `${con()} Could not update location, ${
-        response.response.data.message
-      }`;
+      message = `${end()} Could not update location,`;
       message += menus.footer;
     }
   }
   return message;
 };
+
 /**
  * This function is used to render the menu for adding farm details.
  */
@@ -111,24 +139,26 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
 
   if (locationDetailsPresent === true) {
     if (textValue === 1) {
+      message = renderLocationOptions();
+    } else if (textValue === 2 && text.split('*')[1] === '1') {
       let menuPrompt = `${con()} ${menus.addfarmDetails[0]}`;
       menuPrompt += menus.footer;
       message = menuPrompt;
-    } else if (textValue === 2) {
-      if (isTextOnly(text.split('*')[1]) === true) {
+    } else if (textValue === 3 && text.split('*')[1] === '1') {
+      if (isTextOnly(text.split('*')[2]) === true) {
         let menuPrompt = `${con()} ${menus.addfarmDetails[1]}`;
         menuPrompt += menus.footer;
         message = menuPrompt;
-        client.set('farm_name', text.split('*')[1]);
+        client.set('farm_name', text.split('*')[2]);
       } else {
         message = 'CON Invalid input, try again';
       }
-    } else if (textValue === 3) {
+    } else if (textValue === 4 && text.split('*')[1] === '1') {
       let menuPrompt = `${con()} ${menus.addfarmDetails[4]}`;
       menuPrompt += menus.footer;
       message = menuPrompt;
-    } else if (textValue === 4) {
-      client.set('farm_size', parseInt(text.split('*')[2], 10));
+    } else if (textValue === 5 && text.split('*')[1] === '1') {
+      client.set('farm_size', parseInt(text.split('*')[3], 10));
       const farmDetails = await retreiveCachedItems(client, [
         'farm_name',
         'farm_location',
@@ -153,6 +183,8 @@ export const renderAddFarmDetailsMenu = async (textValue, text) => {
         const menuPrompt = `${end()} ${responseForAddingFarm.data.message}`;
         message = menuPrompt;
       }
+    } if (text.split('*')[1] === '2') {
+      message = await inputFarmLocation(textValue, text, client);
     }
   } else {
     message = 'CON Update your location first';

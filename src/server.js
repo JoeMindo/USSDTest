@@ -61,11 +61,12 @@ app.post('/ussd', async (req, res) => {
   // TODO: Migrate this to usermanagement
   const textValue = text.split('*').length;
   const userStatus = await checkIfUserExists(req.body.phoneNumber);
+  console.log('The textvalue is', textValue);
   let message;
 
   if (userStatus === false) {
     const menus = menuItems.renderRegisterMenu(textValue, text);
-    // let { message } = menus;
+    let { message } = menus;
     if (menus.completedStatus === true) {
       req.session.registration = text.split('*');
 

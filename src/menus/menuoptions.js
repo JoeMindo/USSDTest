@@ -31,10 +31,11 @@ export const menus = {
     joinGroup: '6. Join Group\n',
     cropCalendar: '7. Crop Calendar',
     cropCalendarMenus: '\n1. Option 1\n. Option 2. \n Option 3.',
+    addFarmLocationOption: 'Where would you like to add your farm?\n1.Registred Location\n2.Other location',
   },
   addfarmDetails: {
     0: 'Enter farm name',
-    1: 'Where is your farm\n',
+    1: 'Which area is your farm in?\n',
     2: 'Choose a category of foods that you grow\n',
     3: 'Choose a product that you grow\n',
     4: 'What is the farm size in acres',

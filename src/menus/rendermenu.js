@@ -1,4 +1,5 @@
 import { menus } from './menuoptions.js';
+import usernameValidation, { numberValidation, IdValidation } from '../helpers.js';
 
 export const con = () => 'CON';
 export const end = () => 'END';
@@ -22,21 +23,41 @@ export const renderRegisterMenu = (textValue, text) => {
     menuPrompt += menus.footer;
     message = menuPrompt;
   } else if (textValue === 1) {
-    let menuPrompt = `${con()} ${menus.register.lastname}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
+    const validationResponse = usernameValidation(text, 0);
+    if (validationResponse === 'valid') {
+      let menuPrompt = `${con()} ${menus.register.lastname}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+    } else {
+      message = `${end()} ${validationResponse}`;
+    }
   } else if (textValue === 2) {
-    let menuPrompt = `${con()} ${menus.register.idNumber}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
+    const validationResponse = usernameValidation(text, 1);
+    if (validationResponse === 'valid') {
+      let menuPrompt = `${con()} ${menus.register.idNumber}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+    } else {
+      message = `${end()} ${validationResponse}`;
+    }
   } else if (textValue === 3) {
-    let menuPrompt = `${con()} ${menus.register.gender}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
+    const validationResponse = IdValidation(text);
+    if (validationResponse === 'valid') {
+      let menuPrompt = `${con()} ${menus.register.gender}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+    } else {
+      message = `${end()} ${validationResponse}`;
+    }
   } else if (textValue === 4) {
-    let menuPrompt = `${con()} ${menus.register.password}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
+    const validationResponse = numberValidation(text, 3);
+    if (validationResponse === 'valid') {
+      let menuPrompt = `${con()} ${menus.register.password}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+    } else {
+      message = `${end()} ${validationResponse}`;
+    }
   } else if (textValue === 5) {
     let menuPrompt = `${con()} ${menus.register.confirmPassword}`;
     menuPrompt += menus.footer;
@@ -46,13 +67,18 @@ export const renderRegisterMenu = (textValue, text) => {
     menuPrompt += menus.footer;
     message = menuPrompt;
   } else if (textValue === 7) {
-    let menuPrompt = `${con()} ${menus.submitDetails}`;
-    menuPrompt += menus.footer;
-    message = menuPrompt;
+    const validationResponse = numberValidation(text, 6);
+    if (validationResponse === 'valid') {
+      let menuPrompt = `${con()} ${menus.submitDetails}`;
+      menuPrompt += menus.footer;
+      message = menuPrompt;
+    } else {
+      message = `${end()} ${validationResponse}`;
+    }
   } else if (textValue === 8 && text.split('*')[7] === '1') {
     completedStatus = true;
   } else {
-    message = 'CON Invalid choice';
+    message = 'CON Invalid input';
   }
   return {
     message,
@@ -86,6 +112,11 @@ export const renderFarmerMenus = () => {
   return message;
 };
 
+export const renderLocationOptions = () => {
+  const menuPrompt = `${con()} ${menus.farmer.addFarmLocationOption}`;
+  message = menuPrompt;
+  return message;
+};
 /**
  * This function renders the second level of the farmer menu.
  * @returns A string that is the message that is being displayed to the user.
